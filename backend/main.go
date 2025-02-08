@@ -19,6 +19,8 @@ func main() {
 	}))
 
 	r.GET("/api/random", auth.APIKeyAuth(), handlers.GetRandomNumber)
-
+	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightCorrect)
+	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightIncorrect)
+	
 	r.Run(":8080")
 }
