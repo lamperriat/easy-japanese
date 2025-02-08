@@ -8,7 +8,11 @@ function App() {
   const fetchRandomNumber = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/random');
+      const response = await fetch('http://localhost:8080/api/random', {
+        headers: {
+          'X-Api-Key': process.env.REACT_APP_API_KEY 
+        }
+      });
       const data = await response.json();
       setRandomNumber(data.random);
     } catch (error) {
