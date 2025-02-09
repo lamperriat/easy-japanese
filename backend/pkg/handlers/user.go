@@ -34,7 +34,7 @@ func UpdateWordWeightIncorrect(c *gin.Context) {
 
 
 func updateWordWeight(c *gin.Context, query queryType) error {
-	userID := c.GetHeader("X-User-ID")
+	userID := c.GetHeader("X-API-KEY") // for convenience, we use the API key as the user ID
 	wordIDStr := c.Param("wordId")
 	wordID, err := strconv.Atoi(wordIDStr)
 	if err != nil {
@@ -81,7 +81,13 @@ func loadUserData(userID string, target *models.User) error {
 	file, err := os.ReadFile(path)
 	// create the file if it doesn't exist
 	if os.IsNotExist(err) {
-		return saveUserData(userID, target)
+		target.ID = userID
+		file, err := os.Create(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		return nil
 	}
 	if err != nil {
 		return err
@@ -91,11 +97,6 @@ func loadUserData(userID string, target *models.User) error {
 }
 
 func saveUserData(userID string, data *models.User) error {
-    if data == nil {
-        data = &models.User{} // Initialize with default value
-		data.ID = userID
-    }
-	
 	path := filepath.Join("data", "users", userID+".json")
 	file, err := json.Marshal(data)
 	if err != nil {

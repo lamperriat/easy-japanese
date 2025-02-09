@@ -1,0 +1,39 @@
+[
+    {
+        "id": 1,
+        "kanji": "数学",
+        "chinese": "数学",
+        "katakana": "",
+        "hiragana": "すうがく",
+        "type": "名词",
+        "example": []
+    },
+    {
+        "id": 2,
+        "kanji": "専門",
+        "chinese": "专门",
+        "katakana": "",
+        "hiragana": "せんもん",
+        "type": "名词",
+        "example": [
+            {
+                "sentence": "私は専門が数学です。",
+                "chinese": "我专业是数学。"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "kanji": "女優",
+        "chinese": "女演员",
+        "katakana": "",
+        "hiragana": "じょゆう", 
+        "type": "名词",
+        "example": [
+            {
+                "sentence": "女優になりたい",
+                "chinese": "想成为女演员。"
+            }
+        ]
+    }
+]

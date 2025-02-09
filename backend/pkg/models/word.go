@@ -12,6 +12,7 @@ type JapaneseWord struct {
 	Chinese  string            `json:"chinese"`
 	Katakana string            `json:"katakana"` 
 	Hiragana string            `json:"hiragana"`
+	Type     string            `json:"type"` // specific to verb and adj
 	Example  []ExampleSentence `json:"example"`
 }
 
