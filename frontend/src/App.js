@@ -1,43 +1,16 @@
-import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage.js';
+import WordEditorPage from './pages/WordEditorPage.js';
+import Navigation from './components/Navigation.js';
 import './App.css';
-
-function App() {
-  const [randomNumber, setRandomNumber] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const fetchRandomNumber = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost:8080/api/random', {
-        headers: {
-          'X-Api-Key': process.env.REACT_APP_API_KEY 
-        }
-      });
-      const data = await response.json();
-      setRandomNumber(data.random);
-    } catch (error) {
-      console.error('Error fetching random number:', error);
-    }
-    setLoading(false);
-  };
-
+export default function App() {
   return (
-    <div className="App">
-      <h1>Random Number Generator</h1>
-      <button 
-        onClick={fetchRandomNumber}
-        disabled={loading}
-      >
-        {loading ? 'Loading...' : 'Get Random Number'}
-      </button>
-      {randomNumber !== null && (
-        <div className="result">
-          <h2>Your Random Number:</h2>
-          <p>{randomNumber}</p>
-        </div>
-      )}
-    </div>
+    <Router>
+      <Navigation />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/word-editor" element={<WordEditorPage />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;

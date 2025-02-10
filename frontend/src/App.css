@@ -1,46 +1,153 @@
-.App {
-  text-align: center;
-  padding: 2rem;
-  min-height: 100vh;
-  background-color: #f0f2f5;
+.main-nav {
+  background: #2c3e50;
+  padding: 1rem;
 }
 
-button {
-  padding: 12px 24px;
-  font-size: 1.1rem;
-  background-color: #007bff;
+.main-nav ul {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav a {
   color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.main-nav a:hover {
+  background: #34495e;
+}
+
+/* 表单样式 */
+.word-editor {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-group textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.button-group button {
+  flex: 1;
+  padding: 1rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 1rem;
+  transition: opacity 0.2s;
 }
 
-button:hover {
-  background-color: #0056b3;
+.button-group button:first-child {
+  background: #3498db;
+  color: white;
 }
 
-button:disabled {
-  background-color: #6c757d;
+.button-group button:last-child {
+  background: #27ae60;
+  color: white;
+}
+
+.button-group button:disabled {
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
-.result {
-  margin-top: 2rem;
+.api-message {
+  margin-top: 1rem;
   padding: 1rem;
-  background-color: white;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+
+.home-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.main-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.main-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.main-header h2 {
+  font-size: 1.5rem;
+  color: #666;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.word-editor-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.editor-content {
+  margin-top: 2rem;
+}
+
+.word-form-section {
+  background: #fff;
+  padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.result h2 {
+.word-form-section h3 {
+  margin-bottom: 1.5rem;
   color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.result p {
-  font-size: 2rem;
-  color: #007bff;
-  font-weight: bold;
-  margin: 0;
 }
