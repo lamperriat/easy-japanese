@@ -17,7 +17,7 @@
         "type": "名词",
         "example": [
             {
-                "sentence": "私は専門が数学です。",
+                "example": "私は専門が数学です。",
                 "chinese": "我专业是数学。"
             }
         ]
@@ -31,7 +31,7 @@
         "type": "名词",
         "example": [
             {
-                "sentence": "女優になりたい",
+                "example": "女優になりたい",
                 "chinese": "想成为女演员。"
             }
         ]

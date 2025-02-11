@@ -1,7 +1,7 @@
 package models
 
 type ExampleSentence struct {
-    Sentence    string `json:"sentence"`
+    Sentence    string `json:"example"`
     Chinese     string `json:"chinese"`
 }
 
