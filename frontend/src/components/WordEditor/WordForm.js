@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { API_BASE_URL } from '../../services/api';
 export default function WordForm() {
   const [formData, setFormData] = useState({
-    id: '',
+    id: 0,
     kanji: '',
     chinese: '',
     katakana: '',
@@ -9,7 +10,6 @@ export default function WordForm() {
     type: '',
     example: []
   });
-  
   const [selectedBook, setSelectedBook] = useState('1');
   const [apiMessage, setApiMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,8 +25,8 @@ export default function WordForm() {
     setIsLoading(true);
     try {
       const endpoint = actionType === 'check' 
-        ? '/api/words/check' 
-        : `/api/words/book_${selectedBook}/submit`;
+        ? `${API_BASE_URL}/api/words/book_${selectedBook}/check`
+        : `${API_BASE_URL}/api/words/book_${selectedBook}/submit`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -38,7 +38,7 @@ export default function WordForm() {
       });
 
       const result = await response.json();
-      setApiMessage(result.message || "操作成功");
+      setApiMessage(result.error || result.message || "操作成功");
     } catch (error) {
       setApiMessage("网络请求失败");
     }
@@ -90,8 +90,8 @@ export default function WordForm() {
           <div className="form-group">
             <label>中文</label>
             <input
-              value={formData.kanji}
-              onChange={(e) => setFormData({...formData, kanji: e.target.value})}
+              value={formData.chinese}
+              onChange={(e) => setFormData({...formData, chinese: e.target.value})}
             />
           </div>
         </div>
@@ -99,8 +99,8 @@ export default function WordForm() {
           <div className="form-group">
             <label>片假名</label>
             <input
-              value={formData.kanji}
-              onChange={(e) => setFormData({...formData, kanji: e.target.value})}
+              value={formData.katakana}
+              onChange={(e) => setFormData({...formData, katakana: e.target.value})}
             />
           </div>          
           <div className="form-group">
@@ -110,9 +110,6 @@ export default function WordForm() {
               onChange={(e) => setFormData({...formData, hiragana: e.target.value})}
             />
           </div>
-        
-
-
         </div>
 
         {/* <div className="form-group">

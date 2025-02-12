@@ -1,5 +1,4 @@
 import React from 'react';
-import Navigation from '../components/Navigation';
 import WordForm from '../components/WordEditor/WordForm';
 
 export default function WordEditorPage() {
