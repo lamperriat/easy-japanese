@@ -151,3 +151,17 @@
   margin-bottom: 1.5rem;
   color: #333;
 }
+
+.form-control {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+select.form-control {
+  background-color: white;
+  cursor: pointer;
+}

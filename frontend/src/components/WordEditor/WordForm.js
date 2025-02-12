@@ -10,15 +10,23 @@ export default function WordForm() {
     example: []
   });
   
+  const [selectedBook, setSelectedBook] = useState('1');
   const [apiMessage, setApiMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const bookOptions = [
+    { id: '1', name: '新标日初级上' },
+    { id: '2', name: '新标日初级下' },
+    { id: '3', name: '新标日中级上' },
+    { id: '4', name: '新标日中级下' },
+    { id: '5', name: '新标日高级上' },
+    { id: '6', name: '新标日高级下' },
+  ];
   const handleSubmit = async (actionType) => {
     setIsLoading(true);
     try {
       const endpoint = actionType === 'check' 
         ? '/api/words/check' 
-        : '/api/words/submit';
+        : `/api/words/book_${selectedBook}/submit`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -40,6 +48,19 @@ export default function WordForm() {
   return (
     <div className="word-editor">
       <form>
+        <div className="form-row">
+          <label htmlFor="book-select">选择教材:</label>
+          <select
+            id="book-select"
+            value={selectedBook}
+            onChange={(e) => setSelectedBook(e.target.value)}
+            className="form-control"
+          >
+            {bookOptions.map(book => (
+              <option key={book.id} value={book.id}>{book.name}</option>
+            ))}
+          </select>
+        </div>
         <div className='form-row'>
         <div className="form-group">
           <label>ID(留空会填补默认值)</label>
