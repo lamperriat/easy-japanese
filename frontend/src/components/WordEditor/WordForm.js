@@ -10,6 +10,17 @@ export default function WordForm() {
     type: '',
     example: []
   });
+  const resetForm = () => {
+    setFormData({
+      id: 0,
+      kanji: '',
+      chinese: '',
+      katakana: '',
+      hiragana: '',
+      type: '',
+      example: []
+    });
+  }
   const [selectedBook, setSelectedBook] = useState('1');
   const [apiMessage, setApiMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +49,9 @@ export default function WordForm() {
       });
 
       const result = await response.json();
+      if (response.ok && actionType == "submit") {
+        resetForm();
+      }
       setApiMessage(result.error || result.message || "操作成功");
     } catch (error) {
       setApiMessage("网络请求失败");
@@ -73,8 +87,8 @@ export default function WordForm() {
         <div className="form-group">
           <label>类型</label>
           <input
-            value={formData.english}
-            onChange={(e) => setFormData({...formData, english: e.target.value})}
+            value={formData.type}
+            onChange={(e) => setFormData({...formData, type: e.target.value})}
           />
         </div>
         </div>

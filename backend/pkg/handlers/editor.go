@@ -25,12 +25,17 @@ func CheckSimilarWords(c *gin.Context) {
 	}
 	var similarWords []string
 	for _, word := range words {
-		if word.Kanji == uploadedWord.Kanji || word.Katakana == uploadedWord.Katakana {
-			similarWords = append(similarWords, word.Chinese)
-			break
+		if word.Kanji != "" && word.Kanji == uploadedWord.Kanji {
+			similarWords = append(similarWords, word.Kanji)
+		} else if word.Katakana != "" && word.Katakana == uploadedWord.Katakana {
+			similarWords = append(similarWords, word.Katakana)
 		}
 	}
-	c.JSON(200, gin.H{"similarWords": similarWords})
+	msg := "Found similar words: "
+	for _, word := range similarWords {
+		msg += word + ", "
+	}
+	c.JSON(200, gin.H{"message": msg})
 }
 
 func AddWord(c *gin.Context) {
@@ -82,7 +87,7 @@ func loadDict(dictName string) ([]models.JapaneseWord, error) {
 func saveDict(dictName string, data []models.JapaneseWord) error {
 	dictName = dictName + ".json"
 	path := filepath.Join("data", "japanese", dictName)
-	file, err := json.Marshal(data)
+	file, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
 	}
