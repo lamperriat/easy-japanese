@@ -22,6 +22,7 @@ func main() {
 	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightCorrect)
 	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightIncorrect)
 	r.POST("/api/words/:dictName/check", auth.APIKeyAuth(), handlers.CheckSimilarWords)
-	r.POST("/api/words/:dictName/submit", auth.APIKeyAuth(), handlers.AddWord)	
+	r.POST("/api/words/:dictName/submit", auth.APIKeyAuth(), handlers.AddWord)
+	r.GET("/api/dict/:dictName/get", auth.APIKeyAuth(), handlers.GetDict)	
 	r.Run(":8080")
 }
