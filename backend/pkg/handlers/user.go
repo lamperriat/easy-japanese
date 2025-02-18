@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/pkg/models"
+	"backend/pkg/sync"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -43,6 +44,13 @@ func updateWordWeight(c *gin.Context, query queryType) error {
 	}
 
 	var user models.User
+	userIDInt, err := strconv.Atoi(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return err
+	}
+	sync.GetUserMutex(userIDInt).Lock()
+	defer sync.GetUserMutex(userIDInt).Unlock()
 	if err := loadUserData(userID, &user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		return err

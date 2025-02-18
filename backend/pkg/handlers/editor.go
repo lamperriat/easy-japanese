@@ -69,6 +69,31 @@ func AddWord(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "Word added successfully"})
 }
 
+func EditWord(c *gin.Context) {
+	dictName := c.Param("dictName")
+	words, err := loadDict(dictName)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to load dictionary"})
+		return
+	}
+	var newWord models.JapaneseWord
+	if err := c.ShouldBindJSON(&newWord); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid request body"})
+		return
+	}
+	for i, word := range words {
+		if word.ID == newWord.ID {
+			words[i] = newWord
+			break
+		}
+	}
+	if err := saveDict(dictName, words); err != nil {
+		c.JSON(500, gin.H{"error": "Failed to save dictionary"})
+		return
+	}
+	c.JSON(200, gin.H{"message": "Word edited successfully"})
+}
+
 func loadDict(dictName string) ([]models.JapaneseWord, error) {
 	dictName = dictName + ".json"
 	path := filepath.Join("data", "japanese", dictName)
