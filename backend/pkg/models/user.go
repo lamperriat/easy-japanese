@@ -1,8 +1,7 @@
 package models
 
 type User struct {
-    ID       string     `json:"id"`
-    Username string     `json:"username"`
-    Learned  []UserWord `json:"learned"`
+    ID       string     `gorm:"primaryKey"`
+    Username string     `gorm:"uniqueIndex"`
+    Learned  []UserWord `gorm:"foreignKey:UserID"`
 }
-
