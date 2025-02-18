@@ -1,20 +1,21 @@
 package models
 
 type ExampleSentence struct {
-    ID             uint   `gorm:"primaryKey"`
-    JapaneseWordID uint    // foreign key
-    Sentence       string `gorm:"type:text"`
-    Chinese        string `gorm:"type:text"`
+    ID             uint   `json:"-" gorm:"primaryKey"`
+    JapaneseWordID uint   `json:"-" gorm:"column:japanese_word_id"` // foreign key
+    Sentence       string `json:"example" gorm:"type:text"`
+    Chinese        string `json:"chinese" gorm:"type:text"`
 }
 
 type JapaneseWord struct {
-    ID        uint              `gorm:"primaryKey"`
-    Kanji     string            `gorm:"index"`
-    Chinese   string            `gorm:"index"`
-    Katakana  string            `gorm:"type:varchar(255)"` 
-    Hiragana  string            `gorm:"type:varchar(255)"`
-    Type      string            `gorm:"type:varchar(255)"`
-    Examples  []ExampleSentence `gorm:"foreignKey:JapaneseWordID"`
+    ID        uint              `json:"id" gorm:"primaryKey;<-:create"`
+    DictName  string            `json:"-" gorm:"index:idx_dict"`
+    Kanji     string            `json:"kanji" gorm:"index:idx_dict,priority:1"`
+    Chinese   string            `json:"chinese"`
+    Katakana  string            `json:"katakana" gorm:"index:idx_dict,priority:2"` 
+    Hiragana  string            `json:"hiragana"`
+    Type      string            `json:"type"`
+    Examples  []ExampleSentence `json:"example" gorm:"foreignKey:JapaneseWordID"`
 }
 
 const (
