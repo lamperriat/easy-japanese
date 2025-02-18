@@ -20,52 +20,127 @@ const WordSearchPage = () => {
   const [isLoading, setIsLoading] = useState(false); // 控制加载状态
   const [apiMessage, setApiMessage] = useState(''); // 显示 API 消息
 
-  // 获取词库数据
-  const fetchWordList = async () => {
+  // // 通用获取单词数据的函数
+  // const fetchWords = async (endpoint, method = 'GET', body = null) => {
+  //   setIsLoading(true);
+  //   setApiMessage('');
+  //   try {
+  //     const response = await fetch(endpoint, {
+  //       method,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'X-API-Key': process.env.REACT_APP_API_KEY,
+  //       },
+  //       body: body ? JSON.stringify(body) : null,
+  //     });
+
+  //     const result = await response.json();
+  //     console.log("API Response:", result); // 打印返回的数据
+  //     if (response.ok) {
+  //       return result;
+  //     } else {
+  //       setApiMessage(result.error || '获取词表失败');
+  //       return [];
+  //     }
+  //   } catch (error) {
+  //     setApiMessage('网络请求失败');
+  //     return [];
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const fetchWords = async (endpoint, method = 'GET', body = null) => {
     setIsLoading(true);
     setApiMessage('');
     try {
-      const endpoint = `${API_BASE_URL}/api/dict/book_${selectedBook}/get`;
-
       const response = await fetch(endpoint, {
-        method: 'GET',
+        method,
         headers: {
           'Content-Type': 'application/json',
           'X-API-Key': process.env.REACT_APP_API_KEY,
         },
+        body: body ? JSON.stringify(body) : null,
       });
-
-      const result = await response.json();
-      if (response.ok) {
-        setWords(result.words || []);
-        setFilteredWords(result.words || []); // 初始状态下展示所有词汇
-      } else {
-        setApiMessage(result.error || '获取词表失败');
+  
+      const responseText = await response.text(); // 获取原始的响应文本
+      console.log("Raw API Response:", responseText); // 打印原始响应
+  
+      try {
+        const result = JSON.parse(responseText); // 尝试将响应文本解析为 JSON
+        console.log("Parsed API Response:", result); // 打印解析后的 JSON
+  
+        if (response.ok) {
+          return Array.isArray(result) ? result : result.words || result.data || [];
+        } else {
+          setApiMessage(result.error || '获取词表失败');
+          return [];
+        }
+      } catch (error) {
+        console.error("JSON Parsing Error:", error); // 打印 JSON 解析错误
+        // setApiMessage('解析API响应失败: 非法的 JSON 格式');
+        return [];
       }
+  
     } catch (error) {
-      setApiMessage('网络请求失败');
+      console.error("Fetch Error:", error); // 打印 fetch 请求错误
+      setApiMessage('网络请求失败: ' + error.message);
+      return [];
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
+  };
+  
+
+  // 获取词库数据
+  const fetchWordList = async () => {
+    const endpoint = `${API_BASE_URL}/api/dict/book_${selectedBook}/get`;
+    const words = await fetchWords(endpoint);
+    console.log("Fetched Word List:", words); // 打印获取的词库
+    setWords(words); // 更新词库数据
+  };
+
+  // // 获取相似单词
+  // const fetchSimilarWords = async (query) => {
+  //   const endpoint = `${API_BASE_URL}/api/dict/book_${selectedBook}/search`;
+  //   const words = await fetchWords(endpoint, 'POST', { query });
+  //   console.log("Fetched Similar Words:", words); // 打印获取的相似单词
+  //   setFilteredWords(words); // 更新为返回的相似单词
+  // };
+
+  const fetchSimilarWords = async (query) => {
+    const endpoint = `${API_BASE_URL}/api/dict/book_${selectedBook}/search`;
+    const words = await fetchWords(endpoint, 'POST', { query });
+    if (words.length > 0) {
+      setFilteredWords(words); // 更新为返回的相似单词
+    } else {
+      setFilteredWords([]); // 如果没有数据，清空列表
+    }
   };
 
   // 监听教材选择变化，获取词库数据
   useEffect(() => {
     if (selectedBook) {
-      fetchWordList();
+      fetchWordList(); // 选择教材时，加载所有单词
     }
   }, [selectedBook]);
+
+  // 监听 words 数据变化，更新 filteredWords
+  useEffect(() => {
+    setFilteredWords(words); // 每当 words 更新时，更新 filteredWords
+    console.log("Filtered Words Updated:", words); // 打印更新后的filteredWords
+  }, [words]);
 
   // 处理搜索功能
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (!query.trim()) {
-      setFilteredWords(words); // 为空时显示所有词
-      return;
+      // 如果没有输入，显示所有单词
+      setFilteredWords(words); // 恢复到所有的单词列表
+      setApiMessage('');  // 清空消息
+    } else {
+      fetchSimilarWords(query); // 有输入时，发起请求获取相似单词
     }
-    const filtered = words.filter((word) =>
-      String(word).toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredWords(filtered);
   };
 
   return (
@@ -111,7 +186,14 @@ const WordSearchPage = () => {
           <h3>单词列表</h3>
           <ul>
             {filteredWords.length > 0 ? (
-              filteredWords.map((word, index) => <li key={index}>{word}</li>)
+              filteredWords.map((word, index) => (
+                <li key={index}>
+                  <div>Kanji: {word.kanji || '无'}</div>
+                  <div>Chinese: {word.chinese || '无'}</div>
+                  <div>Hiragana: {word.hiragana || '无'}</div>
+                  <div>Katakana: {word.katakana || '无'}</div>
+                </li>
+              ))
             ) : (
               <li>没有找到匹配的单词。</li>
             )}
