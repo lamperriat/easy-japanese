@@ -58,14 +58,14 @@ func updateWordWeight(c *gin.Context, query queryType) error {
 
 	var word *models.UserWord
 	for i, w := range user.Learned {
-		if w.ID == wordID {
+		if int(w.WordID) == wordID {
 			word = &user.Learned[i]
 			break
 		}
 	}
 	if word == nil {
 		user.Learned = append(user.Learned, models.UserWord{
-			ID: wordID,
+			WordID: uint(wordID),
 			Weight: models.DefaultWeight,
 			UserNote: "",
 		})
