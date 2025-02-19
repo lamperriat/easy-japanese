@@ -82,10 +82,10 @@ func (h *WordHandler) AddWord(c *gin.Context) {
     err := h.db.Transaction(func(tx *gorm.DB) error {
         var existCount int64
         if err := tx.Model(&models.JapaneseWord{}).
-            Where("dict_name = ? AND (kanji = ? OR katakana = ?)", 
-                dictName, 
-                newWord.Kanji, 
-                newWord.Katakana).
+            Where("dict_name = ? AND ((kanji != '' AND kanji = ?) OR (katakana != '' AND katakana = ?))", 
+            dictName, 
+            newWord.Kanji, 
+            newWord.Katakana).
             Count(&existCount).Error; err != nil {
             return err
         }
@@ -98,14 +98,16 @@ func (h *WordHandler) AddWord(c *gin.Context) {
             return err
         }
 
-        if len(newWord.Examples) > 0 {
-            for i := range newWord.Examples {
-                newWord.Examples[i].JapaneseWordID = newWord.ID
-            }
-            if err := tx.Create(&newWord.Examples).Error; err != nil {
-                return err
-            }
-        }
+        // if len(newWord.Examples) > 0 {
+        //     log.Printf("Adding %d examples", len(newWord.Examples))
+        //     for i := range newWord.Examples {
+        //         newWord.Examples[i].JapaneseWordID = newWord.ID
+        //         newWord.Examples[i].ID = 0
+        //     }
+        //     if err := tx.Create(&newWord.Examples).Error; err != nil {
+        //         return err
+        //     }
+        // }
         return nil
     })
 
@@ -154,6 +156,7 @@ func (h *WordHandler) EditWord(c *gin.Context) {
         if len(editedWord.Examples) > 0 {
             for i := range editedWord.Examples {
                 editedWord.Examples[i].JapaneseWordID = editedWord.ID
+                editedWord.Examples[i].ID = 0
             }
             if err := tx.Create(&editedWord.Examples).Error; err != nil {
                 return err
