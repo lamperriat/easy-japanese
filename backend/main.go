@@ -30,6 +30,7 @@ func main() {
 	r.POST("/api/words/:dictName/check", auth.APIKeyAuth(), wordHandler.CheckSimilarWords)
 	r.POST("/api/words/:dictName/submit", auth.APIKeyAuth(), wordHandler.AddWord)
 	r.POST("/api/words/:dictName/edit", auth.APIKeyAuth(), wordHandler.EditWord)
+	r.POST("/api/words/:dictName/delete", auth.APIKeyAuth(), wordHandler.DeleteWord)
 	r.GET("/api/dict/:dictName/get", auth.APIKeyAuth(), handlers.GetDict)	
 	r.Run(":8080")
 }
