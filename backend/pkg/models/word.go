@@ -1,19 +1,21 @@
 package models
 
 type ExampleSentence struct {
-    Sentence    string `json:"example"`
-    Chinese     string `json:"chinese"`
+    ID             uint   `json:"-" gorm:"primaryKey"`
+    JapaneseWordID uint   `json:"-" gorm:"column:japanese_word_id"` // foreign key
+    Sentence       string `json:"example" gorm:"type:text"`
+    Chinese        string `json:"chinese" gorm:"type:text"`
 }
 
-// Empty string if a field is not available
 type JapaneseWord struct {
-	ID       int               `json:"id"` // unique identifier
-	Kanji    string            `json:"kanji"`
-	Chinese  string            `json:"chinese"`
-	Katakana string            `json:"katakana"` 
-	Hiragana string            `json:"hiragana"`
-	Type     string            `json:"type"` // specific to verb and adj
-	Example  []ExampleSentence `json:"example"`
+    ID        uint              `json:"id" gorm:"primaryKey;<-:create"`
+    DictName  string            `json:"-" gorm:"index:idx_dict"`
+    Kanji     string            `json:"kanji" gorm:"index:idx_dict,priority:1"`
+    Chinese   string            `json:"chinese"`
+    Katakana  string            `json:"katakana" gorm:"index:idx_dict,priority:2"` 
+    Hiragana  string            `json:"hiragana"`
+    Type      string            `json:"type"`
+    Examples  []ExampleSentence `json:"example" gorm:"foreignKey:JapaneseWordID"`
 }
 
 const (
@@ -24,7 +26,8 @@ const (
 )
 
 type UserWord struct {
-	ID       int    `json:"id"`
-	Weight   int    `json:"weight"` // 1 to 500
-	UserNote string `json:"note"`
+    UserID    string `gorm:"primaryKey"`
+    WordID    uint   `gorm:"primaryKey"`
+    Weight    int    `gorm:"check:weight BETWEEN 1 AND 500"`
+    UserNote  string `gorm:"type:text"`
 }
