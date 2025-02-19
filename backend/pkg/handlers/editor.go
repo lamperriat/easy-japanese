@@ -2,12 +2,9 @@ package handlers
 
 import (
 	"backend/pkg/models"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -229,20 +226,20 @@ func (h *WordHandler) DeleteWord(c *gin.Context) {
 }
 
 
-func loadDict(dictName string) ([]models.JapaneseWord, error) {
-	dictName = dictName + ".json"
-	path := filepath.Join("data", "japanese", dictName)
-	file, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
+// func loadDict(dictName string) ([]models.JapaneseWord, error) {
+// 	dictName = dictName + ".json"
+// 	path := filepath.Join("data", "japanese", dictName)
+// 	file, err := os.ReadFile(path)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	var words []models.JapaneseWord
-	if err := json.Unmarshal(file, &words); err != nil {
-		return nil, err
-	}
-	return words, nil
-}
+// 	var words []models.JapaneseWord
+// 	if err := json.Unmarshal(file, &words); err != nil {
+// 		return nil, err
+// 	}
+// 	return words, nil
+// }
 
 // func saveDict(dictName string, data []models.JapaneseWord) error {
 // 	dictName = dictName + ".json"
