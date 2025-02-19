@@ -20,35 +20,6 @@ const WordSearchPage = () => {
   const [isLoading, setIsLoading] = useState(false); // 控制加载状态
   const [apiMessage, setApiMessage] = useState(''); // 显示 API 消息
 
-  // // 通用获取单词数据的函数
-  // const fetchWords = async (endpoint, method = 'GET', body = null) => {
-  //   setIsLoading(true);
-  //   setApiMessage('');
-  //   try {
-  //     const response = await fetch(endpoint, {
-  //       method,
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'X-API-Key': process.env.REACT_APP_API_KEY,
-  //       },
-  //       body: body ? JSON.stringify(body) : null,
-  //     });
-
-  //     const result = await response.json();
-  //     console.log("API Response:", result); // 打印返回的数据
-  //     if (response.ok) {
-  //       return result;
-  //     } else {
-  //       setApiMessage(result.error || '获取词表失败');
-  //       return [];
-  //     }
-  //   } catch (error) {
-  //     setApiMessage('网络请求失败');
-  //     return [];
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const fetchWords = async (endpoint, method = 'GET', body = null) => {
     setIsLoading(true);
@@ -78,7 +49,7 @@ const WordSearchPage = () => {
         }
       } catch (error) {
         console.error("JSON Parsing Error:", error); // 打印 JSON 解析错误
-        // setApiMessage('解析API响应失败: 非法的 JSON 格式');
+         setApiMessage('解析API响应失败: 非法的 JSON 格式');
         return [];
       }
   
