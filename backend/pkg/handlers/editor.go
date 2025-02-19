@@ -184,6 +184,50 @@ func (h *WordHandler) EditWord(c *gin.Context) {
 	})
 }
 
+func (h *WordHandler) DeleteWord(c *gin.Context) {
+	dictName := c.Param("dictName")
+	var wordToDelete models.JapaneseWord
+
+	if err := c.ShouldBindJSON(&wordToDelete); err != nil {
+		c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON format"})
+		return
+	}
+
+	wordToDelete.DictName = dictName    
+    
+    err := h.db.Transaction(func(tx *gorm.DB) error {
+        var existing models.JapaneseWord
+        if err := tx.Where("id = ? AND dict_name = ?", wordToDelete.ID, dictName).
+            First(&existing).Error; err != nil {
+            return err
+        }
+        if err := tx.Where("japanese_word_id = ?", wordToDelete.ID).
+            Delete(&models.ExampleSentence{}).Error; err != nil {
+            return err
+        }
+        if err := tx.Delete(&wordToDelete).Error; err != nil {
+            return err
+        }
+        return nil
+    })
+
+    if err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(http.StatusNotFound, gin.H{
+                "error": fmt.Sprintf("Word %d not found in %s", wordToDelete.ID, dictName),
+            })
+        } else {
+            c.JSON(http.StatusInternalServerError, gin.H{
+                "error": "Delete failed: " + err.Error(),
+            })
+        }
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Word deleted",
+    })
+}
+
 
 func loadDict(dictName string) ([]models.JapaneseWord, error) {
 	dictName = dictName + ".json"
