@@ -143,7 +143,7 @@ func (h *WordHandler) EditWord(c *gin.Context) {
 			return err
 		}
 		if err := tx.Model(&existing).
-			Omit("id", "dict_name").
+			Omit("id", "dict_name", "Examples").
 			Updates(&editedWord).Error; err != nil {
 			return err
 		}
@@ -152,7 +152,6 @@ func (h *WordHandler) EditWord(c *gin.Context) {
 			Delete(&models.ExampleSentence{}).Error; err != nil {
 			return err
 		}
-
         if len(editedWord.Examples) > 0 {
             for i := range editedWord.Examples {
                 editedWord.Examples[i].JapaneseWordID = editedWord.ID
