@@ -102,21 +102,27 @@ const WordSearchPage = () => {
 
   // // 获取相似单词
   // const fetchSimilarWords = async (query) => {
-  //   const endpoint = `${API_BASE_URL}/api/dict/book_${selectedBook}/search`;
+  //   const endpoint = `${API_BASE_URL}/api/words/${selectedBook}/check`;
   //   const words = await fetchWords(endpoint, 'POST', { query });
-  //   console.log("Fetched Similar Words:", words); // 打印获取的相似单词
-  //   setFilteredWords(words); // 更新为返回的相似单词
+  //   if (words.length > 0) {
+  //     setFilteredWords(words); // 更新为返回的相似单词
+  //   } else {
+  //     setFilteredWords([]); // 如果没有数据，清空列表
+  //   }
   // };
 
-  const fetchSimilarWords = async (query) => {
-    const endpoint = `${API_BASE_URL}/api/dict/book_${selectedBook}/search`;
-    const words = await fetchWords(endpoint, 'POST', { query });
-    if (words.length > 0) {
-      setFilteredWords(words); // 更新为返回的相似单词
-    } else {
-      setFilteredWords([]); // 如果没有数据，清空列表
-    }
-  };
+  // 获取相似单词
+const fetchSimilarWords = async (query) => {
+  const endpoint = `${API_BASE_URL}/api/words/${selectedBook}/check`;
+  const response = await fetchWords(endpoint, 'POST', { query });
+  
+  // 检查返回的数据中是否有 similar 字段
+  if (response.similar && response.similar.length > 0) {
+    setFilteredWords(response.similar); // 更新为返回的相似单词
+  } else {
+    setFilteredWords([]); // 如果没有数据，清空列表
+  }
+};
 
   // 监听教材选择变化，获取词库数据
   useEffect(() => {
