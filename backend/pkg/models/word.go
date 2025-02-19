@@ -16,6 +16,7 @@ type JapaneseWord struct {
     Hiragana  string            `json:"hiragana"`
     Type      string            `json:"type"`
     Examples  []ExampleSentence `json:"example" gorm:"foreignKey:JapaneseWordID"`
+<<<<<<< HEAD
 }
 
 type ReadingMaterial struct {
@@ -35,6 +36,8 @@ type Grammar struct {
     ID          uint   `json:"id" gorm:"primaryKey"`
     Description string `json:"description" gorm:"type:text"`
     Examples    []GrammarExample `json:"example" gorm:"foreignKey:GrammarID"`
+=======
+>>>>>>> 81d02e8 (merge: Update main with sqlite features (#6))
 }
 
 const (
@@ -49,6 +52,7 @@ type UserWord struct {
     WordID    uint   `gorm:"primaryKey"`
     Weight    int    `gorm:"check:weight BETWEEN 1 AND 500"`
     UserNote  string `gorm:"type:text"`
+<<<<<<< HEAD
 }
 
 type SearchResult[T any] struct {
@@ -57,3 +61,6 @@ type SearchResult[T any] struct {
     PageSize int   `json:"pageSize"`
     Results  []T   `json:"results"`
 }
+=======
+}
+>>>>>>> 81d02e8 (merge: Update main with sqlite features (#6))

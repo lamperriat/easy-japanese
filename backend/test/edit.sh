@@ -21,6 +21,7 @@
 # -d '{"id": 1}'
 
 
+<<<<<<< HEAD
 # curl -X POST "http://localhost:8080/api/words/book_1/submit" \
 # -H "Content-Type: application/json" \
 # -H "X-API-KEY: TEST_USE_API_KEY" \
@@ -112,3 +113,24 @@ curl -X POST "http://localhost:8080/api/words/all/accurate-search" \
 curl -X GET "http://localhost:8080/api/words/all/fuzzy-search?query=ちゅ" \
 -H "Content-Type: application/json" \
 -H "X-API-KEY: TEST_USE_API_KEY"
+=======
+curl -X POST "http://localhost:8080/api/words/book_1/submit" \
+-H "Content-Type: application/json" \
+-H "X-API-KEY: TEST_USE_API_KEY" \
+-d '{
+    "kanji": "test",
+    "chinese": "test",
+    "example": []
+}'
+
+
+curl -X POST "http://localhost:8080/api/words/book_1/delete" \
+-H "Content-Type: application/json" \
+-H "X-API-KEY: TEST_USE_API_KEY" \
+-d '{
+    "id": 5,
+    "kanji": "test",
+    "chinese": "test",
+    "example": []
+}'
+>>>>>>> 81d02e8 (merge: Update main with sqlite features (#6))
