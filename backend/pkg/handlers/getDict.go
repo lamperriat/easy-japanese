@@ -7,16 +7,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var resultPerPage = 30
+const defaultResultPerPage = 30
 
 func (h *WordHandler) GetDict(c *gin.Context) {
 	dictName := c.Param("dictName")
 	page := c.Query("page")
+	resultPerPageStr := c.Query("RPP")
 	var pageInt int
 	var err error
 	pageInt, err = strconv.Atoi(page)
 	if err != nil || pageInt < 1 {
 		pageInt = 1
+	}
+	var resultPerPage int
+	resultPerPage, err = strconv.Atoi(resultPerPageStr)
+	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
+		resultPerPage = defaultResultPerPage
 	}
 	query := h.db.Model(&models.JapaneseWord{})
 	if dictName != "all" {
