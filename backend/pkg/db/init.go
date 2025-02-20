@@ -16,7 +16,10 @@ func InitDB() (*gorm.DB, error) {
 		&models.JapaneseWord{}, 
 		&models.ExampleSentence{}, 
 		&models.User{}, 
-		&models.UserWord{}, 
+		&models.UserWord{},
+		&models.ReadingMaterial{},
+		&models.Grammar{},
+		&models.GrammarExample{}, 
 	)
     return db, err
 }
