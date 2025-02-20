@@ -31,6 +31,12 @@ func main() {
 	r.POST("/api/words/:dictName/submit", auth.APIKeyAuth(), wordHandler.AddWord)
 	r.POST("/api/words/:dictName/edit", auth.APIKeyAuth(), wordHandler.EditWord)
 	r.POST("/api/words/:dictName/delete", auth.APIKeyAuth(), wordHandler.DeleteWord)
-	r.GET("/api/dict/:dictName/get", auth.APIKeyAuth(), wordHandler.GetDict)	
+	r.GET("/api/dict/:dictName/get", auth.APIKeyAuth(), wordHandler.GetDict)
+	
+	r.POST("/api/reading-material/add", auth.APIKeyAuth(), wordHandler.AddReadingMaterial)
+	r.POST("/api/reading-material/edit", auth.APIKeyAuth(), wordHandler.EditReadingMaterial)
+	r.POST("/api/reading-material/delete", auth.APIKeyAuth(), wordHandler.DeleteReadingMaterial)
+	r.GET("/api/reading-material/get", auth.APIKeyAuth(), wordHandler.GetReadingMaterial)
+	r.GET("/api/reading-material/search", auth.APIKeyAuth(), wordHandler.FuzzySearchReadingMaterial)
 	r.Run(":8080")
 }

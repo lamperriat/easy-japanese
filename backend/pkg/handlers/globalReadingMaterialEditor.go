@@ -106,7 +106,7 @@ func (h* WordHandler) DeleteReadingMaterial(c *gin.Context) {
 
 const DefaultResultPerPage = 20
 
-func (h* WordHandler) GetReadingMaterials(c *gin.Context) {
+func (h* WordHandler) GetReadingMaterial(c *gin.Context) {
 	page := c.Query("page")
 	resultPerPageStr := c.Query("RPP")
 	var pageInt int
@@ -133,7 +133,7 @@ func (h* WordHandler) GetReadingMaterials(c *gin.Context) {
 	c.JSON(200, gin.H{"readingMaterials": readingMaterials})
 }
 
-func (h* WordHandler) FuzzySearchReadingMaterials(c *gin.Context) {
+func (h* WordHandler) FuzzySearchReadingMaterial(c *gin.Context) {
 	query := c.Query("query")
 	page := c.Query("page")
 	resultPerPageStr := c.Query("RPP")
