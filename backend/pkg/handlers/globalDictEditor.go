@@ -174,7 +174,10 @@ func (h *WordHandler) EditWord(c *gin.Context) {
 		return
 	}
 	var updatedWord models.JapaneseWord
-	h.db.Preload("Examples").First(&updatedWord, editedWord.ID)
+	if err := h.db.Preload("Examples").First(&updatedWord, editedWord.ID).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve updated word"})
+        return
+    }
 	c.JSON(http.StatusOK, gin.H{
 		"data": updatedWord,
 		"message": "Word updated",
