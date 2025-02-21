@@ -9,12 +9,21 @@ import (
 	"gorm.io/gorm"
 )
 
-
+// @Summary Add reading material
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.ReadingMaterial
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/reading-material/add [post]
 func (h* WordHandler) AddReadingMaterial(c *gin.Context) {
     var newReadingMaterial models.ReadingMaterial
 
     if err := c.ShouldBindJSON(&newReadingMaterial); err != nil {
-        c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON format"})
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON format"})
         return
     }
 
@@ -26,21 +35,28 @@ func (h* WordHandler) AddReadingMaterial(c *gin.Context) {
 	})
 
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Database error"})
+		c.JSON(500, models.ErrorMsg{Error: "Database error"})
 		return
 	}
 
-	c.JSON(201, gin.H{
-		"id": newReadingMaterial.ID,
-	})
+	c.JSON(201, newReadingMaterial)
 }
 
-
+// @Summary Edit reading material
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "Not found"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/reading-material/edit [post]
 func (h* WordHandler) EditReadingMaterial(c *gin.Context) {
 	var updatedReadingMaterial models.ReadingMaterial
 
 	if err := c.ShouldBindJSON(&updatedReadingMaterial); err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON format"})
+		c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON format"})
 		return
 	}
 
@@ -58,24 +74,31 @@ func (h* WordHandler) EditReadingMaterial(c *gin.Context) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(404, gin.H{"error": "Reading material not found"})
+			c.JSON(404, models.ErrorMsg{Error: "Reading material not found"})
 		} else {
-			c.JSON(500, gin.H{"error": "Database error"})
+			c.JSON(500, models.ErrorMsg{Error: "Database error"})
 		}
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"data": updatedReadingMaterial, 
-		"message": "Reading material updated",
-	})
+	c.JSON(200, updatedReadingMaterial)
 }
 
+// @Summary Delete reading material
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "Not found"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/reading-material/delete [post]
 func (h* WordHandler) DeleteReadingMaterial(c *gin.Context) {
 	var toDelete models.ReadingMaterial
 
 	if err := c.ShouldBindJSON(&toDelete); err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON format"})
+		c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON format"})
 		return
 	}
 
@@ -92,20 +115,28 @@ func (h* WordHandler) DeleteReadingMaterial(c *gin.Context) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(404, gin.H{"error": "Reading material not found"})
+			c.JSON(404, models.ErrorMsg{Error: "Reading material not found"})
 		} else {
-			c.JSON(500, gin.H{"error": "Database error"})
+			c.JSON(500, models.ErrorMsg{Error: "Database error"})
 		}
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"message": "Reading material deleted",
-	})
+	c.JSON(200, models.SuccessMsg{Message: "Reading material deleted"})
 }
 
-const DefaultResultPerPage = 20
 
+// @Summary Browse all reading materials
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Success 200 {object} []models.ReadingMaterial
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/reading-material/get [get]
 func (h* WordHandler) GetReadingMaterial(c *gin.Context) {
 	page := c.Query("page")
 	resultPerPageStr := c.Query("RPP")
@@ -118,7 +149,7 @@ func (h* WordHandler) GetReadingMaterial(c *gin.Context) {
 	var resultPerPage int
 	resultPerPage, err = strconv.Atoi(resultPerPageStr)
 	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
-		resultPerPage = DefaultResultPerPage
+		resultPerPage = defaultResultPerPage
 	}
 	
 	var readingMaterials []models.ReadingMaterial
@@ -126,13 +157,24 @@ func (h* WordHandler) GetReadingMaterial(c *gin.Context) {
 		Limit(resultPerPage).
 		Offset((pageInt - 1) * resultPerPage).
 		Find(&readingMaterials).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Database error"})
+		c.JSON(500, models.ErrorMsg{Error: "Database error"})
 		return
 	}
 
-	c.JSON(200, gin.H{"readingMaterials": readingMaterials})
+	c.JSON(200, readingMaterials)
 }
 
+// @Summary Fuzzy search in all reading materials
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Param query query string true "Search query"
+// @Failure 400 {object} models.ErrorMsg "Database error"
+// @Router /api/reading-material/search [get]
 func (h* WordHandler) FuzzySearchReadingMaterial(c *gin.Context) {
 	query := c.Query("query")
 	page := c.Query("page")
@@ -146,7 +188,7 @@ func (h* WordHandler) FuzzySearchReadingMaterial(c *gin.Context) {
 	var resultPerPage int
 	resultPerPage, err = strconv.Atoi(resultPerPageStr)
 	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
-		resultPerPage = DefaultResultPerPage
+		resultPerPage = defaultResultPerPage
 	}
 	var readingMaterials []models.ReadingMaterial
 	if err := h.db.
@@ -154,9 +196,9 @@ func (h* WordHandler) FuzzySearchReadingMaterial(c *gin.Context) {
 		Limit(resultPerPage).
 		Offset((pageInt - 1) * resultPerPage).
 		Find(&readingMaterials).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Database error"})
+		c.JSON(500, models.ErrorMsg{Error: "Database error"})
 		return
 	}
 
-	c.JSON(200, gin.H{"readingMaterials": readingMaterials})
+	c.JSON(200, readingMaterials)
 }

@@ -1,6 +1,9 @@
 package main
 
 import (
+    _ "backend/docs"
+    swaggerFiles "github.com/swaggo/files"
+    ginSwagger "github.com/swaggo/gin-swagger"
 	"backend/pkg/auth"
 	"backend/pkg/db"
 	"backend/pkg/handlers"
@@ -9,8 +12,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
+// @title Easy Japanese API
+// @version 0.1
+// @description 
+// @license.name MIT
+// @license.url http://opensource.org/licenses/MIT
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name X-API-KEY
+// @host localhost:8080
+// @BasePath /
 func main() {
 	r := gin.Default()
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	db, err := db.InitDB()
 	if err != nil {
 		panic(err)
@@ -27,11 +42,11 @@ func main() {
 	r.GET("/api/random", auth.APIKeyAuth(), handlers.GetRandomNumber)
 	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightCorrect)
 	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightIncorrect)
-	r.POST("/api/words/:dictName/check", auth.APIKeyAuth(), wordHandler.CheckSimilarWords)
-	r.POST("/api/words/:dictName/submit", auth.APIKeyAuth(), wordHandler.AddWord)
+	r.POST("/api/words/:dictName/search", auth.APIKeyAuth(), wordHandler.FuzzySearchWord)
+	r.POST("/api/words/:dictName/add", auth.APIKeyAuth(), wordHandler.AddWord)
 	r.POST("/api/words/:dictName/edit", auth.APIKeyAuth(), wordHandler.EditWord)
 	r.POST("/api/words/:dictName/delete", auth.APIKeyAuth(), wordHandler.DeleteWord)
-	r.GET("/api/dict/:dictName/get", auth.APIKeyAuth(), wordHandler.GetDict)
+	r.GET("/api/words/:dictName/get", auth.APIKeyAuth(), wordHandler.GetDict)
 	
 	r.POST("/api/reading-material/add", auth.APIKeyAuth(), wordHandler.AddReadingMaterial)
 	r.POST("/api/reading-material/edit", auth.APIKeyAuth(), wordHandler.EditReadingMaterial)

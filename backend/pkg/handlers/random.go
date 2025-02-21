@@ -7,6 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Get a random number
+// @Description Get a random number between 1 and 100
+// @Produce json
+// @Success 200 {object} map[string]int
+// @Router /api/random [get]
 func GetRandomNumber(c *gin.Context) {
 	min := 1
 	max := 100

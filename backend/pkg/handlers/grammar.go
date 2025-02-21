@@ -9,10 +9,20 @@ import (
 	"gorm.io/gorm"
 )
 
+// @Summary Add grammar 
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.Grammar
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/grammar/add [post]
 func (h* WordHandler) AddGrammar(c *gin.Context) {
 	var newGrammar models.Grammar
 	if err := c.ShouldBindJSON(&newGrammar); err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON"})
+		c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON"})
 		return
 	}
 
@@ -28,12 +38,20 @@ func (h* WordHandler) AddGrammar(c *gin.Context) {
 		return
 	}
 
-	c.JSON(201, gin.H{
-		"id": newGrammar.ID,
-		"description": newGrammar.Description,
-	})
+	c.JSON(201, newGrammar)
 }
 
+// @Summary Edit grammar 
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.Grammar
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "Not found"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/grammar/edit [post]
 func (h* WordHandler) EditGrammar(c *gin.Context) {
 	var editedGrammar models.Grammar
 	if err := c.ShouldBindJSON(&editedGrammar); err != nil {
@@ -80,12 +98,20 @@ func (h* WordHandler) EditGrammar(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Failed to retrieve updated grammar"})
 		return
 	}
-	c.JSON(200, gin.H{
-		"data": updatedGrammar,
-		"message": "Grammar updated",
-	})
+	c.JSON(200, updatedGrammar)
 }
 
+// @Summary Delete grammar 
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SuccessMsg "Grammar deleted"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "Not found"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/grammar/delete [post]
 func (h *WordHandler) DeleteGrammar(c *gin.Context) {
 	var toDelete models.Grammar
 
@@ -119,9 +145,20 @@ func (h *WordHandler) DeleteGrammar(c *gin.Context) {
 		}
 		return
 	}
+
+	c.JSON(200, models.SuccessMsg{Message: "Grammar deleted"})
 }
 
-
+// @Summary Browse all grammars 
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Produce json
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Success 200 {object} []models.Grammar
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/grammar/get [get]
 func (h *WordHandler) GetGrammar(c *gin.Context) {
 	page := c.Query("page")
 	resultPerPageStr := c.Query("RPP")
@@ -146,9 +183,20 @@ func (h *WordHandler) GetGrammar(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"grammars": grammars})
+	c.JSON(200, grammars)
 }
 
+// @Summary Search among all grammars 
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Produce json
+// @Param query query string true "Search query"
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Success 200 {object} []models.Grammar
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/grammar/search [get]
 func (h* WordHandler) FuzzySearchGrammar(c *gin.Context) {
 	query := c.Query("query")
 	page := c.Query("page")
@@ -170,9 +218,9 @@ func (h* WordHandler) FuzzySearchGrammar(c *gin.Context) {
 		Limit(resultPerPage).
 		Offset((pageInt - 1) * resultPerPage).
 		Find(&grammars).Error; err != nil {
-		c.JSON(500, gin.H{"error": "Database error"})
+		c.JSON(500, models.ErrorMsg{Error: "Database error"})
 		return
 	}
 
-	c.JSON(200, gin.H{"grammars": grammars})
+	c.JSON(200, grammars)
 }
