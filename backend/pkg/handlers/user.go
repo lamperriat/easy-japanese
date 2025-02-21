@@ -19,6 +19,7 @@ const (
 	incorrect
 )
 
+// @deprecated
 func UpdateWordWeightCorrect(c *gin.Context) {
 	if err := updateWordWeight(c, correct); err != nil {
 		return
@@ -26,6 +27,7 @@ func UpdateWordWeightCorrect(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Word weight updated"})
 }
 
+// @deprecated
 func UpdateWordWeightIncorrect(c *gin.Context) {
 	if err := updateWordWeight(c, incorrect); err != nil {
 		return

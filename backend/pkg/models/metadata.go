@@ -7,6 +7,14 @@ import (
 	"sync"
 )
 
+type ErrorMsg struct {
+	Error string `json:"error"`
+}
+
+type SuccessMsg struct {
+	Message string `json:"message"`
+}
+
 type Metadata struct {
 	LatestID int `json:"latestID"`
 }

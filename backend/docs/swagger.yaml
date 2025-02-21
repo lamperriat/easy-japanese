@@ -1,0 +1,535 @@
+definitions:
+  models.ErrorMsg:
+    properties:
+      error:
+        type: string
+    type: object
+  models.ExampleSentence:
+    properties:
+      chinese:
+        type: string
+      example:
+        type: string
+    type: object
+  models.Grammar:
+    properties:
+      description:
+        type: string
+      example:
+        items:
+          $ref: '#/definitions/models.GrammarExample'
+        type: array
+      id:
+        type: integer
+    type: object
+  models.GrammarExample:
+    properties:
+      chinese:
+        type: string
+      example:
+        type: string
+    type: object
+  models.JapaneseWord:
+    properties:
+      chinese:
+        type: string
+      example:
+        items:
+          $ref: '#/definitions/models.ExampleSentence'
+        type: array
+      hiragana:
+        type: string
+      id:
+        type: integer
+      kanji:
+        type: string
+      katakana:
+        type: string
+      type:
+        type: string
+    type: object
+  models.ReadingMaterial:
+    properties:
+      chinese:
+        type: string
+      content:
+        type: string
+      id:
+        type: integer
+    type: object
+  models.SuccessMsg:
+    properties:
+      message:
+        type: string
+    type: object
+info:
+  contact: {}
+  license:
+    name: MIT
+    url: http://opensource.org/licenses/MIT
+  title: Easy Japanese API
+  version: "0.1"
+paths:
+  /api/grammar/add:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Grammar'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Add grammar
+      tags:
+      - globalDictOp
+  /api/grammar/delete:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Grammar deleted
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Delete grammar
+      tags:
+      - globalDictOp
+  /api/grammar/edit:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Grammar'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Edit grammar
+      tags:
+      - globalDictOp
+  /api/grammar/get:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Grammar'
+            type: array
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Browse all grammars
+      tags:
+      - globalDictOp
+  /api/grammar/search:
+    get:
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Grammar'
+            type: array
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Search among all grammars
+      tags:
+      - globalDictOp
+  /api/random:
+    get:
+      description: Get a random number between 1 and 100
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+      summary: Get a random number
+  /api/reading-material/add:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ReadingMaterial'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Add reading material
+      tags:
+      - globalDictOp
+  /api/reading-material/delete:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Delete reading material
+      tags:
+      - globalDictOp
+  /api/reading-material/edit:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Edit reading material
+      tags:
+      - globalDictOp
+  /api/reading-material/get:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.ReadingMaterial'
+            type: array
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Browse all reading materials
+      tags:
+      - globalDictOp
+  /api/reading-material/search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Fuzzy search in all reading materials
+      tags:
+      - globalDictOp
+  /api/words/{dictName}/add:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary name
+        in: path
+        name: dictName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "409":
+          description: Duplicate word
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Insert word into dictionary
+      tags:
+      - globalDictOp
+  /api/words/{dictName}/delete:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary name
+        in: path
+        name: dictName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Delete word in dictionary
+      tags:
+      - globalDictOp
+  /api/words/{dictName}/edit:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary name
+        in: path
+        name: dictName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.JapaneseWord'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Update word in dictionary
+      tags:
+      - globalDictOp
+  /api/words/{dictName}/get:
+    get:
+      parameters:
+      - description: Dictionary name
+        in: path
+        name: dictName
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.JapaneseWord'
+            type: array
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Browse words in dictionary
+      tags:
+      - globalDictOp
+  /api/words/{dictName}/search:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary name
+        in: path
+        name: dictName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.JapaneseWord'
+            type: array
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Check for similar words in the dictionary
+      tags:
+      - globalDictOp
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-API-KEY
+    type: apiKey
+swagger: "2.0"

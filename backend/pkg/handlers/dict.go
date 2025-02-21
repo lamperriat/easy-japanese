@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -21,13 +22,23 @@ func NewWordHandler(db *gorm.DB) *WordHandler {
     }
 }
 
-
-func (h *WordHandler) CheckSimilarWords(c *gin.Context) {
+// @Summary Check for similar words in the dictionary
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Param dictName path string true "Dictionary name"
+// @Accept json
+// @Produce json
+// @Success 200 {object} []models.JapaneseWord
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/words/{dictName}/search [post]
+func (h *WordHandler) FuzzySearchWord(c *gin.Context) {
     dictName := c.Param("dictName") // dictName, or "all"
     var uploadedWord models.JapaneseWord
 
     if err := c.ShouldBindJSON(&uploadedWord); err != nil {
-        c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON"})
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON"})
         return
     }
 
@@ -56,22 +67,32 @@ func (h *WordHandler) CheckSimilarWords(c *gin.Context) {
 
     var similarWords []models.JapaneseWord
     if err := query.Find(&similarWords).Error; err != nil {
-        c.AbortWithStatusJSON(500, gin.H{"error": "Database error"})
+        c.AbortWithStatusJSON(500, models.ErrorMsg{Error: "Database error"})
         return
     }
 
-    c.JSON(200, gin.H{
-        "similar": similarWords,
-        "dict":    dictName,
-    })
+    c.JSON(200, similarWords)
 }
 
+
+// @Summary Insert word into dictionary
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Param dictName path string true "Dictionary name"
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 409 {object} models.ErrorMsg "Duplicate word"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/words/{dictName}/add [post]
 func (h *WordHandler) AddWord(c *gin.Context) {
     dictName := c.Param("dictName")
     var newWord models.JapaneseWord
 
     if err := c.ShouldBindJSON(&newWord); err != nil {
-        c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON format"})
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON format"})
         return
     }
     newWord.DictName = dictName
@@ -110,25 +131,34 @@ func (h *WordHandler) AddWord(c *gin.Context) {
 
     if err != nil {
         if strings.Contains(err.Error(), "duplicate") {
-            c.JSON(409, gin.H{"error": "Word already exists in this dictionary"})
+            c.JSON(409, models.ErrorMsg{Error: "Word already exists in this dictionary"})
         } else {
-            c.JSON(500, gin.H{"error": "Database operation failed"})
+            c.JSON(500, models.ErrorMsg{Error: "Database operation failed"})
         }
         return
     }
 
-    c.JSON(201, gin.H{
-        "id":   newWord.ID,
-        "dict": dictName,
-    })
+    c.JSON(201, models.SuccessMsg{Message: "Word added"})
 }
 
+// @Summary Update word in dictionary
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Param dictName path string true "Dictionary name"
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.JapaneseWord
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "Not found"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/words/{dictName}/edit [post]
 func (h *WordHandler) EditWord(c *gin.Context) {
 	dictName := c.Param("dictName")
 	var editedWord models.JapaneseWord
 
 	if err := c.ShouldBindJSON(&editedWord); err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON format"})
+		c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON format"})
 		return
 	}
 	editedWord.DictName = dictName
@@ -163,30 +193,38 @@ func (h *WordHandler) EditWord(c *gin.Context) {
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-            c.JSON(http.StatusNotFound, gin.H{
-                "error": fmt.Sprintf("Word %d not found in %s", editedWord.ID, dictName),
-            })
+            c.JSON(http.StatusNotFound, models.ErrorMsg{Error:  "Word not found in dictionary"})
 		} else {
-            c.JSON(http.StatusInternalServerError, gin.H{
-                "error": "Update failed: " + err.Error(),
-            })
+            c.JSON(http.StatusInternalServerError, models.ErrorMsg{Error: "Update failed: " + err.Error()})
 		}
 		return
 	}
 	var updatedWord models.JapaneseWord
-	h.db.Preload("Examples").First(&updatedWord, editedWord.ID)
-	c.JSON(http.StatusOK, gin.H{
-		"data": updatedWord,
-		"message": "Word updated",
-	})
+	if err := h.db.Preload("Examples").First(&updatedWord, editedWord.ID).Error; err != nil {
+        c.JSON(http.StatusInternalServerError, models.ErrorMsg{Error: "Failed to retrieve updated word"})
+        return
+    }
+	c.JSON(http.StatusOK, updatedWord)
 }
 
+// @Summary Delete word in dictionary
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Param dictName path string true "Dictionary name"
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "Not found"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/words/{dictName}/delete [post]
 func (h *WordHandler) DeleteWord(c *gin.Context) {
 	dictName := c.Param("dictName")
 	var wordToDelete models.JapaneseWord
 
 	if err := c.ShouldBindJSON(&wordToDelete); err != nil {
-		c.AbortWithStatusJSON(400, gin.H{"error": "Invalid JSON format"})
+		c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON format"})
 		return
 	}
 
@@ -210,44 +248,57 @@ func (h *WordHandler) DeleteWord(c *gin.Context) {
 
     if err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
-            c.JSON(http.StatusNotFound, gin.H{
-                "error": fmt.Sprintf("Word %d not found in %s", wordToDelete.ID, dictName),
-            })
+            c.JSON(http.StatusNotFound, models.ErrorMsg{Error: "Word not found in dictionary"})
         } else {
-            c.JSON(http.StatusInternalServerError, gin.H{
-                "error": "Delete failed: " + err.Error(),
-            })
+            c.JSON(http.StatusInternalServerError, models.ErrorMsg{Error: "Delete failed: " + err.Error()})
         }
         return
     }
-    c.JSON(http.StatusOK, gin.H{
-        "message": "Word deleted",
-    })
+    c.JSON(http.StatusOK, models.SuccessMsg{Message: "Word deleted"})
 }
 
+const defaultResultPerPage = 30
 
-// func loadDict(dictName string) ([]models.JapaneseWord, error) {
-// 	dictName = dictName + ".json"
-// 	path := filepath.Join("data", "japanese", dictName)
-// 	file, err := os.ReadFile(path)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+// @Summary Browse words in dictionary
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Param dictName path string true "Dictionary name"
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Produce json
+// @Success 200 {object} []models.JapaneseWord
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/words/{dictName}/get [get]
+func (h *WordHandler) GetDict(c *gin.Context) {
+	dictName := c.Param("dictName")
+	page := c.Query("page")
+	resultPerPageStr := c.Query("RPP")
+	var pageInt int
+	var err error
+	pageInt, err = strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	var resultPerPage int
+	resultPerPage, err = strconv.Atoi(resultPerPageStr)
+	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
+		resultPerPage = defaultResultPerPage
+	}
+	query := h.db.Model(&models.JapaneseWord{})
+	if dictName != "all" {
+		query = query.Where("dict_name = ?", dictName)
+	}
 
-// 	var words []models.JapaneseWord
-// 	if err := json.Unmarshal(file, &words); err != nil {
-// 		return nil, err
-// 	}
-// 	return words, nil
-// }
+	var words []models.JapaneseWord
+	if err := query.
+		Limit(resultPerPage).
+		Offset((pageInt - 1) * resultPerPage).
+		Find(&words).Error; 
+		err != nil {
+		c.AbortWithStatusJSON(500, models.ErrorMsg{Error: "Database error"})
+		return
+	}
 
-// func saveDict(dictName string, data []models.JapaneseWord) error {
-// 	dictName = dictName + ".json"
-// 	path := filepath.Join("data", "japanese", dictName)
-// 	file, err := json.MarshalIndent(data, "", "  ")
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return os.WriteFile(path, file, 0644)
-// }
+	c.JSON(200, words)
+}
