@@ -3,6 +3,8 @@ package handlers
 import (
 	"backend/pkg/models"
 	"errors"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -117,4 +119,60 @@ func (h *WordHandler) DeleteGrammar(c *gin.Context) {
 		}
 		return
 	}
+}
+
+
+func (h *WordHandler) GetGrammar(c *gin.Context) {
+	page := c.Query("page")
+	resultPerPageStr := c.Query("RPP")
+	var pageInt int
+	var err error
+	pageInt, err = strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	var resultPerPage int
+	resultPerPage, err = strconv.Atoi(resultPerPageStr)
+	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
+		resultPerPage = defaultResultPerPage
+	}
+	query := h.db.Model(&models.Grammar{})
+	var grammars []models.Grammar
+	if err := query.
+		Limit(resultPerPage).
+		Offset((pageInt - 1) * resultPerPage).
+		Find(&grammars).Error; err != nil {
+		c.AbortWithStatusJSON(500, gin.H{"error": "Database error"})
+		return
+	}
+
+	c.JSON(200, gin.H{"grammars": grammars})
+}
+
+func (h* WordHandler) FuzzySearchGrammar(c *gin.Context) {
+	query := c.Query("query")
+	page := c.Query("page")
+	resultPerPageStr := c.Query("RPP")
+	var pageInt int
+	var err error
+	pageInt, err = strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	var resultPerPage int
+	resultPerPage, err = strconv.Atoi(resultPerPageStr)
+	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
+		resultPerPage = defaultResultPerPage
+	}
+	var grammars []models.Grammar
+	if err := h.db.
+		Where("description LIKE ?", "%"+query+"%").
+		Limit(resultPerPage).
+		Offset((pageInt - 1) * resultPerPage).
+		Find(&grammars).Error; err != nil {
+		c.JSON(500, gin.H{"error": "Database error"})
+		return
+	}
+
+	c.JSON(200, gin.H{"grammars": grammars})
 }

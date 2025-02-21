@@ -38,5 +38,11 @@ func main() {
 	r.POST("/api/reading-material/delete", auth.APIKeyAuth(), wordHandler.DeleteReadingMaterial)
 	r.GET("/api/reading-material/get", auth.APIKeyAuth(), wordHandler.GetReadingMaterial)
 	r.GET("/api/reading-material/search", auth.APIKeyAuth(), wordHandler.FuzzySearchReadingMaterial)
+	
+	r.POST("/api/grammar/add", auth.APIKeyAuth(), wordHandler.AddGrammar)
+	r.POST("/api/grammar/edit", auth.APIKeyAuth(), wordHandler.EditGrammar)
+	r.POST("/api/grammar/delete", auth.APIKeyAuth(), wordHandler.DeleteGrammar)
+	r.GET("/api/grammar/get", auth.APIKeyAuth(), wordHandler.GetGrammar)
+	r.GET("/api/grammar/search", auth.APIKeyAuth(), wordHandler.FuzzySearchGrammar)
 	r.Run(":8080")
 }
