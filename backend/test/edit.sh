@@ -91,3 +91,10 @@ curl -X GET "http://localhost:8080/api/reading-material/get" \
 -H "Content-Type: application/json" \
 -H "X-API-KEY: TEST_USE_API_KEY"
 
+curl -X "http://localhost:8080/api/words/all/search" \
+-H "Content-Type: application/json" \
+-H "X-API-KEY: TEST_USE_API_KEY" \
+-d '{
+    "page": 1,
+    "query": "中国"
+}'
