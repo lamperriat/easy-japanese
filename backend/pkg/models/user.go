@@ -1,11 +1,12 @@
 package models
 
 type User struct {
-    ID          string     `gorm:"primaryKey"`
-    Username    string     `gorm:"uniqueIndex"`
-    Keyhash     string     `gorm:"uniqueIndex"`
-    Learned     []UserWord `gorm:"foreignKey:UserID"`
-    ReviewCount int64      // the number of words that have been reviewed. 
+    ID          uint       `json:"-" gorm:"primaryKey"`
+    Username    string     `json:"username" gorm:"uniqueIndex"`
+    Keyhash     string     `json:"-" gorm:"uniqueIndex"`
+    Learned     []UserWord `json:"-" gorm:"foreignKey:UserID"`
+    ReviewCount int64      `json:"reviewCount"`
+    // the number of words that have been reviewed. 
     // One word can be counted multiple times. 
     // It will be assigned to `lastSeen` when the user reviews a word.
 }

@@ -502,18 +502,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "globalDictOp"
+                    "userDictOp"
                 ],
-                "summary": "Check for similar words in the dictionary",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Dictionary name",
-                        "name": "dictName",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Check for similar words in the dictionary for that user",
                 "responses": {
                     "200": {
                         "description": "OK",

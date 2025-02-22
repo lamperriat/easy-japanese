@@ -405,12 +405,6 @@ paths:
       consumes:
       - application/json
       description: Only ``kanji" and ``katakana" fields are used for comparison
-      parameters:
-      - description: Dictionary name
-        in: path
-        name: dictName
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -430,9 +424,9 @@ paths:
             $ref: '#/definitions/models.ErrorMsg'
       security:
       - APIKeyAuth: []
-      summary: Check for similar words in the dictionary
+      summary: Check for similar words in the dictionary for that user
       tags:
-      - globalDictOp
+      - userDictOp
   /api/words/{dictName}/add:
     post:
       consumes:
