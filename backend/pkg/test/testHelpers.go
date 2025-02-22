@@ -1,7 +1,7 @@
 package test
 
 import (
-	"backend/pkg/handlers"
+	"backend/pkg/handlers/editor"
 	"backend/pkg/models"
 
 	"gorm.io/driver/sqlite"
@@ -30,6 +30,6 @@ func GetTestDB() *gorm.DB {
 	return db
 }
 
-func GetTestWordHandler() *handlers.WordHandler {
-	return handlers.NewWordHandler(GetTestDB())
+func GetTestWordHandler() *editor.WordHandler {
+	return editor.NewWordHandler(GetTestDB())
 }

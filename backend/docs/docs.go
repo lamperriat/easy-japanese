@@ -248,7 +248,7 @@ const docTemplate = `{
         },
         "/api/random": {
             "get": {
-                "description": "Get a random number between 1 and 100",
+                "description": "Test use",
                 "produces": [
                     "application/json"
                 ],

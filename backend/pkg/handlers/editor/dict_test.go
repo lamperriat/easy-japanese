@@ -1,4 +1,4 @@
-package handlers_test
+package editor_test
 
 import (
 	"backend/pkg/test"

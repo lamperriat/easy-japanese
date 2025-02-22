@@ -6,7 +6,7 @@ import (
     ginSwagger "github.com/swaggo/gin-swagger"
 	"backend/pkg/auth"
 	"backend/pkg/db"
-	"backend/pkg/handlers"
+	"backend/pkg/handlers/editor"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -30,7 +30,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	wordHandler := handlers.NewWordHandler(db)
+	wordHandler := editor.NewWordHandler(db)
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},
@@ -39,9 +39,9 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	r.GET("/api/random", auth.APIKeyAuth(), handlers.GetRandomNumber)
-	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightCorrect)
-	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightIncorrect)
+	r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
+	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), editor.UpdateWordWeightCorrect)
+	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), editor.UpdateWordWeightIncorrect)
 	r.POST("/api/words/:dictName/accurate-search", auth.APIKeyAuth(), wordHandler.AccurateSearchWord)
 	r.GET("/api/words/:dictName/fuzzy-search", auth.APIKeyAuth(), wordHandler.FuzzySearchWord)
 	r.POST("/api/words/:dictName/add", auth.APIKeyAuth(), wordHandler.AddWord)
