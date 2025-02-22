@@ -3,6 +3,7 @@ package models
 type User struct {
     ID          string     `gorm:"primaryKey"`
     Username    string     `gorm:"uniqueIndex"`
+    Keyhash     string     `gorm:"uniqueIndex"`
     Learned     []UserWord `gorm:"foreignKey:UserID"`
     ReviewCount int64      // the number of words that have been reviewed. 
     // One word can be counted multiple times. 
@@ -31,7 +32,7 @@ type UserWord struct {
     Katakana    string  `json:"katakana"`
     Hiragana    string  `json:"hiragana"`
     Type        string  `json:"type"`
-    UserID      string  `json:"-" gorm:"index:idx_user"`
+    UserID      string  `json:"-" gorm:"index:user_id"`
     Familiarity int     `json:"familiarity" gorm:"default:50"`
     LastSeen    int64   `json:"lastSeen" gorm:"column:last_seen"`
     Examples    []UserWordExample `json:"example" gorm:"foreignKey:UserWordID"`

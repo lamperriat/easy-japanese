@@ -133,7 +133,9 @@ func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
     if dictName != "all" {
         q = q.Where("dict_name = ?", dictName)
     }
-    q = q.Where("kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%")
+    queryStr := "%" + query + "%"
+    q = q.Where("kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ? OR chinese LIKE ?", 
+        queryStr, queryStr, queryStr, queryStr)
     if err := q.Count(&count).Error; err != nil {
         c.JSON(500, models.ErrorMsg{Error: "Database error"})
         return
