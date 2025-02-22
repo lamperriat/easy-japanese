@@ -173,7 +173,7 @@ func (h *WordHandler) GetGrammar(c *gin.Context) {
 	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
 		resultPerPage = defaultResultPerPage
 	}
-	query := h.db.Model(&models.Grammar{})
+	query := h.db.Preload("Examples").Model(&models.Grammar{})
 	var grammars []models.Grammar
 	if err := query.
 		Limit(resultPerPage).

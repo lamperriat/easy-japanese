@@ -349,7 +349,7 @@ func (h *WordHandler) GetDict(c *gin.Context) {
 	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
 		resultPerPage = defaultResultPerPage
 	}
-	query := h.db.Model(&models.JapaneseWord{})
+	query := h.db.Preload("Examples").Model(&models.JapaneseWord{})
 	if dictName != "all" {
 		query = query.Where("dict_name = ?", dictName)
 	}

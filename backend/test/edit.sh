@@ -91,6 +91,10 @@ curl -X GET "http://localhost:8080/api/reading-material/get" \
 -H "Content-Type: application/json" \
 -H "X-API-KEY: TEST_USE_API_KEY"
 
+curl -X GET "http://localhost:8080/api/words/book_1/get" \
+-H "Content-Type: application/json" \
+-H "X-API-KEY: TEST_USE_API_KEY"
+
 curl -X POST "http://localhost:8080/api/words/all/accurate-search" \
 -H "Content-Type: application/json" \
 -H "X-API-KEY: TEST_USE_API_KEY" \
