@@ -173,6 +173,7 @@ func (h* WordHandler) GetReadingMaterial(c *gin.Context) {
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"
 // @Param query query string true "Search query"
+// @Success 200 {object} models.SearchResult[models.ReadingMaterial]
 // @Failure 400 {object} models.ErrorMsg "Database error"
 // @Router /api/reading-material/search [get]
 func (h* WordHandler) FuzzySearchReadingMaterial(c *gin.Context) {
@@ -191,6 +192,15 @@ func (h* WordHandler) FuzzySearchReadingMaterial(c *gin.Context) {
 		resultPerPage = defaultResultPerPage
 	}
 	var readingMaterials []models.ReadingMaterial
+	var count int64
+	if err := h.db.Model(&models.ReadingMaterial{}).
+		Where("content LIKE ?", "%"+query+"%").
+		Count(&count).Error; err != nil {
+		c.JSON(500, models.ErrorMsg{Error: "Database error"})
+		return
+	}
+
+
 	if err := h.db.
 		Where("content LIKE ?", "%"+query+"%").
 		Limit(resultPerPage).
@@ -200,5 +210,10 @@ func (h* WordHandler) FuzzySearchReadingMaterial(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, readingMaterials)
+	c.JSON(200, models.SearchResult[models.ReadingMaterial]{
+		Count: count, 
+		Page: pageInt, 
+		PageSize: resultPerPage, 
+		Results: readingMaterials,
+	})
 }

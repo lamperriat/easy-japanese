@@ -234,10 +234,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Grammar"
-                            }
+                            "$ref": "#/definitions/models.SearchResult-models_Grammar"
                         }
                     },
                     "500": {
@@ -475,7 +472,65 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SearchResult-models_ReadingMaterial"
+                        }
+                    },
                     "400": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/words/{dictName}/accurate-search": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "description": "Only ` + "`" + `` + "`" + `kanji\" and ` + "`" + `` + "`" + `katakana\" fields are used for comparison",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "globalDictOp"
+                ],
+                "summary": "Check for similar words in the dictionary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Dictionary name",
+                        "name": "dictName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.JapaneseWord"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
                         "description": "Database error",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMsg"
@@ -646,6 +701,73 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/words/{dictName}/fuzzy-search": {
+            "get": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "globalDictOp"
+                ],
+                "summary": "Check for similar words (fuzzy) in the dictionary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Dictionary name",
+                        "name": "dictName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Results per page",
+                        "name": "RPP",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SearchResult-models_JapaneseWord"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
         "/api/words/{dictName}/get": {
             "get": {
                 "security": [
@@ -689,57 +811,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.JapaneseWord"
                             }
-                        }
-                    },
-                    "500": {
-                        "description": "Database error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/words/{dictName}/search": {
-            "post": {
-                "security": [
-                    {
-                        "APIKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "globalDictOp"
-                ],
-                "summary": "Check for similar words in the dictionary",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Dictionary name",
-                        "name": "dictName",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.JapaneseWord"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid JSON",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
                         }
                     },
                     "500": {
@@ -840,6 +911,66 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.SearchResult-models_Grammar": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Grammar"
+                    }
+                }
+            }
+        },
+        "models.SearchResult-models_JapaneseWord": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.JapaneseWord"
+                    }
+                }
+            }
+        },
+        "models.SearchResult-models_ReadingMaterial": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ReadingMaterial"
+                    }
                 }
             }
         },
