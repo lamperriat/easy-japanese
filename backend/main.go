@@ -1,12 +1,9 @@
 package main
 
 import (
-<<<<<<< HEAD
     _ "backend/docs"
     swaggerFiles "github.com/swaggo/files"
     ginSwagger "github.com/swaggo/gin-swagger"
-=======
->>>>>>> 81d02e8 (merge: Update main with sqlite features (#6))
 	"backend/pkg/auth"
 	"backend/pkg/db"
 	"backend/pkg/handlers"
@@ -28,10 +25,7 @@ import (
 // @BasePath /
 func main() {
 	r := gin.Default()
-<<<<<<< HEAD
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-=======
->>>>>>> 81d02e8 (merge: Update main with sqlite features (#6))
 	db, err := db.InitDB()
 	if err != nil {
 		panic(err)
@@ -48,7 +42,6 @@ func main() {
 	r.GET("/api/random", auth.APIKeyAuth(), handlers.GetRandomNumber)
 	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightCorrect)
 	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightIncorrect)
-<<<<<<< HEAD
 	r.POST("/api/words/:dictName/accurate-search", auth.APIKeyAuth(), wordHandler.AccurateSearchWord)
 	r.GET("/api/words/:dictName/fuzzy-search", auth.APIKeyAuth(), wordHandler.FuzzySearchWord)
 	r.POST("/api/words/:dictName/add", auth.APIKeyAuth(), wordHandler.AddWord)
@@ -67,12 +60,5 @@ func main() {
 	r.POST("/api/grammar/delete", auth.APIKeyAuth(), wordHandler.DeleteGrammar)
 	r.GET("/api/grammar/get", auth.APIKeyAuth(), wordHandler.GetGrammar)
 	r.GET("/api/grammar/search", auth.APIKeyAuth(), wordHandler.FuzzySearchGrammar)
-=======
-	r.POST("/api/words/:dictName/check", auth.APIKeyAuth(), wordHandler.CheckSimilarWords)
-	r.POST("/api/words/:dictName/submit", auth.APIKeyAuth(), wordHandler.AddWord)
-	r.POST("/api/words/:dictName/edit", auth.APIKeyAuth(), wordHandler.EditWord)
-	r.POST("/api/words/:dictName/delete", auth.APIKeyAuth(), wordHandler.DeleteWord)
-	r.GET("/api/dict/:dictName/get", auth.APIKeyAuth(), wordHandler.GetDict)	
->>>>>>> 81d02e8 (merge: Update main with sqlite features (#6))
 	r.Run(":8080")
 }
