@@ -65,35 +65,34 @@ const WordSearchPage = () => {
 
   // 获取词库数据
   const fetchWordList = async () => {
-    const endpoint = `${API_BASE_URL}/api/dict/book_${selectedBook}/get`;
+    const endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/get`;
     const words = await fetchWords(endpoint);
     console.log("Fetched Word List:", words); // 打印获取的词库
     setWords(words); // 更新词库数据
   };
 
-  // // 获取相似单词
-  // const fetchSimilarWords = async (query) => {
-  //   const endpoint = `${API_BASE_URL}/api/words/${selectedBook}/check`;
-  //   const words = await fetchWords(endpoint, 'POST', { query });
-  //   if (words.length > 0) {
-  //     setFilteredWords(words); // 更新为返回的相似单词
-  //   } else {
-  //     setFilteredWords([]); // 如果没有数据，清空列表
-  //   }
-  // };
-
   // 获取相似单词
-const fetchSimilarWords = async (query) => {
-  const endpoint = `${API_BASE_URL}/api/words/${selectedBook}/check`;
-  const response = await fetchWords(endpoint, 'POST', { query });
+  const fetchSimilarWords = async (query) => {
+    const endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/fuzzy-search?query=${encodeURIComponent(query)}`;
+    const response = await fetch(endpoint, {
+      method: 'GET',  // 保持 GET 请求
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': process.env.REACT_APP_API_KEY,
+      },
+    });
   
-  // 检查返回的数据中是否有 similar 字段
-  if (response.similar && response.similar.length > 0) {
-    setFilteredWords(response.similar); // 更新为返回的相似单词
-  } else {
-    setFilteredWords([]); // 如果没有数据，清空列表
-  }
-};
+    const responseData = await response.json();
+    console.log("Fetched Response:", responseData);  // 打印实际返回的数据
+  
+    // 检查返回的数据是否有 similar 字段
+    if (responseData.results && responseData.results.length > 0) {
+      setFilteredWords(responseData.results);
+    } else {
+      setFilteredWords([]); // 如果没有数据，清空列表
+    }
+  };
+  
 
   // 监听教材选择变化，获取词库数据
   useEffect(() => {
@@ -107,6 +106,11 @@ const fetchSimilarWords = async (query) => {
     setFilteredWords(words); // 每当 words 更新时，更新 filteredWords
     console.log("Filtered Words Updated:", words); // 打印更新后的filteredWords
   }, [words]);
+
+  useEffect(() => {
+    console.log("Filtered Words Updated:", filteredWords); // 打印 updated filteredWords
+  }, [filteredWords]);
+  
 
   // 处理搜索功能
   const handleSearch = (query) => {
