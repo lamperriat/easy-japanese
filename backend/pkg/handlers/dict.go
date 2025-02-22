@@ -23,6 +23,16 @@ func NewWordHandler(db *gorm.DB) *WordHandler {
     }
 }
 
+var availableDicts = map[string]struct{}{
+    "book_1": {}, 
+    "book_2": {},
+    "book_3": {},
+    "book_4": {},
+    "book_5": {},
+    "book_6": {},
+    "all": {},
+}
+
 // @Summary Check for similar words in the dictionary
 // @Description Only ``kanji" and ``katakana" fields are used for comparison
 // @Tags globalDictOp
@@ -31,11 +41,15 @@ func NewWordHandler(db *gorm.DB) *WordHandler {
 // @Accept json
 // @Produce json
 // @Success 200 {object} []models.JapaneseWord
-// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON or Invalid dict name"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/words/{dictName}/accurate-search [post]
 func (h *WordHandler) AccurateSearchWord(c *gin.Context) {
     dictName := c.Param("dictName") // dictName, or "all"
+    if _, ok := availableDicts[dictName]; !ok {
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid dictionary name"})
+        return
+    }
     var uploadedWord models.JapaneseWord
 
     if err := c.ShouldBindJSON(&uploadedWord); err != nil {
@@ -85,11 +99,15 @@ func (h *WordHandler) AccurateSearchWord(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SearchResult[models.JapaneseWord]
-// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON or Invalid dict name"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/words/{dictName}/fuzzy-search [get]
 func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
     dictName := c.Param("dictName")
+    if _, ok := availableDicts[dictName]; !ok {
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid dictionary name"})
+        return
+    }
 	query := c.Query("query")
 	page := c.Query("page")
 	resultPerPageStr := c.Query("RPP")
@@ -147,12 +165,16 @@ func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.SuccessMsg
-// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON or Invalid dict name"
 // @Failure 409 {object} models.ErrorMsg "Duplicate word"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/words/{dictName}/add [post]
 func (h *WordHandler) AddWord(c *gin.Context) {
     dictName := c.Param("dictName")
+    if _, ok := availableDicts[dictName]; !ok {
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid dictionary name"})
+        return
+    }
     var newWord models.JapaneseWord
 
     if err := c.ShouldBindJSON(&newWord); err != nil {
@@ -213,12 +235,16 @@ func (h *WordHandler) AddWord(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.JapaneseWord
-// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON or Invalid dict name"
 // @Failure 404 {object} models.ErrorMsg "Not found"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/words/{dictName}/edit [post]
 func (h *WordHandler) EditWord(c *gin.Context) {
 	dictName := c.Param("dictName")
+    if _, ok := availableDicts[dictName]; !ok {
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid dictionary name"})
+        return
+    }
 	var editedWord models.JapaneseWord
 
 	if err := c.ShouldBindJSON(&editedWord); err != nil {
@@ -279,12 +305,16 @@ func (h *WordHandler) EditWord(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg
-// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON or Invalid dict name"
 // @Failure 404 {object} models.ErrorMsg "Not found"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/words/{dictName}/delete [post]
 func (h *WordHandler) DeleteWord(c *gin.Context) {
 	dictName := c.Param("dictName")
+    if _, ok := availableDicts[dictName]; !ok {
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid dictionary name"})
+        return
+    }
 	var wordToDelete models.JapaneseWord
 
 	if err := c.ShouldBindJSON(&wordToDelete); err != nil {
@@ -332,10 +362,15 @@ const defaultResultPerPage = 30
 // @Param RPP query int false "Results per page"
 // @Produce json
 // @Success 200 {object} []models.JapaneseWord
+// @Failure 400 {object} models.ErrorMsg "Invalid dictionary name"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/words/{dictName}/get [get]
 func (h *WordHandler) GetDict(c *gin.Context) {
 	dictName := c.Param("dictName")
+    if _, ok := availableDicts[dictName]; !ok {
+        c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid dictionary name"})
+        return
+    }
 	page := c.Query("page")
 	resultPerPageStr := c.Query("RPP")
 	var pageInt int
