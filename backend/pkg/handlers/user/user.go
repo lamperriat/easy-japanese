@@ -3,6 +3,7 @@ package user
 import (
 	"backend/pkg/auth"
 	"backend/pkg/models"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -62,4 +63,41 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 	}
 
 	c.JSON(201, models.SuccessMsg{Message: "User registered"})
+}
+
+func (h* UserHandler) ChangeUserName(c *gin.Context) {
+	providedKey := c.GetHeader("X-API-Key")
+	keyhash := auth.Sha256hex(providedKey)
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
+		return
+	}
+
+	err := h.db.Transaction(func(tx *gorm.DB) error {
+		var originalUser models.User
+		if err := tx.Where("keyhash = ?", keyhash).First(&originalUser).Error; err != nil {
+			return err
+		}
+		if originalUser.Username == user.Username {
+			return fmt.Errorf("same username")
+		}
+		if err := tx.Model(&originalUser).Update("username", user.Username).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, models.ErrorMsg{Error: "User not found"})
+		} else if strings.Contains(err.Error(), "same username") {
+			c.JSON(409, models.ErrorMsg{Error: "Same username"})
+		} else {
+			c.JSON(500, models.ErrorMsg{Error: "Database error"})
+		}
+		return
+	}
+	
+	c.JSON(200, models.SuccessMsg{Message: "Username changed"})
 }
