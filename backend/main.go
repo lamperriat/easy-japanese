@@ -42,7 +42,7 @@ func main() {
 	r.GET("/api/random", auth.APIKeyAuth(), handlers.GetRandomNumber)
 	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightCorrect)
 	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightIncorrect)
-	r.POST("/api/words/:dictName/search", auth.APIKeyAuth(), wordHandler.FuzzySearchWord)
+	r.POST("/api/words/:dictName/accurate-search", auth.APIKeyAuth(), wordHandler.AccurateSearchWord)
 	r.POST("/api/words/:dictName/add", auth.APIKeyAuth(), wordHandler.AddWord)
 	r.POST("/api/words/:dictName/edit", auth.APIKeyAuth(), wordHandler.EditWord)
 	r.POST("/api/words/:dictName/delete", auth.APIKeyAuth(), wordHandler.DeleteWord)

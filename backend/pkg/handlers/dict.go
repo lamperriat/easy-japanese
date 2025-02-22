@@ -23,7 +23,7 @@ func NewWordHandler(db *gorm.DB) *WordHandler {
 }
 
 // @Summary Check for similar words in the dictionary
-// @Description 
+// @Description Only ``kanji" and ``katakana" fields are used for comparison
 // @Tags globalDictOp
 // @Security APIKeyAuth
 // @Param dictName path string true "Dictionary name"
@@ -32,8 +32,8 @@ func NewWordHandler(db *gorm.DB) *WordHandler {
 // @Success 200 {object} []models.JapaneseWord
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /api/words/{dictName}/search [post]
-func (h *WordHandler) FuzzySearchWord(c *gin.Context) {
+// @Router /api/words/{dictName}/accurate-search [post]
+func (h *WordHandler) AccurateSearchWord(c *gin.Context) {
     dictName := c.Param("dictName") // dictName, or "all"
     var uploadedWord models.JapaneseWord
 
@@ -72,6 +72,67 @@ func (h *WordHandler) FuzzySearchWord(c *gin.Context) {
     }
 
     c.JSON(200, similarWords)
+}
+// @Summary Check for similar words (fuzzy) in the dictionary
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Param dictName path string true "Dictionary name"
+// @Param query query string true "Search query"
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SearchResult[models.JapaneseWord]
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/words/{dictName}/fuzzy-search [get]
+func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
+    dictName := c.Param("dictName")
+	query := c.Query("query")
+	page := c.Query("page")
+	resultPerPageStr := c.Query("RPP")
+	var pageInt int
+	var err error
+	pageInt, err = strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	var resultPerPage int
+	resultPerPage, err = strconv.Atoi(resultPerPageStr)
+	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
+		resultPerPage = defaultResultPerPage
+	}
+
+    var words []models.JapaneseWord
+    var count int64
+
+    // TODO: Here when this handler is called for the same query
+    // but different page, the count is calculated again
+    // Possible solutions: Use cache, or separate it as another handler
+    if err := h.db.Model(&models.JapaneseWord{}).
+        Where("dict_name = ? AND (kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ?)", dictName, "%"+query+"%", "%"+query+"%", "%"+query+"%").
+        Count(&count).Error; err != nil {
+        c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        return
+    }
+
+    // TODO: We may use FTS5 for better performance
+    if err := h.db.Model(&models.JapaneseWord{}).
+        Where("dict_name = ? AND (kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ?)", dictName, "%"+query+"%", "%"+query+"%", "%"+query+"%").
+        Limit(resultPerPage).
+        Offset((pageInt - 1) * resultPerPage).
+        Find(&words).Error; err != nil {
+        c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        return
+    }
+
+    c.JSON(200, models.SearchResult[models.JapaneseWord]{
+        Count: count,
+        Page: pageInt,
+        PageSize: resultPerPage,
+        Results: words,
+    })
 }
 
 
