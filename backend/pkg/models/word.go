@@ -51,3 +51,9 @@ type UserWord struct {
     UserNote  string `gorm:"type:text"`
 }
 
+type SearchResult[T any] struct {
+    Count    int64 `json:"count"`
+    Page     int   `json:"page"`
+    PageSize int   `json:"pageSize"`
+    Results  []T   `json:"results"`
+}

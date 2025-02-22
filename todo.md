@@ -15,3 +15,7 @@ Backend
   * Grammars (comprehension). Simply choose a random sentence from the database. 
 * Advanced
   * User data are saved every several seconds.
+
+
+Optimize: 
+* FTS5 full text search

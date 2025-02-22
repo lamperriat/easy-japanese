@@ -57,6 +57,45 @@ definitions:
       id:
         type: integer
     type: object
+  models.SearchResult-models_Grammar:
+    properties:
+      count:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/models.Grammar'
+        type: array
+    type: object
+  models.SearchResult-models_JapaneseWord:
+    properties:
+      count:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/models.JapaneseWord'
+        type: array
+    type: object
+  models.SearchResult-models_ReadingMaterial:
+    properties:
+      count:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/models.ReadingMaterial'
+        type: array
+    type: object
   models.SuccessMsg:
     properties:
       message:
@@ -201,9 +240,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.Grammar'
-            type: array
+            $ref: '#/definitions/models.SearchResult-models_Grammar'
         "500":
           description: Database error
           schema:
@@ -350,6 +387,10 @@ paths:
       produces:
       - application/json
       responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SearchResult-models_ReadingMaterial'
         "400":
           description: Database error
           schema:
@@ -357,6 +398,39 @@ paths:
       security:
       - APIKeyAuth: []
       summary: Fuzzy search in all reading materials
+      tags:
+      - globalDictOp
+  /api/words/{dictName}/accurate-search:
+    post:
+      consumes:
+      - application/json
+      description: Only ``kanji" and ``katakana" fields are used for comparison
+      parameters:
+      - description: Dictionary name
+        in: path
+        name: dictName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.JapaneseWord'
+            type: array
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Check for similar words in the dictionary
       tags:
       - globalDictOp
   /api/words/{dictName}/add:
@@ -461,6 +535,49 @@ paths:
       summary: Update word in dictionary
       tags:
       - globalDictOp
+  /api/words/{dictName}/fuzzy-search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary name
+        in: path
+        name: dictName
+        required: true
+        type: string
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SearchResult-models_JapaneseWord'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Check for similar words (fuzzy) in the dictionary
+      tags:
+      - globalDictOp
   /api/words/{dictName}/get:
     get:
       parameters:
@@ -493,38 +610,6 @@ paths:
       security:
       - APIKeyAuth: []
       summary: Browse words in dictionary
-      tags:
-      - globalDictOp
-  /api/words/{dictName}/search:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Dictionary name
-        in: path
-        name: dictName
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/models.JapaneseWord'
-            type: array
-        "400":
-          description: Invalid JSON
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "500":
-          description: Database error
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-      security:
-      - APIKeyAuth: []
-      summary: Check for similar words in the dictionary
       tags:
       - globalDictOp
 securityDefinitions:

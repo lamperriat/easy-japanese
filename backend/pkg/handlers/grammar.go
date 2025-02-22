@@ -194,7 +194,7 @@ func (h *WordHandler) GetGrammar(c *gin.Context) {
 // @Param query query string true "Search query"
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"
-// @Success 200 {object} []models.Grammar
+// @Success 200 {object} models.SearchResult[models.Grammar]
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/grammar/search [get]
 func (h* WordHandler) FuzzySearchGrammar(c *gin.Context) {
@@ -213,6 +213,15 @@ func (h* WordHandler) FuzzySearchGrammar(c *gin.Context) {
 		resultPerPage = defaultResultPerPage
 	}
 	var grammars []models.Grammar
+	var count int64
+	if err := h.db.Preload("Examples").
+		Model(&models.Grammar{}).
+		Where("description LIKE ?", "%"+query+"%").
+		Count(&count).Error; err != nil {
+		c.JSON(500, models.ErrorMsg{Error: "Database error"})
+		return
+	}
+
 	if err := h.db.
 		Where("description LIKE ?", "%"+query+"%").
 		Limit(resultPerPage).
@@ -222,5 +231,10 @@ func (h* WordHandler) FuzzySearchGrammar(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, grammars)
+	c.JSON(200, models.SearchResult[models.Grammar]{
+		Count:    count,
+		Page:     pageInt,
+		PageSize: resultPerPage,
+		Results:  grammars,
+	})
 }
