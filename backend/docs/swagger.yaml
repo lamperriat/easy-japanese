@@ -421,7 +421,7 @@ paths:
               $ref: '#/definitions/models.JapaneseWord'
             type: array
         "400":
-          description: Invalid JSON
+          description: Invalid JSON or Invalid dict name
           schema:
             $ref: '#/definitions/models.ErrorMsg'
         "500":
@@ -451,7 +451,7 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessMsg'
         "400":
-          description: Invalid JSON
+          description: Invalid JSON or Invalid dict name
           schema:
             $ref: '#/definitions/models.ErrorMsg'
         "409":
@@ -485,7 +485,7 @@ paths:
           schema:
             $ref: '#/definitions/models.SuccessMsg'
         "400":
-          description: Invalid JSON
+          description: Invalid JSON or Invalid dict name
           schema:
             $ref: '#/definitions/models.ErrorMsg'
         "404":
@@ -519,7 +519,7 @@ paths:
           schema:
             $ref: '#/definitions/models.JapaneseWord'
         "400":
-          description: Invalid JSON
+          description: Invalid JSON or Invalid dict name
           schema:
             $ref: '#/definitions/models.ErrorMsg'
         "404":
@@ -566,7 +566,7 @@ paths:
           schema:
             $ref: '#/definitions/models.SearchResult-models_JapaneseWord'
         "400":
-          description: Invalid JSON
+          description: Invalid JSON or Invalid dict name
           schema:
             $ref: '#/definitions/models.ErrorMsg'
         "500":
@@ -603,6 +603,10 @@ paths:
             items:
               $ref: '#/definitions/models.JapaneseWord'
             type: array
+        "400":
+          description: Invalid dictionary name
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
         "500":
           description: Database error
           schema:

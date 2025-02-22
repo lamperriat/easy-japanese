@@ -525,7 +525,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid JSON",
+                        "description": "Invalid JSON or Invalid dict name",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMsg"
                         }
@@ -573,7 +573,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid JSON",
+                        "description": "Invalid JSON or Invalid dict name",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMsg"
                         }
@@ -627,7 +627,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid JSON",
+                        "description": "Invalid JSON or Invalid dict name",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMsg"
                         }
@@ -681,7 +681,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid JSON",
+                        "description": "Invalid JSON or Invalid dict name",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMsg"
                         }
@@ -754,7 +754,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid JSON",
+                        "description": "Invalid JSON or Invalid dict name",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMsg"
                         }
@@ -811,6 +811,12 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.JapaneseWord"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid dictionary name",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
                         }
                     },
                     "500": {
