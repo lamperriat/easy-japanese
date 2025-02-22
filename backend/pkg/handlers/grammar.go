@@ -214,7 +214,8 @@ func (h* WordHandler) FuzzySearchGrammar(c *gin.Context) {
 	}
 	var grammars []models.Grammar
 	var count int64
-	if err := h.db.Model(&models.Grammar{}).
+	if err := h.db.Preload("Examples").
+		Model(&models.Grammar{}).
 		Where("description LIKE ?", "%"+query+"%").
 		Count(&count).Error; err != nil {
 		c.JSON(500, models.ErrorMsg{Error: "Database error"})

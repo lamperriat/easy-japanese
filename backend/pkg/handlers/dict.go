@@ -4,6 +4,7 @@ import (
 	"backend/pkg/models"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -42,7 +43,7 @@ func (h *WordHandler) AccurateSearchWord(c *gin.Context) {
         return
     }
 
-    query := h.db.Model(&models.JapaneseWord{})
+    query := h.db.Preload("Examples").Model(&models.JapaneseWord{})
     if dictName != "all" {
         query = query.Where("dict_name = ?", dictName)
     }
@@ -106,20 +107,22 @@ func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
 
     var words []models.JapaneseWord
     var count int64
-
+    log.Printf("Searching for %s in %s", query, dictName)
     // TODO: Here when this handler is called for the same query
     // but different page, the count is calculated again
     // Possible solutions: Use cache, or separate it as another handler
-    if err := h.db.Model(&models.JapaneseWord{}).
-        Where("dict_name = ? AND (kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ?)", dictName, "%"+query+"%", "%"+query+"%", "%"+query+"%").
-        Count(&count).Error; err != nil {
+    q := h.db.Preload("Examples").Model(&models.JapaneseWord{})
+    if dictName != "all" {
+        q = q.Where("dict_name = ?", dictName)
+    }
+    q = q.Where("kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%")
+    if err := q.Count(&count).Error; err != nil {
         c.JSON(500, models.ErrorMsg{Error: "Database error"})
         return
     }
 
     // TODO: We may use FTS5 for better performance
-    if err := h.db.Model(&models.JapaneseWord{}).
-        Where("dict_name = ? AND (kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ?)", dictName, "%"+query+"%", "%"+query+"%", "%"+query+"%").
+    if err := q.
         Limit(resultPerPage).
         Offset((pageInt - 1) * resultPerPage).
         Find(&words).Error; err != nil {
