@@ -16,14 +16,10 @@ func InitDB() (*gorm.DB, error) {
 		&models.JapaneseWord{}, 
 		&models.ExampleSentence{}, 
 		&models.User{}, 
-<<<<<<< HEAD
 		&models.UserWord{},
 		&models.ReadingMaterial{},
 		&models.Grammar{},
 		&models.GrammarExample{}, 
-=======
-		&models.UserWord{}, 
->>>>>>> 81d02e8 (merge: Update main with sqlite features (#6))
 	)
     return db, err
 }
