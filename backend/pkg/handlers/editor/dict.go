@@ -4,7 +4,6 @@ import (
 	"backend/pkg/models"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -125,7 +124,7 @@ func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
 
     var words []models.JapaneseWord
     var count int64
-    log.Printf("Searching for %s in %s", query, dictName)
+    // log.Printf("Searching for %s in %s", query, dictName)
     // TODO: Here when this handler is called for the same query
     // but different page, the count is calculated again
     // Possible solutions: Use cache, or separate it as another handler
