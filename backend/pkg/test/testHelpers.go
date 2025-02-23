@@ -1,29 +1,16 @@
 package test
 
 import (
+	"backend/pkg/db"
 	"backend/pkg/handlers/editor"
-	"backend/pkg/models"
+	"backend/pkg/handlers/user"
 
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func initDB() (*gorm.DB, error) {
-    db, err := gorm.Open(sqlite.Open("../../data/japanese.db"), &gorm.Config{})
-    if err != nil {
-        return nil, err
-    }
 
-    err = db.AutoMigrate(
-		&models.JapaneseWord{}, 
-		&models.ExampleSentence{}, 
-		&models.User{}, 
-		&models.UserWord{}, 
-	)
-    return db, err
-}
 func GetTestDB() *gorm.DB {
-	db, err := initDB()
+	db, err := db.InitDB()
 	if err != nil {
 		panic(err)
 	}
@@ -32,4 +19,8 @@ func GetTestDB() *gorm.DB {
 
 func GetTestWordHandler() *editor.WordHandler {
 	return editor.NewWordHandler(GetTestDB())
+}
+
+func GetTestUserHandler() *user.UserHandler {
+	return user.NewUserHandler(GetTestDB())
 }

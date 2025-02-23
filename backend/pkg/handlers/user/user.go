@@ -15,7 +15,7 @@ type UserHandler struct {
     db         *gorm.DB
 }
 
-func NewWordHandler(db *gorm.DB) *UserHandler {
+func NewUserHandler(db *gorm.DB) *UserHandler {
     return &UserHandler{
         db:         db,
     }
@@ -88,7 +88,7 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 // @Failure 409 {object} models.ErrorMsg "Duplicate user or username"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/update [post]
-func (h* UserHandler) ChangeUserName(c *gin.Context) {
+func (h* UserHandler) UpdateUserName(c *gin.Context) {
 	providedKey := c.GetHeader("X-API-Key")
 	keyhash := auth.Sha256hex(providedKey)
 	var user models.User
@@ -134,8 +134,8 @@ func (h* UserHandler) ChangeUserName(c *gin.Context) {
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON"
 // @Failure 409 {object} models.ErrorMsg "Duplicate user or username"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /api/user/remove [get]
-func (h* UserHandler) RemoveUser(c *gin.Context) {
+// @Router /api/user/delete [get]
+func (h* UserHandler) DeleteUser(c *gin.Context) {
 	providedKey := c.GetHeader("X-API-Key")
 	keyhash := auth.Sha256hex(providedKey)
 

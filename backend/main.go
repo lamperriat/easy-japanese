@@ -1,21 +1,22 @@
 package main
 
 import (
-    _ "backend/docs"
-    swaggerFiles "github.com/swaggo/files"
-    ginSwagger "github.com/swaggo/gin-swagger"
+	_ "backend/docs"
 	"backend/pkg/auth"
 	"backend/pkg/db"
 	"backend/pkg/handlers/editor"
+	"backend/pkg/handlers/user"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-
 // @title Easy Japanese API
 // @version 0.1
-// @description 
+// @description
 // @license.name MIT
 // @license.url http://opensource.org/licenses/MIT
 // @securityDefinitions.apikey ApiKeyAuth
@@ -31,6 +32,7 @@ func main() {
 		panic(err)
 	}
 	wordHandler := editor.NewWordHandler(db)
+	userHandler := user.NewUserHandler(db)
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},
@@ -40,8 +42,14 @@ func main() {
 	}))
 
 	r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
+
+	r.POST("/api/user/register", auth.APIKeyAuth(), userHandler.RegisterUser)
+	r.POST("/api/user/update", auth.APIKeyAuth(), userHandler.UpdateUserName)
+	r.GET("/api/user/delete", auth.APIKeyAuth(), userHandler.DeleteUser)
+
 	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), editor.UpdateWordWeightCorrect)
 	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), editor.UpdateWordWeightIncorrect)
+	
 	r.POST("/api/words/:dictName/accurate-search", auth.APIKeyAuth(), wordHandler.AccurateSearchWord)
 	r.GET("/api/words/:dictName/fuzzy-search", auth.APIKeyAuth(), wordHandler.FuzzySearchWord)
 	r.POST("/api/words/:dictName/add", auth.APIKeyAuth(), wordHandler.AddWord)
