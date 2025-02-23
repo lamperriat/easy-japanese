@@ -400,6 +400,95 @@ paths:
       summary: Fuzzy search in all reading materials
       tags:
       - globalDictOp
+  /api/user/register:
+    post:
+      consumes:
+      - application/json
+      description: Both the username and the sha256 of the api key should be unique
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "409":
+          description: Duplicate user or username
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Register user
+      tags:
+      - userOp
+  /api/user/remove:
+    get:
+      description: The sha256 of the api key is used as the identifier.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "409":
+          description: Duplicate user or username
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Remove user
+      tags:
+      - userOp
+  /api/user/update:
+    post:
+      consumes:
+      - application/json
+      description: The sha256 of the api key is used as the identifier.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "409":
+          description: Duplicate user or username
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Change the username
+      tags:
+      - userOp
   /api/words/{dictName}/accurate-search:
     post:
       consumes:
