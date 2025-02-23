@@ -21,6 +21,17 @@ func NewWordHandler(db *gorm.DB) *UserHandler {
     }
 }
 
+// @Summary Register user
+// @Description Both the username and the sha256 of the api key should be unique
+// @Tags userOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 409 {object} models.ErrorMsg "Duplicate user or username"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/register [post]
 func (h *UserHandler) RegisterUser(c *gin.Context) {
 	providedKey := c.GetHeader("X-API-Key")
 	keyhash := auth.Sha256hex(providedKey)
@@ -65,6 +76,18 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 	c.JSON(201, models.SuccessMsg{Message: "User registered"})
 }
 
+// @Summary Change the username
+// @Description The sha256 of the api key is used as the identifier. 
+// @Tags userOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "User not found"
+// @Failure 409 {object} models.ErrorMsg "Duplicate user or username"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/update [post]
 func (h* UserHandler) ChangeUserName(c *gin.Context) {
 	providedKey := c.GetHeader("X-API-Key")
 	keyhash := auth.Sha256hex(providedKey)
@@ -100,4 +123,39 @@ func (h* UserHandler) ChangeUserName(c *gin.Context) {
 	}
 	
 	c.JSON(200, models.SuccessMsg{Message: "Username changed"})
+}
+
+// @Summary Remove user
+// @Description The sha256 of the api key is used as the identifier.
+// @Tags userOp
+// @Security APIKeyAuth
+// @Produce json
+// @Success 201 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 409 {object} models.ErrorMsg "Duplicate user or username"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/remove [get]
+func (h* UserHandler) RemoveUser(c *gin.Context) {
+	providedKey := c.GetHeader("X-API-Key")
+	keyhash := auth.Sha256hex(providedKey)
+
+	err := h.db.Transaction(func(tx *gorm.DB) error {
+		var user models.User
+		if err := tx.Where("keyhash = ?", keyhash).First(&user).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&user).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, models.ErrorMsg{Error: "User not found"})
+		} else {
+			c.JSON(500, models.ErrorMsg{Error: "Database error"})
+		}
+		return
+	}
+	c.JSON(200, models.SuccessMsg{Message: "User removed"})
 }
