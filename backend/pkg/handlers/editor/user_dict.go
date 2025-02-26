@@ -4,6 +4,7 @@ import (
 	"backend/pkg/auth"
 	"backend/pkg/models"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -139,5 +140,70 @@ func (h* WordHandler) FuzzySearchWordUser(c *gin.Context) {
         PageSize: resultPerPage,
         Results: words,
     })
+}
 
+
+// @Summary Insert word into user's dictionary
+// @Description 
+// @Tags userDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 201 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON or Invalid dict name"
+// @Failure 404 {object} models.ErrorMsg "User not found"
+// @Failure 409 {object} models.ErrorMsg "Duplicate word"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/words/add [post]
+func (h* WordHandler) AddWordUser(c *gin.Context) {
+    providedKey := c.GetHeader("X-API-Key")
+    keyhash := auth.Sha256hex(providedKey)
+    var user models.User
+    if err := h.db.Where("keyhash = ?", keyhash).
+        First(&user).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(404, models.ErrorMsg{Error: "User not found"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        } 
+        return
+    }
+
+    var newWord models.UserWord
+
+    if err := c.ShouldBindJSON(&newWord); err != nil {
+        c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
+        return
+    }
+
+    err := h.db.Transaction(func(tx *gorm.DB) error {
+        var existCount int64
+        if err := tx.Model(&models.UserWord{}).
+            Where("(kanji != '' AND kanji = ?) OR (katakana != '' AND katakana = ?)",
+            newWord.Kanji,
+            newWord.Katakana).
+            Count(&existCount).Error; err != nil {
+            return err
+        }
+
+        if existCount > 0 {
+            return fmt.Errorf("duplicate word in dictionary")
+
+        }
+        if err := tx.Create(&newWord).Error; err != nil {
+            return err
+        }
+        return nil
+    })
+   
+    if err != nil {
+        if strings.Contains(err.Error(), "duplicate") {
+            c.JSON(409, models.ErrorMsg{Error: "Word already exists in this dictionary"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database operation failed"})
+        }
+        return
+    }
+
+    c.JSON(201, models.SuccessMsg{Message: "Word added"})
 }
