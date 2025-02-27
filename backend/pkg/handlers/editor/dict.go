@@ -1,4 +1,4 @@
-package editor 
+package editor
 
 import (
 	"backend/pkg/models"

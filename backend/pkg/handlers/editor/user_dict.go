@@ -150,7 +150,7 @@ func (h* WordHandler) FuzzySearchWordUser(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.SuccessMsg
-// @Failure 400 {object} models.ErrorMsg "Invalid JSON or Invalid dict name"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
 // @Failure 404 {object} models.ErrorMsg "User not found"
 // @Failure 409 {object} models.ErrorMsg "Duplicate word"
 // @Failure 500 {object} models.ErrorMsg "Database error"
@@ -206,4 +206,77 @@ func (h* WordHandler) AddWordUser(c *gin.Context) {
     }
 
     c.JSON(201, models.SuccessMsg{Message: "Word added"})
+}
+
+// @Summary Edit a word in user's dictionary
+// @Description 
+// @Tags userDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "User not found"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/words/edit [post]
+func (h* WordHandler) EditWordUser(c *gin.Context) {
+    providedKey := c.GetHeader("X-API-Key")
+    keyhash := auth.Sha256hex(providedKey)
+    var user models.User
+    if err := h.db.Where("keyhash = ?", keyhash).
+        First(&user).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(404, models.ErrorMsg{Error: "User not found"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        } 
+        return
+    }
+
+    var newWord models.UserWord
+
+    if err := c.ShouldBindJSON(&newWord); err != nil {
+        c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
+        return
+    }
+
+    err := h.db.Transaction(func(tx* gorm.DB) error {
+        var existing models.UserWord
+        if err := tx.Model(&models.UserWord{}).
+            Where("id = ? AND user_id = ?", newWord.ID, user.ID).
+            First(&existing).Error; err != nil {
+            return err
+        }
+
+        if err := tx.Model(&existing).
+            Omit("id", "user_id", "Examples").
+            Updates(&newWord).Error; err != nil {
+            return err
+        }
+        if err := tx.Where("user_word_id = ?", newWord.ID).
+            Delete(&models.UserWordExample{}).Error; err != nil {
+            return err
+        }
+        if len(newWord.Examples) > 0 {
+            for i := range newWord.Examples {
+                newWord.Examples[i].UserWordID = newWord.ID
+                newWord.Examples[i].ID = 0
+            }
+            if err := tx.Create(&newWord.Examples).Error; err != nil {
+                return err
+            }
+        }
+        return nil
+    })
+
+    if err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(404, models.ErrorMsg{Error: "Word not found"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database operation failed"})
+        }
+        return
+    }
+
+    c.JSON(200, models.SuccessMsg{Message: "Word updated"})
 }
