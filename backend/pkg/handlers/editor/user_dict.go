@@ -176,6 +176,8 @@ func (h* WordHandler) AddWordUser(c *gin.Context) {
         return
     }
 
+    newWord.UserID = user.ID
+
     err := h.db.Transaction(func(tx *gorm.DB) error {
         var existCount int64
         if err := tx.Model(&models.UserWord{}).
@@ -401,5 +403,4 @@ func (h *WordHandler) GetDictUser(c *gin.Context) {
         PageSize: resultPerPage,
         Results: words,
     })
-   
 }

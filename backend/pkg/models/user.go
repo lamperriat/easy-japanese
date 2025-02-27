@@ -33,7 +33,7 @@ type UserWord struct {
     Katakana    string  `json:"katakana"`
     Hiragana    string  `json:"hiragana"`
     Type        string  `json:"type"`
-    UserID      string  `json:"-" gorm:"index:user_id"`
+    UserID      uint    `json:"-" gorm:"index:user_id"`
     Familiarity int     `json:"familiarity" gorm:"default:50"`
     LastSeen    int64   `json:"lastSeen" gorm:"column:last_seen"`
     Examples    []UserWordExample `json:"example" gorm:"foreignKey:UserWordID"`
