@@ -362,7 +362,7 @@ const defaultResultPerPage = 30
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"
 // @Produce json
-// @Success 200 {object} []models.JapaneseWord
+// @Success 200 {object} models.SearchResult[models.JapaneseWord]
 // @Failure 400 {object} models.ErrorMsg "Invalid dictionary name"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/words/{dictName}/get [get]
@@ -391,6 +391,11 @@ func (h *WordHandler) GetDict(c *gin.Context) {
 	}
 
 	var words []models.JapaneseWord
+    var count int64
+    if err := query.Count(&count).Error; err != nil {
+        c.AbortWithStatusJSON(500, models.ErrorMsg{Error: "Database error"})
+        return
+    }
 	if err := query.
 		Limit(resultPerPage).
 		Offset((pageInt - 1) * resultPerPage).
@@ -400,5 +405,10 @@ func (h *WordHandler) GetDict(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, words)
+	c.JSON(200, models.SearchResult[models.JapaneseWord]{
+        Count: count,
+        Page: pageInt,
+        PageSize: resultPerPage,
+        Results: words,
+    })
 }

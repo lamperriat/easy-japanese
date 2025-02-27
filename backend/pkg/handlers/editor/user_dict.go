@@ -340,3 +340,66 @@ func (h *WordHandler) DeleteWordUser(c *gin.Context) {
     }
     c.JSON(200, models.SuccessMsg{Message: "Word deleted"})
 }
+
+// @Summary Browse words in dictionary
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Produce json
+// @Success 200 {object} models.SearchResult[models.UserWord]
+// @Failure 400 {object} models.ErrorMsg "Invalid dictionary name"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/words/get [get]
+func (h *WordHandler) GetDictUser(c *gin.Context) {
+    providedKey := c.GetHeader("X-API-Key")
+    keyhash := auth.Sha256hex(providedKey)
+    var user models.User
+    if err := h.db.Where("keyhash = ?", keyhash).
+        First(&user).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(404, models.ErrorMsg{Error: "User not found"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        } 
+        return
+    }
+	page := c.Query("page")
+	resultPerPageStr := c.Query("RPP")
+	var pageInt int
+	var err error
+	pageInt, err = strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	var resultPerPage int
+	resultPerPage, err = strconv.Atoi(resultPerPageStr)
+	if err != nil || resultPerPage < 1 || resultPerPage > 100 {
+		resultPerPage = defaultResultPerPage
+	}
+    query := h.db.Preload("Examples").Model(&models.UserWord{})
+
+    var words []models.UserWord
+    var count int64
+    if err := query.Where("user_id = ?", user.ID).
+        Count(&count).Error; err != nil {
+        c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        return
+    }
+    if err := query.Where("user_id = ?", user.ID).
+        Limit(resultPerPage).
+        Offset((pageInt - 1) * resultPerPage).
+        Find(&words).Error; err != nil {
+        c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        return
+    }
+
+    c.JSON(200, models.SearchResult[models.UserWord]{
+        Count: count,
+        Page: pageInt,
+        PageSize: resultPerPage,
+        Results: words,
+    })
+   
+}
