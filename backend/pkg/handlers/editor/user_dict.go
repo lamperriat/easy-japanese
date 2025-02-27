@@ -280,3 +280,63 @@ func (h* WordHandler) EditWordUser(c *gin.Context) {
 
     c.JSON(200, models.SuccessMsg{Message: "Word updated"})
 }
+
+
+// @Summary Delete a word in user's dictionary
+// @Description 
+// @Tags userDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 404 {object} models.ErrorMsg "User not found"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/words/delete [post]
+func (h *WordHandler) DeleteWordUser(c *gin.Context) {
+    providedKey := c.GetHeader("X-API-Key")
+    keyhash := auth.Sha256hex(providedKey)
+    var user models.User
+    if err := h.db.Where("keyhash = ?", keyhash).
+        First(&user).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(404, models.ErrorMsg{Error: "User not found"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        } 
+        return
+    }
+    var toDelete models.UserWord
+
+    if err := c.ShouldBindJSON(&toDelete); err != nil {
+        c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
+        return
+    }
+
+    err := h.db.Transaction(func(tx *gorm.DB) error {
+        var existing models.UserWord
+        if err := tx.Model(&models.UserWord{}).
+            Where("id = ? AND user_id = ?", toDelete.ID, user.ID).
+            First(&existing).Error; err != nil {
+            return err
+        }
+        if err := tx.Where("user_word_id = ?", toDelete.ID).
+            Delete(&models.UserWordExample{}).Error; err != nil {
+            return err
+        }
+        if err := tx.Delete(&existing).Error; err != nil {
+            return err
+        }
+        return nil
+    })
+
+    if err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(404, models.ErrorMsg{Error: "Word not found"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database operation failed"})
+        }
+        return
+    }
+    c.JSON(200, models.SuccessMsg{Message: "Word deleted"})
+}
