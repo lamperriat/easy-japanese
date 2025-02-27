@@ -478,24 +478,21 @@
                 }
             }
         },
-        "/api/user/register": {
-            "post": {
+        "/api/user/delete": {
+            "get": {
                 "security": [
                     {
                         "APIKeyAuth": []
                     }
                 ],
-                "description": "Both the username and the sha256 of the api key should be unique",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "The sha256 of the api key is used as the identifier.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "userOp"
                 ],
-                "summary": "Register user",
+                "summary": "Remove user",
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -524,21 +521,24 @@
                 }
             }
         },
-        "/api/user/remove": {
-            "get": {
+        "/api/user/register": {
+            "post": {
                 "security": [
                     {
                         "APIKeyAuth": []
                     }
                 ],
-                "description": "The sha256 of the api key is used as the identifier.",
+                "description": "Both the username and the sha256 of the api key should be unique",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "userOp"
                 ],
-                "summary": "Remove user",
+                "summary": "Register user",
                 "responses": {
                     "201": {
                         "description": "Created",
@@ -619,7 +619,7 @@
                 }
             }
         },
-        "/api/words/{dictName}/accurate-search": {
+        "/api/user/words/accurate-search": {
             "post": {
                 "security": [
                     {
@@ -637,6 +637,303 @@
                     "userDictOp"
                 ],
                 "summary": "Check for similar words in the dictionary for that user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.JapaneseWord"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Invalid dict name",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/words/add": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Insert word into user's dictionary",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "409": {
+                        "description": "Duplicate word",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/words/delete": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Delete a word in user's dictionary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/words/edit": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Edit a word in user's dictionary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/words/fuzzy-search": {
+            "get": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Check (fuzzy search) for similar words in the dictionary for that user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.JapaneseWord"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON or Invalid dict name",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/words/get": {
+            "get": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "globalDictOp"
+                ],
+                "summary": "Browse words in dictionary",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Results per page",
+                        "name": "RPP",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SearchResult-models_UserWord"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid dictionary name",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/words/{dictName}/accurate-search": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "description": "Only ``kanji\" and ``katakana\" fields are used for comparison",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "globalDictOp"
+                ],
+                "summary": "Check for similar words in the dictionary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Dictionary name",
+                        "name": "dictName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -930,10 +1227,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.JapaneseWord"
-                            }
+                            "$ref": "#/definitions/models.SearchResult-models_JapaneseWord"
                         }
                     },
                     "400": {
@@ -1103,10 +1397,76 @@
                 }
             }
         },
+        "models.SearchResult-models_UserWord": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserWord"
+                    }
+                }
+            }
+        },
         "models.SuccessMsg": {
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserWord": {
+            "type": "object",
+            "properties": {
+                "chinese": {
+                    "type": "string"
+                },
+                "example": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserWordExample"
+                    }
+                },
+                "familiarity": {
+                    "type": "integer"
+                },
+                "hiragana": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "kanji": {
+                    "type": "string"
+                },
+                "katakana": {
+                    "type": "string"
+                },
+                "lastSeen": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserWordExample": {
+            "type": "object",
+            "properties": {
+                "chinese": {
+                    "type": "string"
+                },
+                "example": {
                     "type": "string"
                 }
             }
