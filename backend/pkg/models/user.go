@@ -38,3 +38,17 @@ type UserWord struct {
     LastSeen    int64   `json:"lastSeen" gorm:"column:last_seen"`
     Examples    []UserWordExample `json:"example" gorm:"foreignKey:UserWordID"`
 }
+
+type UserGrammarExample struct {
+    ID          uint   `json:"-" gorm:"primaryKey"`
+    GrammarID   uint   `json:"-" gorm:"column:grammar_id"` // foreign key
+    Example     string `json:"example" gorm:"type:text"`
+    Chinese     string `json:"chinese" gorm:"type:text"`
+}
+
+type UserGrammar struct {
+    ID          uint   `json:"id" gorm:"primaryKey"`
+    UserID      uint   `json:"-" gorm:"index:user_id"`
+    Description string `json:"description" gorm:"type:text"`
+    Examples    []UserGrammarExample `json:"example" gorm:"foreignKey:GrammarID"`
+}
