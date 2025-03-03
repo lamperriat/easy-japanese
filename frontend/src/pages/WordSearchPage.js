@@ -127,7 +127,7 @@ const WordSearchPage = () => {
   return (
     <div className="word-search-page">
       <header className="main-header">
-        <h1>词表搜索</h1>
+        <h1>词库搜索</h1>
         <h2>Word Search</h2>
       </header>
 

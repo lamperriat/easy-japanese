@@ -2,19 +2,9 @@
 
 .word-search-page {
     font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
     padding: 20px;
     text-align: center;
-  }
-
-  body {
-    background-image: url('../images/background2.jpg');
-    background-size: cover;   /* 使背景图铺满容器，可能会裁剪一部分 */
-    background-attachment:scroll;
-    margin: 0;
-    padding: 0;
-    /* height: 100vh; 让背景高度覆盖整个视口 */
-    position: relative;
+    animation: fadeIn 1.5s forwards; /* 页面加载时的渐入效果 */
   }
   
   /* 标题部分 */
@@ -113,3 +103,20 @@
     text-decoration: underline;
   }
   
+  /* 滑动动画 */
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 页面加载动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

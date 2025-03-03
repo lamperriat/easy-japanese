@@ -1,0 +1,7 @@
+.word-form-section {
+    background-color: rgba(255, 255, 255, 0.8); /* 这里的 0.8 表示80%的不透明度 */
+    padding: 20px;
+    border-radius: 10px; /* 可选：为框添加圆角 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 可选：添加阴影效果 */
+  }
+  

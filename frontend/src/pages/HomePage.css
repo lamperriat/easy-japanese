@@ -7,7 +7,7 @@
 body {
     background-image: url('../images/background2.jpg');
     background-size: cover;   /* 使背景图铺满容器，可能会裁剪一部分 */
-    background-attachment:scroll;
+    background-attachment:fixed;
     margin: 0;
     padding: 0;
     /* height: 100vh; 让背景高度覆盖整个视口 */

@@ -1,5 +1,6 @@
 import React from 'react';
 import WordForm from '../components/WordEditor/WordForm';
+import '../components/WordEditor/WordForm.css';
 
 export default function WordEditorPage() {
   return (
