@@ -4,13 +4,14 @@ import (
 	"backend/pkg/auth"
 	"backend/pkg/models"
 	"errors"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 // @Summary Add a grammar to user's dictionary
-// @Description 
+// @Description
 // @Tags userDictOp
 // @Security APIKeyAuth
 // @Accept json
@@ -181,4 +182,116 @@ func (h* WordHandler) DeleteGrammarUser(c *gin.Context) {
 	}
 
 	c.JSON(200, models.SuccessMsg{Message: "Grammar deleted"})
+}
+
+// @Summary Browse all grammars in user's dictionary
+// @Description 
+// @Tags userDictOp
+// @Security APIKeyAuth
+// @Produce json
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Success 200 {object} []models.UserGrammar
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/grammar/get [get]
+func (h* WordHandler) GetGrammarUser(c *gin.Context) {
+	providedKey := c.GetHeader("X-API-Key")
+	keyhash := auth.Sha256hex(providedKey)
+	var user models.User
+	if err := h.db.Where("keyhash =?", keyhash).
+		First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, models.ErrorMsg{Error: "User not found"})
+		} else {
+			c.JSON(500, models.ErrorMsg{Error: "Database error"})
+		} 
+		return
+	}
+	page := c.Query("page")
+	resultPerPageStr := c.Query("RPP")
+	var pageInt int
+	var err error
+	pageInt, err = strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	var resultPerPage int
+	resultPerPage, err = strconv.Atoi(resultPerPageStr)
+	if err != nil || resultPerPage < 1 {
+		resultPerPage = defaultResultPerPage
+	}
+	query := h.db.Preload("Examples").Model(&models.UserGrammar{})
+	var grammars []models.UserGrammar
+	if err := query.
+		Limit(resultPerPage).
+		Offset((pageInt - 1) * resultPerPage).
+		Where("user_id = ?", user.ID).
+		Find(&grammars).Error; err != nil {
+		c.AbortWithStatusJSON(500, models.ErrorMsg{Error: "Database error"})
+		return
+	}
+}
+
+// @Summary Search among all grammars in user's dictionary
+// @Description 
+// @Tags userDictOp
+// @Security APIKeyAuth
+// @Produce json
+// @Param query query string true "Search query"
+// @Param page query int false "Page number"
+// @Param RPP query int false "Results per page"
+// @Success 200 {object} models.SearchResult[models.UserGrammar]
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/grammar/search [get]
+func (h* WordHandler) SearchGrammarUser(c *gin.Context) {
+	providedKey := c.GetHeader("X-API-Key")
+	keyhash := auth.Sha256hex(providedKey)
+	var user models.User
+	if err := h.db.Where("keyhash =?", keyhash).
+		First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, models.ErrorMsg{Error: "User not found"})
+		} else {
+			c.JSON(500, models.ErrorMsg{Error: "Database error"})
+		} 
+		return
+	}
+	page := c.Query("page")
+	resultPerPageStr := c.Query("RPP")
+	var pageInt int
+	var err error
+	pageInt, err = strconv.Atoi(page)
+	if err != nil || pageInt < 1 {
+		pageInt = 1
+	}
+	var resultPerPage int
+	resultPerPage, err = strconv.Atoi(resultPerPageStr)
+	if err != nil || resultPerPage < 1 {
+		resultPerPage = defaultResultPerPage
+	}
+	var grammars []models.UserGrammar
+	var count int64
+	query := h.db.Preload("Examples").Model(&models.UserGrammar{})
+	if err := query.
+		Where("user_id = ?", user.ID).
+		Where("description LIKE ?", "%"+c.Query("query")+"%").
+		Count(&count).Error; err != nil {
+		c.AbortWithStatusJSON(500, models.ErrorMsg{Error: "Database error"})
+		return
+	}
+	if err := query.
+		Where("user_id = ?", user.ID).
+		Where("description LIKE ?", "%"+c.Query("query")+"%").
+		Limit(resultPerPage).
+		Offset((pageInt - 1) * resultPerPage).
+		Find(&grammars).Error; err != nil {
+		c.AbortWithStatusJSON(500, models.ErrorMsg{Error: "Database error"})
+		return
+	}
+	c.JSON(200, models.SearchResult[models.UserGrammar]{
+		Count: count,
+		Page:  pageInt,
+		PageSize: resultPerPage,
+		Results: grammars,
+	})
 }
