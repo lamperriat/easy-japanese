@@ -20,7 +20,30 @@ func InitDB() (*gorm.DB, error) {
 		&models.ReadingMaterial{},
 		&models.Grammar{},
 		&models.GrammarExample{},
-		&models.UserWordExample{}, 
+		&models.UserWordExample{},
+		&models.UserGrammar{},
+		&models.UserGrammarExample{}, 
 	)
     return db, err
+}
+
+func InitDBTest() (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open("data/japanese_test.db"), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	println("You are using test-only database.")
+	err = db.AutoMigrate(
+		&models.JapaneseWord{}, 
+		&models.ExampleSentence{}, 
+		&models.User{}, 
+		&models.UserWord{},
+		&models.ReadingMaterial{},
+		&models.Grammar{},
+		&models.GrammarExample{},
+		&models.UserWordExample{},
+		&models.UserGrammar{},
+		&models.UserGrammarExample{}, 
+	)
+	return db, err
 }

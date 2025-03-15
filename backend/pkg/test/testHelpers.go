@@ -16,7 +16,7 @@ import (
 
 
 func GetTestDB() *gorm.DB {
-	db, err := db.InitDB()
+	db, err := db.InitDBTest()
 	if err != nil {
 		panic(err)
 	}

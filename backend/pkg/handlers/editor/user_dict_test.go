@@ -29,6 +29,12 @@ func init() {
 func TestUserDictOps(t *testing.T) {
 	router := gin.Default()
 	handler := test.GetTestWordHandler()
+	defer func() {
+		err := os.Remove("data/japanese_test.db")
+		if err != nil {
+			panic(err)
+		}
+	} ()
 	handler_user := test.GetTestUserHandler()
 	router.POST("/api/user/register", auth.APIKeyAuth(), handler_user.RegisterUser)
 	router.POST("/api/user/update", auth.APIKeyAuth(), handler_user.UpdateUserName)
@@ -152,7 +158,7 @@ func TestUserDictOps(t *testing.T) {
 		}, "/api/user/words/delete", "POST", http.StatusOK,
 	))
 
-	// Test stops here
+	// Test ends here
 	req = test.NewRequest(t, "GET", "/api/user/delete", nil, apikey)
 	rr = httptest.NewRecorder()
 	router.ServeHTTP(rr, req)

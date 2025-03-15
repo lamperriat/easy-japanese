@@ -230,6 +230,7 @@ func (h* WordHandler) GetGrammarUser(c *gin.Context) {
 		c.AbortWithStatusJSON(500, models.ErrorMsg{Error: "Database error"})
 		return
 	}
+	c.JSON(200, grammars)
 }
 
 // @Summary Search among all grammars in user's dictionary

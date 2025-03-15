@@ -4,7 +4,8 @@ type User struct {
     ID          uint       `json:"-" gorm:"primaryKey"`
     Username    string     `json:"username" gorm:"uniqueIndex"`
     Keyhash     string     `json:"-" gorm:"uniqueIndex"`
-    Learned     []UserWord `json:"-" gorm:"foreignKey:UserID"`
+    Learned     []UserWord `json:"-" gorm:"foreignKey:user_id;references:ID"`
+    Grammar     []UserGrammar `json:"-" gorm:"foreignKey:user_id;references:ID"`
     ReviewCount int64      `json:"reviewCount"`
     // the number of words that have been reviewed. 
     // One word can be counted multiple times. 
@@ -33,10 +34,11 @@ type UserWord struct {
     Katakana    string  `json:"katakana"`
     Hiragana    string  `json:"hiragana"`
     Type        string  `json:"type"`
-    UserID      uint    `json:"-" gorm:"index:user_id"`
+    UserID      uint    `json:"-"` 
+    User        User    `json:"-" gorm:"foreignKey:user_id;references:ID"`
     Familiarity int     `json:"familiarity" gorm:"default:50"`
     LastSeen    int64   `json:"lastSeen" gorm:"column:last_seen"`
-    Examples    []UserWordExample `json:"example" gorm:"foreignKey:UserWordID"`
+    Examples    []UserWordExample `json:"example" gorm:"foreignKey:user_word_id"`
 }
 
 type UserGrammarExample struct {
@@ -48,7 +50,8 @@ type UserGrammarExample struct {
 
 type UserGrammar struct {
     ID          uint   `json:"id" gorm:"primaryKey"`
-    UserID      uint   `json:"-" gorm:"index:user_id"`
+    UserID      uint   `json:"-"`
+    User        User   `json:"-" gorm:"foreignKey:user_id;references:ID"`
     Description string `json:"description" gorm:"type:text"`
-    Examples    []UserGrammarExample `json:"example" gorm:"foreignKey:GrammarID"`
+    Examples    []UserGrammarExample `json:"example" gorm:"foreignKey:grammar_id"`
 }
