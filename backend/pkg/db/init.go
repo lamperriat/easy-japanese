@@ -22,7 +22,8 @@ func InitDB() (*gorm.DB, error) {
 		&models.GrammarExample{},
 		&models.UserWordExample{},
 		&models.UserGrammar{},
-		&models.UserGrammarExample{}, 
+		&models.UserGrammarExample{},
+		&models.UserReadingMaterial{}, 
 	)
     return db, err
 }
@@ -44,6 +45,7 @@ func InitDBTest() (*gorm.DB, error) {
 		&models.UserWordExample{},
 		&models.UserGrammar{},
 		&models.UserGrammarExample{}, 
+		&models.UserReadingMaterial{}, 
 	)
 	return db, err
 }
