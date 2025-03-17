@@ -57,3 +57,12 @@ type UserGrammar struct {
     LastSeen    int64   `json:"lastSeen" gorm:"column:last_seen"`
     Examples    []UserGrammarExample `json:"example" gorm:"foreignKey:grammar_id"`
 }
+
+type UserReadingMaterial struct {
+    ID      uint   `json:"id" gorm:"primaryKey"`
+    UserID  uint   `json:"-"`
+    User    User   `json:"-" gorm:"foreignKey:user_id;references:ID"`
+    Title   string `json:"title" gorm:"type:text"`
+    Content string `json:"content" gorm:"type:text"`
+    Chinese string `json:"chinese" gorm:"type:text"`
+}

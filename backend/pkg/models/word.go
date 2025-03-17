@@ -20,6 +20,7 @@ type JapaneseWord struct {
 
 type ReadingMaterial struct {
     ID      uint   `json:"id" gorm:"primaryKey"`
+    Title   string `json:"title" gorm:"type:text"`
     Content string `json:"content" gorm:"type:text"`
     Chinese string `json:"chinese" gorm:"type:text"`
 }
