@@ -96,6 +96,19 @@ definitions:
           $ref: '#/definitions/models.ReadingMaterial'
         type: array
     type: object
+  models.SearchResult-models_UserGrammar:
+    properties:
+      count:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/models.UserGrammar'
+        type: array
+    type: object
   models.SearchResult-models_UserWord:
     properties:
       count:
@@ -112,6 +125,28 @@ definitions:
   models.SuccessMsg:
     properties:
       message:
+        type: string
+    type: object
+  models.UserGrammar:
+    properties:
+      description:
+        type: string
+      example:
+        items:
+          $ref: '#/definitions/models.UserGrammarExample'
+        type: array
+      familiarity:
+        type: integer
+      id:
+        type: integer
+      lastSeen:
+        type: integer
+    type: object
+  models.UserGrammarExample:
+    properties:
+      chinese:
+        type: string
+      example:
         type: string
     type: object
   models.UserWord:
@@ -470,6 +505,151 @@ paths:
       summary: Remove user
       tags:
       - userOp
+  /api/user/grammar/add:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Add a grammar to user's dictionary
+      tags:
+      - userDictOp
+  /api/user/grammar/delete:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User/Grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Delete a grammar from user's dictionary
+      tags:
+      - userDictOp
+  /api/user/grammar/edit:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User/Grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Edit a grammar in user's dictionary
+      tags:
+      - userDictOp
+  /api/user/grammar/get:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UserGrammar'
+            type: array
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Browse all grammars in user's dictionary
+      tags:
+      - userDictOp
+  /api/user/grammar/search:
+    get:
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SearchResult-models_UserGrammar'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Search among all grammars in user's dictionary
+      tags:
+      - userDictOp
   /api/user/register:
     post:
       consumes:

@@ -53,5 +53,7 @@ type UserGrammar struct {
     UserID      uint   `json:"-"`
     User        User   `json:"-" gorm:"foreignKey:user_id;references:ID"`
     Description string `json:"description" gorm:"type:text"`
+    Familiarity int     `json:"familiarity" gorm:"default:50"`
+    LastSeen    int64   `json:"lastSeen" gorm:"column:last_seen"`
     Examples    []UserGrammarExample `json:"example" gorm:"foreignKey:grammar_id"`
 }
