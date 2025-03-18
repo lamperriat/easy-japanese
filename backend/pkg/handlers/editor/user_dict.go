@@ -170,7 +170,6 @@ func (h* WordHandler) AddWordUser(c *gin.Context) {
     }
 
     var newWord models.UserWord
-    newWord.LastSeen = user.ReviewCount
     if err := h.db.Model(&user).Update("review_count", user.ReviewCount + 1).Error; err != nil {
         c.JSON(500, models.ErrorMsg{Error: "Database error"})
         return
@@ -182,6 +181,7 @@ func (h* WordHandler) AddWordUser(c *gin.Context) {
     }
 
     newWord.UserID = user.ID
+    newWord.LastSeen = user.ReviewCount
 
     err := h.db.Transaction(func(tx *gorm.DB) error {
         var existCount int64
@@ -239,6 +239,10 @@ func (h* WordHandler) EditWordUser(c *gin.Context) {
         } 
         return
     }
+    if err := h.db.Model(&user).Update("review_count", user.ReviewCount + 1).Error; err != nil {
+        c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        return
+    }
 
     var newWord models.UserWord
 
@@ -246,6 +250,8 @@ func (h* WordHandler) EditWordUser(c *gin.Context) {
         c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
         return
     }
+    newWord.UserID = user.ID
+    newWord.LastSeen = user.ReviewCount
 
     err := h.db.Transaction(func(tx* gorm.DB) error {
         var existing models.UserWord

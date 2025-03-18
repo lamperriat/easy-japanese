@@ -153,12 +153,12 @@ func getReviewWordsSeq(db *gorm.DB, review_cnt int64, userID uint, batch_size in
 	recent_threshold := review_cnt - time_threshold
 	var userWords []models.UserWord
 	err := db.Preload("Examples").
-		Where("user_id = ? AND last_seen >= ? AND Familiarity > 0", userID, recent_threshold).
+		Where("user_id = ? AND last_seen <= ? AND Familiarity > 0", userID, recent_threshold).
 		Find(&userWords).Error
 	if err != nil {
 		return nil, err
 	}
-	if len(userWords) == 0 {
+	if len(userWords) < batch_size {
 		err := db.Preload("Examples").
 			Where("user_id = ? AND Familiarity > 0", userID).
 			Find(&userWords).Error
@@ -260,13 +260,15 @@ func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size i
 	recent_threshold := review_cnt - time_threshold
 
 	var userWords []models.UserWord
+	// fmt.Printf("filtering: user_id = %d, last_seen <= %d\n", userID, recent_threshold)
 	err := db.Preload("Examples").
-		Where("user_id = ? AND last_seen >= ? AND Familiarity > 0", userID, recent_threshold).
+		Where("user_id = ? AND last_seen <= ? AND Familiarity > 0", userID, recent_threshold).
 		Find(&userWords).Error
 	if err != nil {
 		return nil, err
 	}
-	if len(userWords) == 0 {
+	if len(userWords) < batch_size {
+		// fmt.Printf("filtering: user_id = %d, Familiarity > 0\n", userID)
 		err := db.Preload("Examples").
 			Where("user_id = ? AND Familiarity > 0", userID).
 			Find(&userWords).Error

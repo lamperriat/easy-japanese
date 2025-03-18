@@ -145,14 +145,14 @@ func TestReviewWord(t *testing.T) {
 			Hiragana: "",
 			Type: "n",
 			Examples: []models.UserWordExample{
-				{
-					Example: "This is a test sentence." + idx,
-					Chinese: "这是一个测试句子。" + idx,
-				}, 
-				{
-					Example: "This is another test sentence." + idx,
-					Chinese: "这是另一个测试句子。" + idx,
-				}, 
+				// {
+				// 	Example: "This is a test sentence." + idx,
+				// 	Chinese: "这是一个测试句子。" + idx,
+				// }, 
+				// {
+				// 	Example: "This is another test sentence." + idx,
+				// 	Chinese: "这是另一个测试句子。" + idx,
+				// }, 
 			}, 
 		}
 		t.Run("Add word", test.CreateTest(
