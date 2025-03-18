@@ -7,10 +7,12 @@ import (
 	"backend/pkg/models"
 	"errors"
 	"sort"
+	"strconv"
+
+	"math/rand"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"math/rand"
 )
 
 type ReviewHandler struct {
@@ -279,4 +281,65 @@ func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size i
 		weights[index] = 0
 	}
 	return choices, nil
+}
+
+// @Summary Get batched words for review 
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Param batch query int false "Batch size (default 20)"
+// @Param seq query bool false "Use sequential sampling (default false)"
+// @Success 200 {object} []models.UserWord "Success"
+// @Failure 404 {object} models.ErrorMsg "User word not found"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/review/get [get]
+func (h *ReviewHandler) GetWords(c *gin.Context) {
+    providedKey := c.GetHeader("X-API-Key")
+    keyhash := auth.Sha256hex(providedKey)
+    var user models.User
+    if err := h.db.Where("keyhash = ?", keyhash).
+        First(&user).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(404, models.ErrorMsg{Error: "User not found"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        } 
+        return
+    }
+
+	batch_size_str := c.Query("batch")
+	batch_size, err := strconv.Atoi(batch_size_str)
+	if err != nil || batch_size < 1 {
+		batch_size = 20
+	}
+	seq_str := c.Query("seq")
+	seq, err := strconv.ParseBool(seq_str)
+	if err != nil {
+		seq = false
+	}
+	var userWords []models.UserWord
+	if seq {
+		userWords, err = getReviewWordsSeq(h.db, user.ReviewCount, user.ID, batch_size)
+	} else {
+		userWords, err = getReviewWordsRand(h.db, user.ReviewCount, user.ID, batch_size)
+	}
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, models.ErrorMsg{Error: "User word not found"})
+		} else {
+			c.JSON(500, models.ErrorMsg{Error: "Database error"})
+		}
+		return
+	}
+	if len(userWords) == 0 {
+		c.JSON(200, []models.UserWord{})
+		return
+	}
+	// We do NOT need to care about updating the LastSeen of words here.
+	// When user answers, `updateWord` will do the job
+
+	c.JSON(200, userWords)
 }
