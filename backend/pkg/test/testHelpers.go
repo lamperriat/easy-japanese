@@ -3,6 +3,7 @@ package test
 import (
 	"backend/pkg/db"
 	"backend/pkg/handlers/editor"
+	"backend/pkg/handlers/reviewer"
 	"backend/pkg/handlers/user"
 	"bytes"
 	"encoding/json"
@@ -29,6 +30,10 @@ func GetTestWordHandler() *editor.WordHandler {
 
 func GetTestUserHandler() *user.UserHandler {
 	return user.NewUserHandler(GetTestDB())
+}
+
+func GetTestReviewHandler() *reviewer.ReviewHandler {
+	return reviewer.NewReviewHandler(GetTestDB())
 }
 
 func NewRequest(t *testing.T, method, url string, body []byte, apikey string) *http.Request {

@@ -5,8 +5,12 @@ import (
 	"gorm.io/gorm"
 	"backend/pkg/models"
 )
-
+var realDB *gorm.DB
 func InitDB() (*gorm.DB, error) {
+	// singleton
+	if realDB != nil {
+		return realDB, nil
+	}
     db, err := gorm.Open(sqlite.Open("data/japanese.db"), &gorm.Config{})
     if err != nil {
         return nil, err
@@ -25,10 +29,17 @@ func InitDB() (*gorm.DB, error) {
 		&models.UserGrammarExample{},
 		&models.UserReadingMaterial{}, 
 	)
+	realDB = db
     return db, err
 }
 
+var testDB *gorm.DB
+
 func InitDBTest() (*gorm.DB, error) {
+	// singleton
+	if testDB != nil {
+		return testDB, nil
+	}
 	db, err := gorm.Open(sqlite.Open("data/japanese_test.db"), &gorm.Config{})
 	if err != nil {
 		return nil, err
@@ -47,5 +58,6 @@ func InitDBTest() (*gorm.DB, error) {
 		&models.UserGrammarExample{}, 
 		&models.UserReadingMaterial{}, 
 	)
+	testDB = db
 	return db, err
 }

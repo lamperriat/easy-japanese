@@ -147,18 +147,27 @@ func (h* ReviewHandler) updateWord(c *gin.Context, correct bool) {
 	c.JSON(200, models.SuccessMsg{Message: "User word updated"})
 }
 
-const time_threshold = 120
+const time_threshold = 90
 
 func getReviewWordsSeq(db *gorm.DB, review_cnt int64, userID uint, batch_size int) ([]models.UserWord, error) {
 	recent_threshold := review_cnt - time_threshold
 	var userWords []models.UserWord
-	err := db.Where("user_id = ? AND last_seen >= ? AND Familiarity > 0", userID, recent_threshold).
+	err := db.Preload("Examples").
+		Where("user_id = ? AND last_seen >= ? AND Familiarity > 0", userID, recent_threshold).
 		Find(&userWords).Error
 	if err != nil {
 		return nil, err
 	}
 	if len(userWords) == 0 {
-		return []models.UserWord{}, nil
+		err := db.Preload("Examples").
+			Where("user_id = ? AND Familiarity > 0", userID).
+			Find(&userWords).Error
+		if err != nil {
+			return nil, err
+		}
+		if len(userWords) == 0 {
+			return []models.UserWord{}, nil
+		}
 	}
 	if len(userWords) <= batch_size {
 		return userWords, nil
@@ -214,6 +223,7 @@ func (st *segmentTree) build(arr []int) {
 	}
 }
 
+// return: index in the original array
 func (st *segmentTree) search(target_sum int) int {
 	// find the index of the first element that is greater than or equal to target_sum
 	n := len(st.tree)
@@ -231,7 +241,7 @@ func (st *segmentTree) search(target_sum int) int {
 			node = right
 		}
 	}
-	return node
+	return node - st.original_start
 }
 
 func (st *segmentTree) setZero(index int) {
@@ -250,13 +260,22 @@ func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size i
 	recent_threshold := review_cnt - time_threshold
 
 	var userWords []models.UserWord
-	err := db.Where("user_id = ? AND last_seen >= ? AND Familiarity > 0", userID, recent_threshold).
+	err := db.Preload("Examples").
+		Where("user_id = ? AND last_seen >= ? AND Familiarity > 0", userID, recent_threshold).
 		Find(&userWords).Error
 	if err != nil {
 		return nil, err
 	}
 	if len(userWords) == 0 {
-		return []models.UserWord{}, nil
+		err := db.Preload("Examples").
+			Where("user_id = ? AND Familiarity > 0", userID).
+			Find(&userWords).Error
+		if err != nil {
+			return nil, err
+		}
+		if len(userWords) == 0 {
+			return []models.UserWord{}, nil
+		}
 	}
 	if len(userWords) <= batch_size {
 		return userWords, nil
@@ -273,7 +292,7 @@ func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size i
 	st.build(weights)
 	choices := make([]models.UserWord, batch_size)
 	for i := 0; i < batch_size; i++ {
-		weight := rand.Intn(total_weight)
+		weight := rand.Intn(total_weight) + 1
 		index := st.search(weight)
 		choices[i] = userWords[index]
 		st.setZero(index)

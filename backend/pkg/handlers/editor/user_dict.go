@@ -170,6 +170,11 @@ func (h* WordHandler) AddWordUser(c *gin.Context) {
     }
 
     var newWord models.UserWord
+    newWord.LastSeen = user.ReviewCount
+    if err := h.db.Model(&user).Update("review_count", user.ReviewCount + 1).Error; err != nil {
+        c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        return
+    }
 
     if err := c.ShouldBindJSON(&newWord); err != nil {
         c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
