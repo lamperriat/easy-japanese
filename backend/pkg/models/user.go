@@ -66,3 +66,27 @@ type UserReadingMaterial struct {
     Content string `json:"content" gorm:"type:text"`
     Chinese string `json:"chinese" gorm:"type:text"`
 }
+
+type Learnable interface {
+    SetUserID(userID uint)
+    GetUserID() uint
+    GetID() uint
+    GetFamiliarity() int
+    GetLastSeen() int64
+    GetName() string
+}
+
+func (u *UserWord) SetUserID(userID uint) { u.UserID = userID }
+func (u *UserWord) GetUserID() uint { return u.UserID }
+func (u *UserWord) GetID() uint { return u.ID }
+func (u *UserWord) GetFamiliarity() int { return u.Familiarity }
+func (u *UserWord) GetLastSeen() int64 { return u.LastSeen }
+func (u *UserWord) GetName() string { return "word" }
+
+func (u *UserGrammar) SetUserID(userID uint) { u.UserID = userID }
+func (u *UserGrammar) GetUserID() uint { return u.UserID }
+func (u *UserGrammar) GetID() uint { return u.ID }
+func (u *UserGrammar) GetFamiliarity() int { return u.Familiarity }
+func (u *UserGrammar) GetLastSeen() int64 { return u.LastSeen }
+func (u *UserGrammar) GetName() string { return "grammar" }
+

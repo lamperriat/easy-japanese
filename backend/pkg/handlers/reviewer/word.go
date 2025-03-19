@@ -65,9 +65,10 @@ func calcWeight(familiarity int, lastSeenTillNow int) int {
 // @Failure 404 {object} models.ErrorMsg "User word not found"
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /api/user/review/correct [post]
+// @Router /api/user/review/word/correct [post]
 func (h* ReviewHandler) CorrectWord(c *gin.Context) {
-	h.updateWord(c, true)
+	var model models.UserWord
+	updateLearnable(h.db, c, updateFamiliarityCorrect, &model)
 }
 
 // @Summary User incorrectly answer the word
@@ -80,22 +81,50 @@ func (h* ReviewHandler) CorrectWord(c *gin.Context) {
 // @Failure 404 {object} models.ErrorMsg "User word not found"
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /api/user/review/incorrect [post]
+// @Router /api/user/review/word/incorrect [post]
 func (h* ReviewHandler) IncorrectWord(c *gin.Context) {
-	h.updateWord(c, false)
+	var model models.UserWord
+	updateLearnable(h.db, c, updateFamiliarityIncorrect, &model)
 }
 
-func (h* ReviewHandler) updateWord(c *gin.Context, correct bool) {
-	var updateFunc func(int) int
-	if correct {
-		updateFunc = updateFamiliarityCorrect
-	} else {
-		updateFunc = updateFamiliarityIncorrect
-	}
+// @Summary User correctly answer the grammar
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SuccessMsg "Success"
+// @Failure 404 {object} models.ErrorMsg "User grammar not found"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/review/grammar/correct [post]
+func (h* ReviewHandler) CorrectGrammar(c *gin.Context) {
+	var model models.UserGrammar
+	updateLearnable(h.db, c, updateFamiliarityCorrect, &model)
+}
+
+// @Summary User incorrectly answer the grammar
+// @Description 
+// @Tags globalDictOp
+// @Security APIKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SuccessMsg "Success"
+// @Failure 404 {object} models.ErrorMsg "User grammar not found"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/review/grammar/incorrect [post]
+func (h* ReviewHandler) IncorrectGrammar(c *gin.Context) {
+	var model models.UserGrammar
+	updateLearnable(h.db, c, updateFamiliarityIncorrect, &model)
+}
+
+// abstraction
+func updateLearnable[T models.Learnable](db *gorm.DB, c *gin.Context, updateFunc func(int) int, model T) {
     providedKey := c.GetHeader("X-API-Key")
     keyhash := auth.Sha256hex(providedKey)
     var user models.User
-    if err := h.db.Where("keyhash = ?", keyhash).
+    if err := db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
         if errors.Is(err, gorm.ErrRecordNotFound) {
             c.JSON(404, models.ErrorMsg{Error: "User not found"})
@@ -105,16 +134,15 @@ func (h* ReviewHandler) updateWord(c *gin.Context, correct bool) {
         return
     }
 
-	var userWord models.UserWord
-	if err := c.ShouldBindJSON(&userWord); err != nil {
+	if err := c.ShouldBindJSON(model); err != nil {
 		c.AbortWithStatusJSON(400, models.ErrorMsg{Error: "Invalid JSON format"})
 		return
 	}
-	userWord.UserID = user.ID
-	err := h.db.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("user_id = ? AND id = ?", user.ID, userWord.ID).
-			First(&userWord).Error; err != nil {
-				return err
+	model.SetUserID(user.ID)
+	err := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("user_id = ? AND id = ?", user.ID, model.GetID()).
+			First(model).Error; err != nil {
+			return err
 		}
 		// 3 steps: 
 		// 1. Get and update User.ReviewCount
@@ -124,13 +152,13 @@ func (h* ReviewHandler) updateWord(c *gin.Context, correct bool) {
 			return err
 		}
 		if err := tx.
-			Model(&userWord).
-			Update("familiarity", updateFunc(userWord.Familiarity)).
+			Model(model).
+			Update("familiarity", updateFunc(model.GetFamiliarity())).
 			Error; err != nil {
 			return err
 		}
 		if err := tx.
-			Model(&userWord).
+			Model(model).
 			Update("last_seen", user.ReviewCount).
 			Error; err != nil {
 			return err
@@ -139,13 +167,13 @@ func (h* ReviewHandler) updateWord(c *gin.Context, correct bool) {
 	})
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(404, models.ErrorMsg{Error: "User word not found"})
+			c.JSON(404, models.ErrorMsg{Error: fmt.Sprintf("User or %s found", model.GetName())})
 		} else {
 			c.JSON(500, models.ErrorMsg{Error: "Database error"})
 		}
 		return
 	}
-	c.JSON(200, models.SuccessMsg{Message: "User word updated"})
+	c.JSON(200, models.SuccessMsg{Message: fmt.Sprintf("User %s updated", model.GetName())})
 }
 
 const time_threshold = 90

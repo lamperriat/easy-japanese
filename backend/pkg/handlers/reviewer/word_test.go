@@ -119,8 +119,8 @@ func TestReviewWord(t *testing.T) {
 	router.POST("/api/user/words/delete", auth.APIKeyAuth(), handler.DeleteWordUser)
 	router.GET("/api/user/words/get", auth.APIKeyAuth(), handler.GetWordsUser)
 	router.GET("/api/user/review/get", auth.APIKeyAuth(), reviewer.GetWords)
-	router.POST("/api/user/review/correct", auth.APIKeyAuth(), reviewer.CorrectWord)
-	router.POST("/api/user/review/incorrect", auth.APIKeyAuth(), reviewer.IncorrectWord)
+	router.POST("/api/user/review/word/correct", auth.APIKeyAuth(), reviewer.CorrectWord)
+	router.POST("/api/user/review/word/incorrect", auth.APIKeyAuth(), reviewer.IncorrectWord)
 	
 
 	apikey := "TEST_USE_API_KEY"
@@ -168,7 +168,7 @@ func TestReviewWord(t *testing.T) {
 				ID: uint(i),
 			}
 			t.Run("Correct word", test.CreateTest(
-				router, apikey, word, "/api/user/review/correct", "POST", http.StatusOK,
+				router, apikey, word, "/api/user/review/word/correct", "POST", http.StatusOK,
 			))
 		}
 	}
@@ -178,7 +178,7 @@ func TestReviewWord(t *testing.T) {
 				ID: uint(i),
 			}
 			t.Run("Incorrect word", test.CreateTest(
-				router, apikey, word, "/api/user/review/incorrect", "POST", http.StatusOK,
+				router, apikey, word, "/api/user/review/word/correct", "POST", http.StatusOK,
 			))
 		}
 	}
@@ -186,7 +186,7 @@ func TestReviewWord(t *testing.T) {
 		t.Run("Correct word", test.CreateTest(
 			router, apikey, models.UserWord{
 				ID: uint(99),
-			}, "/api/user/review/correct", "POST", http.StatusOK,
+			}, "/api/user/review/word/correct", "POST", http.StatusOK,
 		))
 	}
 	t.Run("Get all", test.CreateTest(
