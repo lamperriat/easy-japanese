@@ -1,10 +1,9 @@
-package handlers
+package editor
 
 import (
 	"backend/pkg/models"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -125,7 +124,7 @@ func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
 
     var words []models.JapaneseWord
     var count int64
-    log.Printf("Searching for %s in %s", query, dictName)
+    // log.Printf("Searching for %s in %s", query, dictName)
     // TODO: Here when this handler is called for the same query
     // but different page, the count is calculated again
     // Possible solutions: Use cache, or separate it as another handler
@@ -133,7 +132,9 @@ func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
     if dictName != "all" {
         q = q.Where("dict_name = ?", dictName)
     }
-    q = q.Where("kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ?", "%"+query+"%", "%"+query+"%", "%"+query+"%")
+    queryStr := "%" + query + "%"
+    q = q.Where("kanji LIKE ? OR katakana LIKE ? OR hiragana LIKE ? OR chinese LIKE ?", 
+        queryStr, queryStr, queryStr, queryStr)
     if err := q.Count(&count).Error; err != nil {
         c.JSON(500, models.ErrorMsg{Error: "Database error"})
         return
@@ -361,7 +362,7 @@ const defaultResultPerPage = 30
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"
 // @Produce json
-// @Success 200 {object} []models.JapaneseWord
+// @Success 200 {object} models.SearchResult[models.JapaneseWord]
 // @Failure 400 {object} models.ErrorMsg "Invalid dictionary name"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/words/{dictName}/get [get]
@@ -390,6 +391,11 @@ func (h *WordHandler) GetDict(c *gin.Context) {
 	}
 
 	var words []models.JapaneseWord
+    var count int64
+    if err := query.Count(&count).Error; err != nil {
+        c.AbortWithStatusJSON(500, models.ErrorMsg{Error: "Database error"})
+        return
+    }
 	if err := query.
 		Limit(resultPerPage).
 		Offset((pageInt - 1) * resultPerPage).
@@ -399,5 +405,10 @@ func (h *WordHandler) GetDict(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, words)
+	c.JSON(200, models.SearchResult[models.JapaneseWord]{
+        Count: count,
+        Page: pageInt,
+        PageSize: resultPerPage,
+        Results: words,
+    })
 }

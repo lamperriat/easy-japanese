@@ -1,21 +1,22 @@
 package main
 
 import (
-    _ "backend/docs"
-    swaggerFiles "github.com/swaggo/files"
-    ginSwagger "github.com/swaggo/gin-swagger"
+	_ "backend/docs"
 	"backend/pkg/auth"
 	"backend/pkg/db"
-	"backend/pkg/handlers"
+	"backend/pkg/handlers/editor"
+	"backend/pkg/handlers/user"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-
 // @title Easy Japanese API
 // @version 0.1
-// @description 
+// @description
 // @license.name MIT
 // @license.url http://opensource.org/licenses/MIT
 // @securityDefinitions.apikey ApiKeyAuth
@@ -30,7 +31,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	wordHandler := handlers.NewWordHandler(db)
+	wordHandler := editor.NewWordHandler(db)
+	userHandler := user.NewUserHandler(db)
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},
@@ -39,26 +41,79 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	r.GET("/api/random", auth.APIKeyAuth(), handlers.GetRandomNumber)
-	r.POST("/api/answer/correct/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightCorrect)
-	r.POST("/api/answer/wrong/:wordId", auth.APIKeyAuth(), handlers.UpdateWordWeightIncorrect)
-	r.POST("/api/words/:dictName/accurate-search", auth.APIKeyAuth(), wordHandler.AccurateSearchWord)
-	r.GET("/api/words/:dictName/fuzzy-search", auth.APIKeyAuth(), wordHandler.FuzzySearchWord)
-	r.POST("/api/words/:dictName/add", auth.APIKeyAuth(), wordHandler.AddWord)
-	r.POST("/api/words/:dictName/edit", auth.APIKeyAuth(), wordHandler.EditWord)
-	r.POST("/api/words/:dictName/delete", auth.APIKeyAuth(), wordHandler.DeleteWord)
-	r.GET("/api/words/:dictName/get", auth.APIKeyAuth(), wordHandler.GetDict)
+	// Random API
+	r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
+
+	// User routes
+	userGroup := r.Group("/api/user", auth.APIKeyAuth())
+	{
+		userGroup.POST("/register", userHandler.RegisterUser)
+		userGroup.POST("/update", userHandler.UpdateUserName)
+		userGroup.GET("/delete", userHandler.DeleteUser)
+		grammarGroup := userGroup.Group("/grammar")
+		{
+			grammarGroup.POST("/add", wordHandler.AddGrammarUser)
+			grammarGroup.POST("/edit", wordHandler.EditGrammarUser)
+			grammarGroup.POST("/delete", wordHandler.DeleteGrammarUser)
+			grammarGroup.GET("/get", wordHandler.GetGrammarUser)
+			grammarGroup.GET("/search", wordHandler.SearchGrammarUser)
+		}
+		readingGroup := userGroup.Group("/reading-material")
+		{
+			readingGroup.POST("/add", wordHandler.AddReadingMaterialUser)
+			readingGroup.POST("/edit", wordHandler.EditReadingMaterialUser)
+			readingGroup.POST("/delete", wordHandler.DeleteReadingMaterialUser)
+			readingGroup.GET("/get", wordHandler.GetReadingMaterialUser)
+			readingGroup.GET("/search", wordHandler.FuzzySearchReadingMaterialUser) // full text search
+		}
+		wordsGroup := userGroup.Group("/words")
+		{
+			wordsGroup.POST("/accurate-search", wordHandler.AccurateSearchWordUser)
+			wordsGroup.GET("/fuzzy-search", wordHandler.FuzzySearchWordUser)
+			wordsGroup.POST("/add", wordHandler.AddWordUser)
+			wordsGroup.POST("/edit", wordHandler.EditWordUser)
+			wordsGroup.POST("/delete", wordHandler.DeleteWordUser)
+			wordsGroup.GET("/get", wordHandler.GetWordsUser)
+		}
+	}
+
+	// Answer routes
+	answerGroup := r.Group("/api/answer", auth.APIKeyAuth())
+	{
+		answerGroup.POST("/correct/:wordId", editor.UpdateWordWeightCorrect)
+		answerGroup.POST("/wrong/:wordId", editor.UpdateWordWeightIncorrect)
+	}
+
+	// Dictionary/Words routes
+	dictGroup := r.Group("/api/words/:dictName", auth.APIKeyAuth())
+	{
+		dictGroup.POST("/accurate-search", wordHandler.AccurateSearchWord)
+		dictGroup.GET("/fuzzy-search", wordHandler.FuzzySearchWord)
+		dictGroup.POST("/add", wordHandler.AddWord)
+		dictGroup.POST("/edit", wordHandler.EditWord)
+		dictGroup.POST("/delete", wordHandler.DeleteWord)
+		dictGroup.GET("/get", wordHandler.GetDict)
+	}
 	
-	r.POST("/api/reading-material/add", auth.APIKeyAuth(), wordHandler.AddReadingMaterial)
-	r.POST("/api/reading-material/edit", auth.APIKeyAuth(), wordHandler.EditReadingMaterial)
-	r.POST("/api/reading-material/delete", auth.APIKeyAuth(), wordHandler.DeleteReadingMaterial)
-	r.GET("/api/reading-material/get", auth.APIKeyAuth(), wordHandler.GetReadingMaterial)
-	r.GET("/api/reading-material/search", auth.APIKeyAuth(), wordHandler.FuzzySearchReadingMaterial)
+	// Reading Material routes
+	readingGroup := r.Group("/api/reading-material", auth.APIKeyAuth())
+	{
+		readingGroup.POST("/add", wordHandler.AddReadingMaterial)
+		readingGroup.POST("/edit", wordHandler.EditReadingMaterial)
+		readingGroup.POST("/delete", wordHandler.DeleteReadingMaterial)
+		readingGroup.GET("/get", wordHandler.GetReadingMaterial)
+		readingGroup.GET("/search", wordHandler.FuzzySearchReadingMaterial)
+	}
 	
-	r.POST("/api/grammar/add", auth.APIKeyAuth(), wordHandler.AddGrammar)
-	r.POST("/api/grammar/edit", auth.APIKeyAuth(), wordHandler.EditGrammar)
-	r.POST("/api/grammar/delete", auth.APIKeyAuth(), wordHandler.DeleteGrammar)
-	r.GET("/api/grammar/get", auth.APIKeyAuth(), wordHandler.GetGrammar)
-	r.GET("/api/grammar/search", auth.APIKeyAuth(), wordHandler.FuzzySearchGrammar)
+	// Grammar routes
+	grammarGroup := r.Group("/api/grammar", auth.APIKeyAuth())
+	{
+		grammarGroup.POST("/add", wordHandler.AddGrammar)
+		grammarGroup.POST("/edit", wordHandler.EditGrammar)
+		grammarGroup.POST("/delete", wordHandler.DeleteGrammar)
+		grammarGroup.GET("/get", wordHandler.GetGrammar)
+		grammarGroup.GET("/search", wordHandler.FuzzySearchGrammar)
+	}
+	
 	r.Run(":8080")
 }

@@ -56,6 +56,8 @@ definitions:
         type: string
       id:
         type: integer
+      title:
+        type: string
     type: object
   models.SearchResult-models_Grammar:
     properties:
@@ -96,9 +98,111 @@ definitions:
           $ref: '#/definitions/models.ReadingMaterial'
         type: array
     type: object
+  models.SearchResult-models_UserGrammar:
+    properties:
+      count:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/models.UserGrammar'
+        type: array
+    type: object
+  models.SearchResult-models_UserReadingMaterial:
+    properties:
+      count:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/models.UserReadingMaterial'
+        type: array
+    type: object
+  models.SearchResult-models_UserWord:
+    properties:
+      count:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      results:
+        items:
+          $ref: '#/definitions/models.UserWord'
+        type: array
+    type: object
   models.SuccessMsg:
     properties:
       message:
+        type: string
+    type: object
+  models.UserGrammar:
+    properties:
+      description:
+        type: string
+      example:
+        items:
+          $ref: '#/definitions/models.UserGrammarExample'
+        type: array
+      familiarity:
+        type: integer
+      id:
+        type: integer
+      lastSeen:
+        type: integer
+    type: object
+  models.UserGrammarExample:
+    properties:
+      chinese:
+        type: string
+      example:
+        type: string
+    type: object
+  models.UserReadingMaterial:
+    properties:
+      chinese:
+        type: string
+      content:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  models.UserWord:
+    properties:
+      chinese:
+        type: string
+      example:
+        items:
+          $ref: '#/definitions/models.UserWordExample'
+        type: array
+      familiarity:
+        type: integer
+      hiragana:
+        type: string
+      id:
+        type: integer
+      kanji:
+        type: string
+      katakana:
+        type: string
+      lastSeen:
+        type: integer
+      type:
+        type: string
+    type: object
+  models.UserWordExample:
+    properties:
+      chinese:
+        type: string
+      example:
         type: string
     type: object
 info:
@@ -252,7 +356,7 @@ paths:
       - globalDictOp
   /api/random:
     get:
-      description: Get a random number between 1 and 100
+      description: Test use
       produces:
       - application/json
       responses:
@@ -400,6 +504,728 @@ paths:
       summary: Fuzzy search in all reading materials
       tags:
       - globalDictOp
+  /api/user/delete:
+    get:
+      description: The sha256 of the api key is used as the identifier.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "409":
+          description: Duplicate user or username
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Remove user
+      tags:
+      - userOp
+  /api/user/grammar/add:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Add a grammar to user's dictionary
+      tags:
+      - userDictOp
+  /api/user/grammar/delete:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User/Grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Delete a grammar from user's dictionary
+      tags:
+      - userDictOp
+  /api/user/grammar/edit:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User/Grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Edit a grammar in user's dictionary
+      tags:
+      - userDictOp
+  /api/user/grammar/get:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UserGrammar'
+            type: array
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Browse all grammars in user's dictionary
+      tags:
+      - userDictOp
+  /api/user/grammar/search:
+    get:
+      parameters:
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SearchResult-models_UserGrammar'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Search among all grammars in user's dictionary
+      tags:
+      - userDictOp
+  /api/user/reading-material/add:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Add a reading material to user's dictionary
+      tags:
+      - userDictOp
+  /api/user/reading-material/delete:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Delete a reading material from user's dictionary
+      tags:
+      - userDictOp
+  /api/user/reading-material/edit:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Edit a reading material in user's dictionary
+      tags:
+      - userDictOp
+  /api/user/reading-material/get:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.UserReadingMaterial'
+            type: array
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Browse all reading materials from user's dictionary
+      tags:
+      - userDictOp
+  /api/user/reading-material/search:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      - description: Search query
+        in: query
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SearchResult-models_UserReadingMaterial'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Fuzzy search in all reading materials from user's dictionary
+      tags:
+      - userDictOp
+  /api/user/register:
+    post:
+      consumes:
+      - application/json
+      description: Both the username and the sha256 of the api key should be unique
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "409":
+          description: Duplicate user or username
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Register user
+      tags:
+      - userOp
+  /api/user/review/get:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Batch size (default 20)
+        in: query
+        name: batch
+        type: integer
+      - description: Use sequential sampling (default false)
+        in: query
+        name: seq
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            items:
+              $ref: '#/definitions/models.UserWord'
+            type: array
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User word not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Get batched words for review
+      tags:
+      - globalDictOp
+  /api/user/review/grammar/correct:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: User correctly answer the grammar
+      tags:
+      - globalDictOp
+  /api/user/review/grammar/incorrect:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: User incorrectly answer the grammar
+      tags:
+      - globalDictOp
+  /api/user/review/word/correct:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User word not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: User correctly answer the word
+      tags:
+      - globalDictOp
+  /api/user/review/word/incorrect:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User word not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: User incorrectly answer the word
+      tags:
+      - globalDictOp
+  /api/user/update:
+    post:
+      consumes:
+      - application/json
+      description: The sha256 of the api key is used as the identifier.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "409":
+          description: Duplicate user or username
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Change the username
+      tags:
+      - userOp
+  /api/user/words/accurate-search:
+    post:
+      consumes:
+      - application/json
+      description: Only ``kanji" and ``katakana" fields are used for comparison
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.JapaneseWord'
+            type: array
+        "400":
+          description: Invalid JSON or Invalid dict name
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Check for similar words in the dictionary for that user
+      tags:
+      - userDictOp
+  /api/user/words/add:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "409":
+          description: Duplicate word
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Insert word into user's dictionary
+      tags:
+      - userDictOp
+  /api/user/words/delete:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Delete a word in user's dictionary
+      tags:
+      - userDictOp
+  /api/user/words/edit:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Edit a word in user's dictionary
+      tags:
+      - userDictOp
+  /api/user/words/fuzzy-search:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.JapaneseWord'
+            type: array
+        "400":
+          description: Invalid JSON or Invalid dict name
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Check (fuzzy search) for similar words in the dictionary for that user
+      tags:
+      - userDictOp
+  /api/user/words/get:
+    get:
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Results per page
+        in: query
+        name: RPP
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SearchResult-models_UserWord'
+        "400":
+          description: Invalid dictionary name
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: Browse words in dictionary for that user
+      tags:
+      - userDictOp
   /api/words/{dictName}/accurate-search:
     post:
       consumes:
@@ -600,9 +1426,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.JapaneseWord'
-            type: array
+            $ref: '#/definitions/models.SearchResult-models_JapaneseWord'
         "400":
           description: Invalid dictionary name
           schema:

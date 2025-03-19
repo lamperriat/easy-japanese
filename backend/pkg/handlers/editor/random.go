@@ -1,4 +1,4 @@
-package handlers
+package editor
 
 import (
 	"math/rand"
@@ -8,7 +8,7 @@ import (
 )
 
 // @Summary Get a random number
-// @Description Get a random number between 1 and 100
+// @Description Test use 
 // @Produce json
 // @Success 200 {object} map[string]int
 // @Router /api/random [get]

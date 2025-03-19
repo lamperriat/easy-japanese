@@ -20,6 +20,7 @@ type JapaneseWord struct {
 
 type ReadingMaterial struct {
     ID      uint   `json:"id" gorm:"primaryKey"`
+    Title   string `json:"title" gorm:"type:text"`
     Content string `json:"content" gorm:"type:text"`
     Chinese string `json:"chinese" gorm:"type:text"`
 }
@@ -35,20 +36,6 @@ type Grammar struct {
     ID          uint   `json:"id" gorm:"primaryKey"`
     Description string `json:"description" gorm:"type:text"`
     Examples    []GrammarExample `json:"example" gorm:"foreignKey:GrammarID"`
-}
-
-const (
-	DefaultWeight = 50
-	MinWeight	  = 1
-	MaxWeight	  = 500
-	ChangeRate    = 1
-)
-
-type UserWord struct {
-    UserID    string `gorm:"primaryKey"`
-    WordID    uint   `gorm:"primaryKey"`
-    Weight    int    `gorm:"check:weight BETWEEN 1 AND 500"`
-    UserNote  string `gorm:"type:text"`
 }
 
 type SearchResult[T any] struct {
