@@ -1,6 +1,8 @@
 import React from 'react';
 import './HomePage.css'; // 引入样式文件
-
+import pic1 from './assets/homepage/pic1.jpg';
+import pic2 from './assets/homepage/pic2.jpg';
+import pic3 from './assets/homepage/pic3.jpg';
 export default function HomePage() {
   return (
     <div className="home-page">
@@ -18,9 +20,9 @@ export default function HomePage() {
 
         {/* 图片部分，左边和右边各一张 */}
         <div className="image-section">
-          <img className="home-image-1" src="/pic/pic1.jpg" alt="image1" />
-          <img className="home-image-2" src="/pic/pic2.jpg" alt="image2" />
-          <img className="home-image-3" src="/pic/pic3.jpg" alt="image3" />
+          <img className="home-image-1" src={pic1} alt="image1" />
+          <img className="home-image-2" src={pic2} alt="image2" />
+          <img className="home-image-3" src={pic3} alt="image3" />
         </div>
       </main>
     </div>

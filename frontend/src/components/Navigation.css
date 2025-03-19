@@ -1,10 +1,9 @@
 /* 使用Google字体，选用Roman字体（Times New Roman） */
-@import url('https://fonts.googleapis.com/css2?family=Times+New+Roman&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
 /* 主导航条样式 */
 .main-nav {
   height: 100px;
-  font-family: 'ZCOOL KuaiLe', sans-serif; /* 使用 ZCOOL KuaiLe 字体 */
+  font-family: 'Ma Shan Zheng', sans-serif; 
   background-color: #f4f4f4;
   padding: 15px 20px;
   text-align: center;
