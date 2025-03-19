@@ -6,6 +6,7 @@ import (
 	"backend/pkg/auth"
 	"backend/pkg/models"
 	"errors"
+	"fmt"
 	"sort"
 	"strconv"
 
@@ -174,7 +175,8 @@ func getReviewWordsSeq(db *gorm.DB, review_cnt int64, userID uint, batch_size in
 	}
 	// sort with calcWeight(familiarity, lastSeenTillNow)
 	sort.Slice(userWords, func(i, j int) bool {
-		return calcWeight(userWords[i].Familiarity, int(review_cnt - userWords[i].LastSeen)) < calcWeight(userWords[j].Familiarity, int(review_cnt - userWords[i].LastSeen))
+		// descending order
+		return calcWeight(userWords[i].Familiarity, int(review_cnt - userWords[i].LastSeen)) > calcWeight(userWords[j].Familiarity, int(review_cnt - userWords[i].LastSeen))
 	})
 
 	return userWords[:batch_size], nil
@@ -267,6 +269,7 @@ func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size i
 	if err != nil {
 		return nil, err
 	}
+	// println(len(userWords))
 	if len(userWords) < batch_size {
 		// fmt.Printf("filtering: user_id = %d, Familiarity > 0\n", userID)
 		err := db.Preload("Examples").
@@ -288,6 +291,7 @@ func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size i
 		weight := calcWeight(userWords[i].Familiarity, int(review_cnt - userWords[i].LastSeen))
 		weights[i] = weight
 		total_weight += weight
+		// fmt.Printf("%d: %d, ", userWords[i].ID, weight)
 	}
 	// build the segment tree
 	st := &segmentTree{}
@@ -363,4 +367,30 @@ func (h *ReviewHandler) GetWords(c *gin.Context) {
 	// When user answers, `updateWord` will do the job
 
 	c.JSON(200, userWords)
+}
+
+// since our segment tree is not exposed, we have to write unit test in the same package
+func TestSegTree() {
+	arr := []int{1,2,1,1,2,1,1,1,10,20,30}
+	st := &segmentTree{}
+	st.build(arr)
+	n_choices := 5
+	total := 0
+	for _, v := range arr {
+		total += v
+	}
+	fmt.Printf("tree arr len: %d\n", len(st.tree))
+	for i := 0; i < n_choices; i++ {
+		weight := rand.Intn(total) + 1
+		index := st.search(weight)
+		println("index:", index)
+		st.setZero(index)
+		total -= arr[index]
+		arr[index] = 0
+		println("tree: ", st.tree[0])
+		fmt.Printf("%v\n", st.tree[1:3])
+		fmt.Printf("%v\n", st.tree[3:7])
+		fmt.Printf("%v\n", st.tree[7:15])
+		fmt.Printf("%v\n", st.tree[15:31])
+	}
 }

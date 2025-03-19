@@ -159,3 +159,17 @@ func (h* UserHandler) DeleteUser(c *gin.Context) {
 	}
 	c.JSON(200, models.SuccessMsg{Message: "User removed"})
 }
+
+func (h* UserHandler) GetUserInfo(keyhash string) (*models.User, error) {
+	var user models.User
+	if err := h.db.Where("keyhash = ?", keyhash).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &user, fmt.Errorf("user not found")
+		} else {
+			return &user, fmt.Errorf("database error")
+		}
+	}
+	println(user.Username)
+	println(user.ReviewCount)
+	return &user, nil
+}

@@ -124,6 +124,7 @@ func TestReviewWord(t *testing.T) {
 	
 
 	apikey := "TEST_USE_API_KEY"
+	keyhash := auth.Sha256hex(apikey)
 	test_user := models.User{
 		Username: "test_user",
 	}
@@ -159,12 +160,47 @@ func TestReviewWord(t *testing.T) {
 			router, apikey, word, "/api/user/words/add", "POST", http.StatusCreated, 
 		))
 	}
+	correct_arr := []int{4,6,22,34,87}
+	incorrect_arr := []int{3,5,22,37,70}
+	for _, i := range correct_arr {
+		for j := 0; j < 10; j++ {
+			word := models.UserWord{
+				ID: uint(i),
+			}
+			t.Run("Correct word", test.CreateTest(
+				router, apikey, word, "/api/user/review/correct", "POST", http.StatusOK,
+			))
+		}
+	}
+	for _, i := range incorrect_arr {
+		for j := 0; j < 10; j++ {
+			word := models.UserWord{
+				ID: uint(i),
+			}
+			t.Run("Incorrect word", test.CreateTest(
+				router, apikey, word, "/api/user/review/incorrect", "POST", http.StatusOK,
+			))
+		}
+	}
+	for i := 0; i < 90; i++ {
+		t.Run("Correct word", test.CreateTest(
+			router, apikey, models.UserWord{
+				ID: uint(99),
+			}, "/api/user/review/correct", "POST", http.StatusOK,
+		))
+	}
 	t.Run("Get all", test.CreateTest(
-		router, apikey, nil, "/api/user/words/get?RPP=100", "GET", http.StatusOK, 
+		router, apikey, nil, "/api/user/words/get?RPP=10", "GET", http.StatusOK, 
 	))
 	t.Run("Get words", test.CreateTest(
 		router, apikey, nil, "/api/user/review/get", "GET", http.StatusOK,
 	))
+	if user_ptr, err := handler_user.GetUserInfo(keyhash); err != nil {
+		t.Fatalf("Failed to get user: %v", err)
+	} else {
+		println(user_ptr.Username)
+		println(user_ptr.ReviewCount)
+	}
 	t.Run("Get words seq", test.CreateTest(
 		router, apikey, nil, "/api/user/review/get?seq=true", "GET", http.StatusOK,
 	))
@@ -178,4 +214,8 @@ func TestReviewWord(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			rr.Code, http.StatusOK)
 	}
+}
+
+func TestSegTree(t *testing.T) {
+	reviewer.TestSegTree()
 }
