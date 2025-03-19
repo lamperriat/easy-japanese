@@ -862,34 +862,6 @@ paths:
       summary: Register user
       tags:
       - userOp
-  /api/user/review/correct:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/models.SuccessMsg'
-        "400":
-          description: Invalid JSON format
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "404":
-          description: User word not found
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "500":
-          description: Database error
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-      security:
-      - APIKeyAuth: []
-      summary: User correctly answer the word
-      tags:
-      - globalDictOp
   /api/user/review/get:
     get:
       consumes:
@@ -929,7 +901,91 @@ paths:
       summary: Get batched words for review
       tags:
       - globalDictOp
-  /api/user/review/incorrect:
+  /api/user/review/grammar/correct:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: User correctly answer the grammar
+      tags:
+      - globalDictOp
+  /api/user/review/grammar/incorrect:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: User incorrectly answer the grammar
+      tags:
+      - globalDictOp
+  /api/user/review/word/correct:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User word not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - APIKeyAuth: []
+      summary: User correctly answer the word
+      tags:
+      - globalDictOp
+  /api/user/review/word/incorrect:
     post:
       consumes:
       - application/json
