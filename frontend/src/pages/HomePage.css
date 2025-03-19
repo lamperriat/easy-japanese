@@ -1,0 +1,210 @@
+/* 使用Google字体，选用Roman字体（Times New Roman） */
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
+
+
+/* 背景填满整个页面并置于底层 */
+body {
+    background-image: url('../images/background2.jpg');
+    background-size: cover;   /* 使背景图铺满容器，可能会裁剪一部分 */
+    background-attachment:fixed;
+    margin: 0;
+    padding: 0;
+    /* height: 100vh; 让背景高度覆盖整个视口 */
+    position: relative;
+  }
+
+/* 页面基础样式 */
+.home-page {
+  font-family: 'Ma Shan Zheng', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: column;
+  opacity: 0;
+  animation: fadeIn 2s forwards; /* 页面加载时淡入效果 */
+  padding: 20px; /* 增加整体页面内边距，防止内容贴边 */
+  text-align: center; /* 使内容居中 */
+  position: relative;  /* 确保主页面是相对定位 */
+}
+
+/* 设置头部样式 */
+.main-header {
+  text-align: center;
+  margin-bottom: 40px; /* 适当调整标题和下面内容的间距 */
+  background-color: rgba(255, 255, 255, 0.8); /* 为整个header设置一个白色背景 */
+  padding: 20px 40px; /* 给整个背景框添加内边距 */
+  border-radius: 15px; /* 圆角效果 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+  display: inline-block; /* 使得它不占据整个页面宽度，而是只包裹内容 */
+  
+  position:relative;
+  transform: perspective(1000px) rotateY(10deg); /* 加入3D效果 */
+  transition: transform 0.5s ease; /* 鼠标悬停时的平滑过渡 */
+}
+
+/* 鼠标悬停头部，产生旋转效果 */
+.main-header:hover {
+  transform: perspective(1000px) rotateY(0deg);
+}
+
+
+/* 为h3和p添加背景框 */
+.welcome-section h3,
+.welcome-section p {
+  background-color: rgba(255, 255, 255, 0.8); /* 白色背景，设置透明度 */
+  padding: 10px 20px; /* 增加内边距 */
+  border-radius: 8px; /* 圆角效果 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+  margin: 10px 0; /* 添加上下的间距 */
+  /* margin-right: -700px; */
+  margin-top: 50px;
+  position:relative;
+  transform: translateY(30px); /* 初始位置稍微下移 */
+  opacity: 0;
+  animation: slideUp 1s forwards; /* 加入滑动动画 */
+}
+
+/* 滑动动画 */
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 标题的大小和颜色 */
+.main-header h1 {
+  font-size: 4.8rem !important;
+  color: #777 !important;
+  margin-top: 30px; /* 标题向上调整 */
+}
+
+.main-header h2 {
+  font-size: 1.5rem;
+  color: #777;
+  margin-top: 10px; /* 给h2标题添加适当间距 */
+}
+
+/* 首页内容 */
+.home-content {
+  display: flex;
+  flex-direction: column; /* 让欢迎文本和图片竖直排列 */
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  max-width: 1200px;
+}
+
+/* 欢迎文本居中 */
+.welcome-section {
+  text-align: center;
+  margin-bottom: 20px; /* 适当增加间距 */
+}
+
+.welcome-section h3 {
+  font-size: 2.5rem;
+  color: #777;
+}
+
+.welcome-section p {
+  font-size: 1.7rem;
+  color: #777;
+}
+
+/* 图片部分 */
+.image-section {
+  display: flex;
+  justify-content: space-between; /* 图片分别位于左侧和右侧 */
+  width: 100%;
+  max-width: 1000px; /* 控制图片区域的最大宽度 */
+  margin-top: 20px; /* 给图片部分添加间距 */
+  position: relative; /* 确保图片容器独立定位 */
+}
+
+
+.home-image-1 {
+  width: 15%; /* 每张图片占宽度的40% */
+  height: auto; /* 图片自适应高度 */
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0);
+  top: -690px; /* 调整左侧图片向上移动的距离 */
+  margin-left: 400px; /* 调整左侧图片与右侧图片的间距 */
+  position: absolute;  /* 使用绝对定位来确保图片独立 */
+  transform: translateX(-50px); /* 初始位置稍微偏移 */
+  animation: slideInLeft 1.5s forwards; /* 加入图片滑入动画 */
+}
+
+
+.home-image-2 {
+  width: 10%; /* 每张图片占宽度的40% */
+  height: auto; /* 图片自适应高度 */
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0);
+  top: -250px; /* 调整右侧图片向上移动的距离 */
+  margin-bottom: auto;
+  left: 295px; /* 调整右侧图片与左侧图片的间距 */
+  position: absolute;  /* 使用绝对定位来确保图片独立 */
+  animation: slideInRight 1.5s forwards; /* 加入图片滑入动画 */
+  background-color: transparent;
+}
+
+
+.home-image-3 {
+    width: 8%; /* 每张图片占宽度的40% */
+    height: auto; /* 图片自适应高度 */
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0);
+    top: -140px; /* 调整右侧图片向上移动的距离 */
+    margin-bottom: auto;
+    right: 290px; /* 调整右侧图片与左侧图片的间距 */
+    position: absolute;  /* 使用绝对定位来确保图片独立 */
+    animation: slideInRight 1.5s forwards; /* 加入图片滑入动画 */
+    background-color: transparent;
+  }
+
+
+/* 图片滑入动画 */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 页面加载动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 鼠标悬停时的倾斜效果，仅对文字生效 */
+.welcome-section h3,
+.welcome-section p {
+  transition: transform 0.3s ease-in-out; /* 平滑过渡 */
+}
+
+.welcome-section h3:hover,
+.welcome-section p:hover {
+  transform: perspective(1000px) rotateX(5deg) rotateY(5deg) !important;
+}

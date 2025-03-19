@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { API_BASE_URL } from '../../services/api';
+// import './WordForm.css';
+
 export default function WordForm() {
   const [formData, setFormData] = useState({
     id: 0,
