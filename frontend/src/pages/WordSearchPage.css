@@ -1,0 +1,105 @@
+/* src/pages/WordSearchPage.css */
+
+.word-search-page {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  /* 标题部分 */
+  .main-header h1 {
+    font-size: 2.5rem;
+    color: #343a40;
+  }
+  
+  .main-header h2 {
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+  }
+  
+  /* 词典选择部分 */
+  .dictionary-section {
+    margin-bottom: 20px;
+  }
+  
+  .dictionary-section label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  .dictionary-section select {
+    padding: 8px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    cursor: pointer;
+  }
+  
+  /* 搜索框 */
+  .search-section {
+    margin-bottom: 20px;
+  }
+  
+  .search-section input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .search-section input:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  
+  /* 单词列表 */
+  .word-list-section {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: inline-block;
+    text-align: left;
+  }
+  
+  .word-list-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .word-list-section ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .word-list-section li {
+    background: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    transition: background 0.3s ease;
+  }
+  
+  .word-list-section li:hover {
+    background: #ced4da;
+  }
+  
+  /* 返回主页 */
+  a {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
