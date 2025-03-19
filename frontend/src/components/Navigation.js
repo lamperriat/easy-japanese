@@ -5,7 +5,6 @@ export default function Navigation() {
     <nav className="main-nav">
       <ul>
         <li><Link to="/word-editor">📖 修改词库</Link></li>
-        <li><Link to="/word-search">🔍 词库搜索</Link></li>
         <li><Link to="/">🏠 返回主页</Link></li>
       </ul>
     </nav>
