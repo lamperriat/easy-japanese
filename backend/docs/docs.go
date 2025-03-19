@@ -763,6 +763,257 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/user/reading-material/add": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Add a reading material to user's dictionary",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/reading-material/delete": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Delete a reading material from user's dictionary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/reading-material/edit": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Edit a reading material in user's dictionary",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/reading-material/get": {
+            "get": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Browse all reading materials from user's dictionary",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Results per page",
+                        "name": "RPP",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UserReadingMaterial"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/reading-material/search": {
+            "get": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "userDictOp"
+                ],
+                "summary": "Fuzzy search in all reading materials from user's dictionary",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Results per page",
+                        "name": "RPP",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "query",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.SearchResult-models_UserReadingMaterial"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
         "/api/user/register": {
             "post": {
                 "security": [
@@ -796,6 +1047,158 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Duplicate user or username",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/review/correct": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "globalDictOp"
+                ],
+                "summary": "User correctly answer the word",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User word not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/review/get": {
+            "get": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "globalDictOp"
+                ],
+                "summary": "Get batched words for review",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Batch size (default 20)",
+                        "name": "batch",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Use sequential sampling (default false)",
+                        "name": "seq",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UserWord"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User word not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/review/incorrect": {
+            "post": {
+                "security": [
+                    {
+                        "APIKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "globalDictOp"
+                ],
+                "summary": "User incorrectly answer the word",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User word not found",
                         "schema": {
                             "$ref": "#/definitions/models.ErrorMsg"
                         }
@@ -1110,9 +1513,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "globalDictOp"
+                    "userDictOp"
                 ],
-                "summary": "Browse words in dictionary",
+                "summary": "Browse words in dictionary for that user",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1576,6 +1979,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
@@ -1659,6 +2065,26 @@ const docTemplate = `{
                 }
             }
         },
+        "models.SearchResult-models_UserReadingMaterial": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserReadingMaterial"
+                    }
+                }
+            }
+        },
         "models.SearchResult-models_UserWord": {
             "type": "object",
             "properties": {
@@ -1717,6 +2143,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "example": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserReadingMaterial": {
+            "type": "object",
+            "properties": {
+                "chinese": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
                     "type": "string"
                 }
             }

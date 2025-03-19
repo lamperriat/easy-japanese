@@ -117,7 +117,7 @@ func TestReviewWord(t *testing.T) {
 	router.POST("/api/user/words/add", auth.APIKeyAuth(), handler.AddWordUser)
 	router.POST("/api/user/words/edit", auth.APIKeyAuth(), handler.EditWordUser)
 	router.POST("/api/user/words/delete", auth.APIKeyAuth(), handler.DeleteWordUser)
-	router.GET("/api/user/words/get", auth.APIKeyAuth(), handler.GetDictUser)
+	router.GET("/api/user/words/get", auth.APIKeyAuth(), handler.GetWordsUser)
 	router.GET("/api/user/review/get", auth.APIKeyAuth(), reviewer.GetWords)
 	router.POST("/api/user/review/correct", auth.APIKeyAuth(), reviewer.CorrectWord)
 	router.POST("/api/user/review/incorrect", auth.APIKeyAuth(), reviewer.IncorrectWord)

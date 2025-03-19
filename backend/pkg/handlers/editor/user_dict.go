@@ -354,9 +354,9 @@ func (h *WordHandler) DeleteWordUser(c *gin.Context) {
     c.JSON(200, models.SuccessMsg{Message: "Word deleted"})
 }
 
-// @Summary Browse words in dictionary
+// @Summary Browse words in dictionary for that user
 // @Description 
-// @Tags globalDictOp
+// @Tags userDictOp
 // @Security APIKeyAuth
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"
@@ -365,7 +365,7 @@ func (h *WordHandler) DeleteWordUser(c *gin.Context) {
 // @Failure 400 {object} models.ErrorMsg "Invalid dictionary name"
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/words/get [get]
-func (h *WordHandler) GetDictUser(c *gin.Context) {
+func (h *WordHandler) GetWordsUser(c *gin.Context) {
     providedKey := c.GetHeader("X-API-Key")
     keyhash := auth.Sha256hex(providedKey)
     var user models.User

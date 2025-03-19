@@ -50,6 +50,31 @@ func main() {
 		userGroup.POST("/register", userHandler.RegisterUser)
 		userGroup.POST("/update", userHandler.UpdateUserName)
 		userGroup.GET("/delete", userHandler.DeleteUser)
+		grammarGroup := userGroup.Group("/grammar")
+		{
+			grammarGroup.POST("/add", wordHandler.AddGrammarUser)
+			grammarGroup.POST("/edit", wordHandler.EditGrammarUser)
+			grammarGroup.POST("/delete", wordHandler.DeleteGrammarUser)
+			grammarGroup.GET("/get", wordHandler.GetGrammarUser)
+			grammarGroup.GET("/search", wordHandler.SearchGrammarUser)
+		}
+		readingGroup := userGroup.Group("/reading-material")
+		{
+			readingGroup.POST("/add", wordHandler.AddReadingMaterialUser)
+			readingGroup.POST("/edit", wordHandler.EditReadingMaterialUser)
+			readingGroup.POST("/delete", wordHandler.DeleteReadingMaterialUser)
+			readingGroup.GET("/get", wordHandler.GetReadingMaterialUser)
+			readingGroup.GET("/search", wordHandler.FuzzySearchReadingMaterialUser) // full text search
+		}
+		wordsGroup := userGroup.Group("/words")
+		{
+			wordsGroup.POST("/accurate-search", wordHandler.AccurateSearchWordUser)
+			wordsGroup.GET("/fuzzy-search", wordHandler.FuzzySearchWordUser)
+			wordsGroup.POST("/add", wordHandler.AddWordUser)
+			wordsGroup.POST("/edit", wordHandler.EditWordUser)
+			wordsGroup.POST("/delete", wordHandler.DeleteWordUser)
+			wordsGroup.GET("/get", wordHandler.GetWordsUser)
+		}
 	}
 
 	// Answer routes

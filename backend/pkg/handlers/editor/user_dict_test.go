@@ -44,7 +44,7 @@ func TestUserDictOps(t *testing.T) {
 	router.POST("/api/user/words/add", auth.APIKeyAuth(), handler.AddWordUser)
 	router.POST("/api/user/words/edit", auth.APIKeyAuth(), handler.EditWordUser)
 	router.POST("/api/user/words/delete", auth.APIKeyAuth(), handler.DeleteWordUser)
-	router.GET("/api/user/words/get", auth.APIKeyAuth(), handler.GetDictUser)
+	router.GET("/api/user/words/get", auth.APIKeyAuth(), handler.GetWordsUser)
 	apikey := "TEST_USE_API_KEY"
 	test_user := models.User{
 		Username: "test_user",
