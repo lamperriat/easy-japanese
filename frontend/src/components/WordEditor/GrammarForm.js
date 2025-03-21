@@ -1,25 +1,17 @@
 import { useState } from 'react';
 import { API_BASE_URL } from '../../services/api';
-// import './WordForm.css';
 
-export default function WordForm() {
+
+export default function GrammarForm() {
   const [formData, setFormData] = useState({
     id: 0,
-    kanji: '',
-    chinese: '',
-    katakana: '',
-    hiragana: '',
-    type: '',
+    description: '', 
     example: []
   });
   const resetForm = () => {
     setFormData({
       id: 0,
-      kanji: '',
-      chinese: '',
-      katakana: '',
-      hiragana: '',
-      type: '',
+      description: '',
       example: []
     });
   }
@@ -27,14 +19,10 @@ export default function WordForm() {
   const [apiMessage, setApiMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const bookOptions = [
-    { id: '1', name: '新标日初级上' },
-    { id: '2', name: '新标日初级下' },
-    { id: '3', name: '新标日中级上' },
-    { id: '4', name: '新标日中级下' },
-    { id: '5', name: '新标日高级上' },
-    { id: '6', name: '新标日高级下' },
-    { id: '-1', name: 'user'}, 
-  ];
+    { id: '0', name: 'global' }, 
+    { id: '-1', name: 'user' },
+  ]
+
   const handleSubmit = async (actionType) => {
     setIsLoading(true);
     try {
@@ -42,18 +30,18 @@ export default function WordForm() {
       var method  = '';
       if (actionType === 'check') {
         if (selectedBook === '-1') {
-          endpoint = `${API_BASE_URL}/api/user/words/fuzzy-search`;
+          endpoint = `${API_BASE_URL}/api/user/grammar/search`;
           method = 'GET';
         } else {
-          endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/fuzzy-search`;
+          endpoint = `${API_BASE_URL}/api/grammar/search`;
           method = 'GET';
         }
       } else {
         if (selectedBook === '-1') {
-          endpoint = `${API_BASE_URL}/api/user/words/add`;
+          endpoint = `${API_BASE_URL}/api/user/grammar/add`;
           method = 'POST';
         } else {
-          endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/add`;
+          endpoint = `${API_BASE_URL}/api/grammar/add`;
           method = 'POST';
         }
       }
@@ -77,11 +65,11 @@ export default function WordForm() {
     setIsLoading(false);
   };
 
-  return (
-    <div className="word-editor">
-      <form>
+    return (
+      <div className="word-editor">
+        <form>
         <div className="form-row">
-          <label htmlFor="book-select">选择教材:</label>
+          <label htmlFor="book-select">选择数据库:</label>
           <select
             id="book-select"
             value={selectedBook}
@@ -92,60 +80,17 @@ export default function WordForm() {
               <option key={book.id} value={book.id}>{book.name}</option>
             ))}
           </select>
-        </div>
-        <div className='form-row'>
-
-        <div className="form-group">
-          <label>类型(名/动1/动2/动3/形1/形2/副/连)</label>
-          <input
-            value={formData.type}
-            onChange={(e) => setFormData({...formData, type: e.target.value})}
-          />
-          </div>
-          
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label>汉字</label>
-            <input
-              value={formData.kanji}
-              onChange={(e) => setFormData({...formData, kanji: e.target.value})}
-            />
           </div>
           <div className="form-group">
-            <label>中文</label>
-            <input
-              value={formData.chinese}
-              onChange={(e) => setFormData({...formData, chinese: e.target.value})}
-            />
+              <label htmlFor="description">语法:</label>
+              <textarea
+                style={{ height: '100px', width: '100%' }}
+                placeholder='语法描述'
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              ></textarea>
           </div>
-        </div>
-        <div className="form-row">
           <div className="form-group">
-            <label>片假名</label>
-            <input
-              value={formData.katakana}
-              onChange={(e) => setFormData({...formData, katakana: e.target.value})}
-            />
-          </div>          
-          <div className="form-group">
-            <label>平假名</label>
-            <input
-              value={formData.hiragana}
-              onChange={(e) => setFormData({...formData, hiragana: e.target.value})}
-            />
-          </div>
-        </div>
-
-        {/* <div className="form-group">
-          <label>例句</label>
-          <textarea
-            value={formData.example}
-            onChange={(e) => setFormData({...formData, example: e.target.value})}
-          />
-        </div> */}
-        <div className="form-group">
           <label>例句</label>
           {formData.example.map((ex, index) => (
             <div key={index}>
@@ -183,7 +128,6 @@ export default function WordForm() {
             +
           </button>
         </div>
-
         <div className="button-group">
           <button 
             type="button"
@@ -203,7 +147,7 @@ export default function WordForm() {
         </div>
 
         {apiMessage && <div className="api-message">{apiMessage}</div>}
-      </form>
-    </div>
-  );
+        </form>
+      </div>
+    )
 }
