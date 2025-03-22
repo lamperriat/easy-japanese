@@ -1,64 +1,79 @@
-/* 使用Google字体，选用Roman字体（Times New Roman） */
 @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
-/* 主导航条样式 */
+
 .main-nav {
   height: 100px;
   font-family: 'Ma Shan Zheng', sans-serif; 
-  background-color: #f4f4f4;
+  background-color: rgba(255, 255, 255, 0.1);
   padding: 15px 20px;
   text-align: center;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   opacity: 0;
-  animation: fadeIn 1s forwards; /* 导航条渐进动画 */
-  gap: 30px; /* 控制链接之间的间距 */
+  animation: fadeIn 1s forwards; 
+  gap: 30px; 
 }
 
-/* 导航菜单列表 */
 .main-nav ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
   display: flex;
   justify-content: center;
-  align-items: center; /* 垂直居中 */
-  gap: 30px; /* 控制链接之间的间距 */
+  align-items: center; 
+  gap: 30px; 
 }
 
-/* 每个导航项 */
 .main-nav li {
   display: inline-block;
   opacity: 0;
-  animation: fadeInLink 1s forwards; /* 每个链接逐渐显现 */
-  animation-delay: 0.3s; /* 延迟时间，控制每个链接的出现顺序 */
+  animation: fadeInLink 1s forwards; 
+  animation-delay: 0.3s; 
 }
 
-/* 导航链接样式 */
+
 .main-nav a {
   text-decoration: none;
   color: #333;
   font-size: 2rem !important;
   font-weight: bold;
-  padding: 10px 20px; /* 增加内边距，使背景更明显 */
-  border-radius: 15px; /* 圆角效果 */
-  background-color: rgba(255, 255, 255, 0.3); /* 设置白色背景和透明度 */
-  transition: color 0.3s ease, background-color 0.3s ease; /* 平滑过渡 */
+  padding: 10px 20px; 
+  border-radius: 15px; 
+  background-color: rgba(255, 255, 255, 0.3); 
+  transition: color 0.3s ease, background-color 0.3s ease; 
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* 右对齐的导航项 */
 .right-item {
-    margin-left:auto; /* 使用自动外边距，将该项推到右侧 */
-    font-size: 1.2rem !important; /* 字体变小 */
+    margin-left:auto; 
+    /* font-size: 1.2rem !important;  */
   }
 
-/* 链接背景颜色变化 */
 .main-nav a:hover {
-  color: #f3f6f97b; /* 设置悬停时的文字颜色 */
-  background-color: rgba(255, 255, 255, 1); /* 悬停时背景变为不透明 */
+  color: #f3f6f97b; 
+  background-color: rgba(255, 255, 255, 0.4);
 }
 
-/* 渐进的加载动画 */
+.username-btn {
+  font-family: 'Ma Shan Zheng', sans-serif;
+  text-decoration: none;
+  color: #333;
+  font-size: 1.2rem !important;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: color 0.3s ease, background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+  display: inline-block;
+}
+
+/* Use the same hover effect as links */
+.username-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -68,7 +83,6 @@
   }
 }
 
-/* 链接的渐进动画 */
 @keyframes fadeInLink {
   from {
     opacity: 0;

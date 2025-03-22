@@ -15,7 +15,6 @@ func APIKeyAuth() gin.HandlerFunc {
 			return
 		}
 		validKeys := strings.Split(os.Getenv("API_KEYS"), ",")
-
 		valid := false
 		for _, key := range validKeys {
 			if key == providedKey {
