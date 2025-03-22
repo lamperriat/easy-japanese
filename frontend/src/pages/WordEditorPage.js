@@ -1,6 +1,7 @@
 import React from 'react';
 import WordForm from '../components/WordEditor/WordForm';
 import GrammarForm from '../components/WordEditor/GrammarForm';
+import ReadingForm from '../components/WordEditor/ReadingForm';
 import '../components/WordEditor/WordForm.css';
 
 export default function WordEditorPage() {
@@ -20,6 +21,10 @@ export default function WordEditorPage() {
         <section className="word-form-section">
           <h3>添加/编辑语法</h3>
           <GrammarForm />
+        </section>
+        <section className="word-form-section">
+          <h3>添加/编辑阅读</h3>
+          <ReadingForm />
         </section>
       </main>
     </div>
