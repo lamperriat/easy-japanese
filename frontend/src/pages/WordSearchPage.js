@@ -1,8 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { API_BASE_URL } from '../services/api'; // 引入 API 地址
+import { API_BASE_URL } from '../services/api'; 
 import './WordSearchPage.css';
-
-// 词典选项（教材）
+const searchOptions = [
+  {
+    id: '1', name: '单词', options: [
+      { id: '1', name: '新标日初级上' },
+      { id: '2', name: '新标日初级下' },
+      { id: '3', name: '新标日中级上' },
+      { id: '4', name: '新标日中级下' },
+      { id: '5', name: '新标日高级上' },
+      { id: '6', name: '新标日高级下' },
+      { id: '-1', name: 'global'},
+    ]
+  },
+  {
+    id: '2', name: '语法', options: [
+      { id: '1', name: 'user' }, 
+      { id: '2', name: 'global' },
+  ] },
+  {
+    id: '3', name: '阅读', options: [
+      { id: '1', name: 'user' }, 
+      { id: '2', name: 'global' },
+  ] },
+]
 const bookOptions = [
   { id: '1', name: '新标日初级上' },
   { id: '2', name: '新标日初级下' },
@@ -10,6 +31,7 @@ const bookOptions = [
   { id: '4', name: '新标日中级下' },
   { id: '5', name: '新标日高级上' },
   { id: '6', name: '新标日高级下' },
+  { id: '-1', name: 'global'}
 ];
 
 const WordSearchPage = () => {
@@ -94,14 +116,12 @@ const WordSearchPage = () => {
   };
   
 
-  // 监听教材选择变化，获取词库数据
   useEffect(() => {
     if (selectedBook) {
       fetchWordList(); // 选择教材时，加载所有单词
     }
   }, [selectedBook]);
 
-  // 监听 words 数据变化，更新 filteredWords
   useEffect(() => {
     setFilteredWords(words); // 每当 words 更新时，更新 filteredWords
     console.log("Filtered Words Updated:", words); // 打印更新后的filteredWords
@@ -132,7 +152,6 @@ const WordSearchPage = () => {
       </header>
 
       <main className="search-content">
-        {/* 选择词典 */}
         <section className="dictionary-section">
           <label htmlFor="dictionary">选择词典:</label>
           <select
@@ -148,7 +167,6 @@ const WordSearchPage = () => {
           </select>
         </section>
 
-        {/* 搜索框 */}
         <section className="search-section">
           <input
             type="text"
@@ -158,11 +176,9 @@ const WordSearchPage = () => {
           />
         </section>
 
-        {/* 加载状态 & API 错误信息 */}
         {isLoading && <p>加载中...</p>}
         {apiMessage && <p className="error-message">{apiMessage}</p>}
 
-        {/* 单词列表 */}
         <section className="word-list-section">
           <h3>单词列表</h3>
           <ul>

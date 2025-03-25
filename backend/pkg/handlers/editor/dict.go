@@ -35,7 +35,7 @@ var availableDicts = map[string]struct{}{
 // @Summary Check for similar words in the dictionary
 // @Description Only ``kanji" and ``katakana" fields are used for comparison
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Param dictName path string true "Dictionary name"
 // @Accept json
 // @Produce json
@@ -90,7 +90,7 @@ func (h *WordHandler) AccurateSearchWord(c *gin.Context) {
 // @Summary Check for similar words (fuzzy) in the dictionary
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Param dictName path string true "Dictionary name"
 // @Param query query string true "Search query"
 // @Param page query int false "Page number"
@@ -161,7 +161,7 @@ func (h* WordHandler) FuzzySearchWord(c *gin.Context) {
 // @Summary Insert word into dictionary
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Param dictName path string true "Dictionary name"
 // @Accept json
 // @Produce json
@@ -231,7 +231,7 @@ func (h *WordHandler) AddWord(c *gin.Context) {
 // @Summary Update word in dictionary
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Param dictName path string true "Dictionary name"
 // @Accept json
 // @Produce json
@@ -301,7 +301,7 @@ func (h *WordHandler) EditWord(c *gin.Context) {
 // @Summary Delete word in dictionary
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Param dictName path string true "Dictionary name"
 // @Accept json
 // @Produce json
@@ -357,7 +357,7 @@ const defaultResultPerPage = 30
 // @Summary Browse words in dictionary
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Param dictName path string true "Dictionary name"
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"

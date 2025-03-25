@@ -58,7 +58,7 @@ func calcWeight(familiarity int, lastSeenTillNow int) int {
 // @Summary User correctly answer the word
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg "Success"
@@ -74,7 +74,7 @@ func (h* ReviewHandler) CorrectWord(c *gin.Context) {
 // @Summary User incorrectly answer the word
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg "Success"
@@ -90,7 +90,7 @@ func (h* ReviewHandler) IncorrectWord(c *gin.Context) {
 // @Summary User correctly answer the grammar
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg "Success"
@@ -106,7 +106,7 @@ func (h* ReviewHandler) CorrectGrammar(c *gin.Context) {
 // @Summary User incorrectly answer the grammar
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg "Success"
@@ -339,7 +339,7 @@ func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size i
 // @Summary Get batched words for review 
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Param batch query int false "Batch size (default 20)"

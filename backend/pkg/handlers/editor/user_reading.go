@@ -13,7 +13,7 @@ import (
 // @Summary Add a reading material to user's dictionary
 // @Description
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.SuccessMsg
@@ -58,7 +58,7 @@ func (h* WordHandler) AddReadingMaterialUser(c *gin.Context) {
 // @Summary Edit a reading material in user's dictionary
 // @Description
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg
@@ -111,7 +111,7 @@ func (h* WordHandler) EditReadingMaterialUser(c *gin.Context) {
 // @Summary Delete a reading material from user's dictionary
 // @Description
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg
@@ -163,7 +163,7 @@ func (h* WordHandler) DeleteReadingMaterialUser(c *gin.Context) {
 // @Summary Browse all reading materials from user's dictionary
 // @Description
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Param page query int false "Page number"
@@ -214,7 +214,7 @@ func (h* WordHandler) GetReadingMaterialUser(c *gin.Context) {
 // @Summary Fuzzy search in all reading materials from user's dictionary
 // @Description
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Param page query int false "Page number"

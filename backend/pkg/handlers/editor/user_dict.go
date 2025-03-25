@@ -15,7 +15,7 @@ import (
 // @Summary Check for similar words in the dictionary for that user
 // @Description Only ``kanji" and ``katakana" fields are used for comparison
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} []models.JapaneseWord
@@ -79,7 +79,7 @@ func (h* WordHandler) AccurateSearchWordUser(c *gin.Context) {
 // @Summary Check (fuzzy search) for similar words in the dictionary for that user
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} []models.JapaneseWord
@@ -146,7 +146,7 @@ func (h* WordHandler) FuzzySearchWordUser(c *gin.Context) {
 // @Summary Insert word into user's dictionary
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.SuccessMsg
@@ -218,7 +218,7 @@ func (h* WordHandler) AddWordUser(c *gin.Context) {
 // @Summary Edit a word in user's dictionary
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg
@@ -298,7 +298,7 @@ func (h* WordHandler) EditWordUser(c *gin.Context) {
 // @Summary Delete a word in user's dictionary
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg
@@ -357,7 +357,7 @@ func (h *WordHandler) DeleteWordUser(c *gin.Context) {
 // @Summary Browse words in dictionary for that user
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"
 // @Produce json
