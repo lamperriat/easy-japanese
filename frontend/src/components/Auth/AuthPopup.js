@@ -8,10 +8,8 @@ const AuthPopup = ({ onClose, onSubmit }) => {
   // Load from localStorage if available
   useEffect(() => {
     const savedUsername = localStorage.getItem('username');
-    const savedApiKey = localStorage.getItem('apiKey');
     
     if (savedUsername) setUsername(savedUsername);
-    if (savedApiKey) setApiKey(savedApiKey);
   }, []);
 
   const handleSubmit = (e) => {
@@ -19,6 +17,7 @@ const AuthPopup = ({ onClose, onSubmit }) => {
     if (username && apiKey) {
       onSubmit(username, apiKey);
     }
+    // get token
   };
 
   return (

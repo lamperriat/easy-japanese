@@ -19,11 +19,49 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/auth/token": {
+            "post": {
+                "description": "Exchange API key for a JWT token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Get authentication token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TokenResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
         "/api/grammar/add": {
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -62,7 +100,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -107,7 +145,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -152,7 +190,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "produces": [
@@ -199,7 +237,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "produces": [
@@ -270,7 +308,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -309,7 +347,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -348,7 +386,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -387,7 +425,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -437,7 +475,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -491,7 +529,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "description": "The sha256 of the api key is used as the identifier.",
@@ -534,7 +572,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -579,7 +617,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -624,7 +662,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -669,7 +707,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "produces": [
@@ -716,7 +754,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "produces": [
@@ -767,7 +805,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -812,7 +850,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -857,7 +895,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -902,7 +940,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -958,7 +996,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1018,7 +1056,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "description": "Both the username and the sha256 of the api key should be unique",
@@ -1064,7 +1102,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1126,7 +1164,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1171,7 +1209,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1216,7 +1254,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1261,7 +1299,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1306,7 +1344,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "description": "The sha256 of the api key is used as the identifier.",
@@ -1358,7 +1396,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "description": "Only ` + "`" + `` + "`" + `kanji\" and ` + "`" + `` + "`" + `katakana\" fields are used for comparison",
@@ -1407,7 +1445,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1458,7 +1496,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1503,7 +1541,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1548,7 +1586,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1596,7 +1634,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "produces": [
@@ -1646,7 +1684,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "description": "Only ` + "`" + `` + "`" + `kanji\" and ` + "`" + `` + "`" + `katakana\" fields are used for comparison",
@@ -1698,7 +1736,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1752,7 +1790,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1806,7 +1844,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1860,7 +1898,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "consumes": [
@@ -1927,7 +1965,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "APIKeyAuth": []
+                        "JWTAuth": []
                     }
                 ],
                 "produces": [
@@ -2199,6 +2237,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TokenResponse": {
+            "type": "object",
+            "properties": {
+                "expires_in": {
+                    "type": "integer"
+                },
+                "token": {
                     "type": "string"
                 }
             }

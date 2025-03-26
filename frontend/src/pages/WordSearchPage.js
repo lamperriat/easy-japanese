@@ -47,11 +47,17 @@ const WordSearchPage = () => {
     setIsLoading(true);
     setApiMessage('');
     try {
+      var token = sessionStorage.getItem('token');
+      if (!token) {
+        setApiMessage('请先登录');
+        setIsLoading(false);
+        return [];
+      }
       const response = await fetch(endpoint, {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': process.env.REACT_APP_API_KEY,
+          'Authorization': token,
         },
         body: body ? JSON.stringify(body) : null,
       });
@@ -60,7 +66,7 @@ const WordSearchPage = () => {
       console.log("Raw API Response:", responseText); // 打印原始响应
   
       try {
-        const result = JSON.parse(responseText); // 尝试将响应文本解析为 JSON
+        const result = JSON.parse(responseText).results; // 尝试将响应文本解析为 JSON
         console.log("Parsed API Response:", result); // 打印解析后的 JSON
   
         if (response.ok) {
@@ -95,12 +101,18 @@ const WordSearchPage = () => {
 
   // 获取相似单词
   const fetchSimilarWords = async (query) => {
+    var token = sessionStorage.getItem('token');
+    if (!token) {
+      setApiMessage('请先登录');
+      setIsLoading(false);
+      return [];
+    }
     const endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/fuzzy-search?query=${encodeURIComponent(query)}`;
     const response = await fetch(endpoint, {
-      method: 'GET',  // 保持 GET 请求
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': process.env.REACT_APP_API_KEY,
+        'Authorization': token,
       },
     });
   
