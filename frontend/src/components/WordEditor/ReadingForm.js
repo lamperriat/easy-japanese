@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { API_BASE_URL } from '../../services/api';
-
+import Notification from '../Auth/Notification';
 
 export default function ReadingForm() {
   const [formData, setFormData] = useState({
@@ -20,6 +20,7 @@ export default function ReadingForm() {
   const [selectedBook, setSelectedBook] = useState('1');
   const [apiMessage, setApiMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
   const bookOptions = [
     { id: '0', name: 'global' }, 
     { id: '-1', name: 'user' },
@@ -47,11 +48,24 @@ export default function ReadingForm() {
           method = 'POST';
         }
       }
+      var token = sessionStorage.getItem('token');
+      if (!token) {
+        setNotification({
+          show: true,
+          message: '请先登录',
+          type: 'error'
+        });
+        setTimeout(() => {
+          setNotification({ show: false, message: '', type: '' });
+        }, 3000);
+        setIsLoading(false);
+        return;
+      }
       const response = await fetch(endpoint, {
         method: method, 
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': process.env.REACT_APP_API_KEY
+          'Authorization': token,
         },
         body: JSON.stringify(formData)
       });
@@ -129,8 +143,14 @@ export default function ReadingForm() {
           </button>
         </div>
 
-        {apiMessage && <div className="api-message">{apiMessage}</div>}
+          {apiMessage && <div className="api-message">{apiMessage}</div>}
         </form>
+        {notification.show && (
+          <Notification 
+            message={notification.message} 
+            type={notification.type} 
+          />
+        )}
       </div>
     )
 }

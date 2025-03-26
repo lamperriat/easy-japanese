@@ -56,6 +56,7 @@ export default function GrammarForm() {
         setTimeout(() => {
           setNotification({ show: false, message: '', type: '' });
         }, 3000);
+        setIsLoading(false);
         return;
       }
       const response = await fetch(endpoint, {

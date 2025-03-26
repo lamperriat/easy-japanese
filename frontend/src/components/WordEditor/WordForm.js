@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { API_BASE_URL } from '../../services/api';
-// import './WordForm.css';
-
+import Notification from '../Auth/Notification';
 export default function WordForm() {
   const [formData, setFormData] = useState({
     id: 0,
@@ -26,6 +25,7 @@ export default function WordForm() {
   const [selectedBook, setSelectedBook] = useState('1');
   const [apiMessage, setApiMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
   const bookOptions = [
     { id: '1', name: '新标日初级上' },
     { id: '2', name: '新标日初级下' },
@@ -57,11 +57,24 @@ export default function WordForm() {
           method = 'POST';
         }
       }
+      var token = sessionStorage.getItem('token');
+      if (!token) {
+        setNotification({
+          show: true,
+          message: '请先登录',
+          type: 'error'
+        });
+        setTimeout(() => {
+          setNotification({ show: false, message: '', type: '' });
+        }, 3000);
+        setIsLoading(false);
+        return;
+      }
       const response = await fetch(endpoint, {
         method: method, 
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': process.env.REACT_APP_API_KEY
+          'Authorization': token,
         },
         body: JSON.stringify(formData)
       });
@@ -204,6 +217,12 @@ export default function WordForm() {
 
         {apiMessage && <div className="api-message">{apiMessage}</div>}
       </form>
+      {notification.show && (
+          <Notification 
+            message={notification.message} 
+            type={notification.type} 
+          />
+        )}
     </div>
   );
 }

@@ -35,12 +35,12 @@ const bookOptions = [
 ];
 
 const WordSearchPage = () => {
-  const [words, setWords] = useState([]); // 词库数据
-  const [filteredWords, setFilteredWords] = useState([]); // 过滤后的词
-  const [searchQuery, setSearchQuery] = useState(''); // 搜索关键字
-  const [selectedBook, setSelectedBook] = useState(bookOptions[0].id); // 默认选择第一本书 (使用 id)
-  const [isLoading, setIsLoading] = useState(false); // 控制加载状态
-  const [apiMessage, setApiMessage] = useState(''); // 显示 API 消息
+  const [words, setWords] = useState([]);
+  const [filteredWords, setFilteredWords] = useState([]);
+  const [searchQuery, setSearchQuery] = useState(''); 
+  const [selectedBook, setSelectedBook] = useState(bookOptions[0].id); 
+  const [isLoading, setIsLoading] = useState(false); 
+  const [apiMessage, setApiMessage] = useState('');
 
 
   const fetchWords = async (endpoint, method = 'GET', body = null) => {
@@ -62,12 +62,12 @@ const WordSearchPage = () => {
         body: body ? JSON.stringify(body) : null,
       });
   
-      const responseText = await response.text(); // 获取原始的响应文本
-      console.log("Raw API Response:", responseText); // 打印原始响应
+      const responseText = await response.text(); 
+      console.log("Raw API Response:", responseText); 
   
       try {
-        const result = JSON.parse(responseText).results; // 尝试将响应文本解析为 JSON
-        console.log("Parsed API Response:", result); // 打印解析后的 JSON
+        const result = JSON.parse(responseText).results; 
+        console.log("Parsed API Response:", result); 
   
         if (response.ok) {
           return Array.isArray(result) ? result : result.words || result.data || [];

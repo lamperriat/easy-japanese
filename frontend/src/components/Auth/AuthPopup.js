@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './AuthPopup.css';
-
+import Notification from './Notification';
 const AuthPopup = ({ onClose, onSubmit }) => {
   const [username, setUsername] = useState('');
   const [apiKey, setApiKey] = useState('');
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
   
   // Load from localStorage if available
   useEffect(() => {
@@ -17,7 +18,6 @@ const AuthPopup = ({ onClose, onSubmit }) => {
     if (username && apiKey) {
       onSubmit(username, apiKey);
     }
-    // get token
   };
 
   return (
@@ -48,9 +48,34 @@ const AuthPopup = ({ onClose, onSubmit }) => {
               required
             />
           </div>
-          <button type="submit" className="submit-button">提交</button>
+          <div className="button-group">
+            <button 
+              type="button" 
+              className="logout-button" 
+              onClick={() => {
+                sessionStorage.removeItem('token');
+                setNotification({
+                  show: true,
+                  message: '已登出',
+                  type: 'success'
+                });
+                setTimeout(() => {
+                  setNotification({ show: false, message: '', type: '' });
+                }, 3000);
+              }}
+            >
+              登出
+            </button>
+            <button type="submit" className="submit-button">提交</button>
+          </div>
         </form>
       </div>
+      {notification.show && (
+        <Notification 
+          message={notification.message} 
+          type={notification.type} 
+        />
+      )}
     </div>
   );
 };
