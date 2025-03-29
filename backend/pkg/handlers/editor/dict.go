@@ -73,7 +73,7 @@ func (h *WordHandler) AccurateSearchWord(c *gin.Context) {
     }
 
     if len(orConditions) == 0 {
-        c.JSON(200, gin.H{"similar": []interface{}{}})
+        c.JSON(200, []interface{}{})
         return
     }
 
