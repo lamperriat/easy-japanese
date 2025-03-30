@@ -28,6 +28,7 @@ export default function WordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: '', type: '' });
   const [searchResult, setSearchResult] = useState({
+    id: 0,
     kanji: '',
     chinese: '',
     katakana: '',
@@ -35,6 +36,7 @@ export default function WordForm() {
     type: '',
     example: []
   });
+  
   
   const bookOptions = [
     { id: '1', name: '新标日初级上' },
@@ -61,11 +63,18 @@ export default function WordForm() {
         }
       } else {
         if (selectedBook === '-1') {
-          endpoint = `${API_BASE_URL}/api/user/words/add`;
+          endpoint = `${API_BASE_URL}/api/user/words`;
           method = 'POST';
         } else {
-          endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/add`;
+          endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}`;
           method = 'POST';
+        }
+        if (formData.id == 0) {
+          // 0: add new
+          endpoint += '/add';
+        } else {
+          // 1: update
+          endpoint += '/edit';
         }
       }
       var token = sessionStorage.getItem('token');
@@ -129,6 +138,7 @@ export default function WordForm() {
   const handleMsgButtonClick = () => {
     setFormData({
       ...formData,
+      id: searchResult.id,
       kanji: searchResult.kanji,
       chinese: searchResult.chinese,
       katakana: searchResult.katakana,
@@ -136,7 +146,7 @@ export default function WordForm() {
       type: searchResult.type,
       example: searchResult.example
     });
-    setApiMessage('加载完成');
+    setApiMessage('加载完成。清注意：此时您的提交会修改该词条，而非新增。');
     setEnableMsgButton(false);
   }
 
@@ -157,6 +167,15 @@ export default function WordForm() {
           </select>
         </div>
         <div className='form-row'>
+        <div className="form-group">
+          <label>ID</label>
+          <input
+            value={formData.id}
+            readOnly
+            disabled
+            style={{ backgroundColor: '#f0f0f0' }}
+          />
+        </div>
 
         <div className="form-group">
           <label>类型(名/动1/动2/动3/形1/形2/副/连)</label>
@@ -164,8 +183,8 @@ export default function WordForm() {
             value={formData.type}
             onChange={(e) => setFormData({...formData, type: e.target.value})}
           />
-          </div>
-          
+        </div>
+        
         </div>
 
         <div className="form-row">
