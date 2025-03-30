@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../../services/api';
 import Notification from '../Auth/Notification';
 
-export default function ReadingForm() {
+export default function ReadingForm({ initReadingData, initBookId }) {
   const [formData, setFormData] = useState({
     id: 0,
     title: '', 
@@ -17,6 +17,10 @@ export default function ReadingForm() {
         chinese: ''
     });
   }
+  const resetFormUser = () => {
+    resetForm();
+    setApiMessage('表单清空完成');
+  }
   const [selectedBook, setSelectedBook] = useState('1');
   const [apiMessage, setApiMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -25,21 +29,29 @@ export default function ReadingForm() {
     { id: '0', name: 'global' }, 
     { id: '-1', name: 'user' },
   ]
-
+  useEffect(() => {
+    if (initBookId) {
+      setSelectedBook(initBookId);
+    }
+    if (initReadingData) {
+      setFormData({
+        id: initReadingData.id,
+        title: initReadingData.title,
+        content: initReadingData.content,
+        chinese: initReadingData.chinese
+      });
+      setApiMessage('加载完成。清注意：此时您的提交会修改该词条，而非新增。');
+    }
+  }, [initReadingData, initBookId]);
   const handleSubmit = async (actionType) => {
     setIsLoading(true);
     try {
       var endpoint = '';
       var method  = '';
       if (actionType === 'check') {
-        if (selectedBook === '-1') {
-          endpoint = `${API_BASE_URL}/api/user/reading-material/search`;
-          method = 'GET';
-        } else {
-          endpoint = `${API_BASE_URL}/api/reading-material/search`;
-          method = 'GET';
-        }
-      } else {
+        setApiMessage('由于阅读材料只能全文检索，暂时不提供重复检查');
+        return;
+      } else if (actionType === 'submit') {
         if (selectedBook === '-1') {
           endpoint = `${API_BASE_URL}/api/user/reading-material/add`;
           method = 'POST';
@@ -47,6 +59,17 @@ export default function ReadingForm() {
           endpoint = `${API_BASE_URL}/api/reading-material/add`;
           method = 'POST';
         }
+      } else if (actionType === 'delete') {
+        if (selectedBook === '-1') {
+          endpoint = `${API_BASE_URL}/api/user/reading-material/delete`;
+          method = 'POST';
+        } else {
+          endpoint = `${API_BASE_URL}/api/reading-material/delete`;
+          method = 'POST';
+        }
+      } else {
+        setApiMessage('未知操作');
+        return;
       }
       var token = sessionStorage.getItem('token');
       if (!token) {
@@ -71,10 +94,11 @@ export default function ReadingForm() {
       });
 
       const result = await response.json();
-      if (response.ok && actionType === "submit") {
+      if (response.ok && actionType !== "check") {
         resetForm();
       }
-      setApiMessage(result.error || result.message || "操作成功");
+      console.log(result);
+      setApiMessage("操作成功");
     } catch (error) {
       setApiMessage("网络请求失败");
     }
@@ -96,6 +120,15 @@ export default function ReadingForm() {
               <option key={book.id} value={book.id}>{book.name}</option>
             ))}
           </select>
+          </div>
+        <div className="form-group">
+          <label>ID</label>
+          <input
+            value={formData.id}
+            readOnly
+            disabled
+            style={{ backgroundColor: '#f0f0f0' }}
+          />
         </div>
         <div className="form-group">
           <label>标题</label>
@@ -143,6 +176,25 @@ export default function ReadingForm() {
           </button>
         </div>
 
+        <div className="button-group">
+          <button 
+            type="button" 
+            onClick={resetFormUser}
+            disabled={isLoading}
+            style={{ backgroundColor: '#6c757d', color: 'white' }}
+          >
+            重置表单
+          </button>
+          
+          <button 
+            type="button" 
+            onClick={() => handleSubmit('delete')}
+            disabled={isLoading || formData.id === 0}
+            style={{ backgroundColor: '#dc3545', color: 'white' }}
+          >
+            删除词条
+          </button>
+        </div>
           {apiMessage && <div className="api-message">{apiMessage}</div>}
         </form>
         {notification.show && (

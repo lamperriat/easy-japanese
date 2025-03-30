@@ -40,6 +40,7 @@ const WordSearchPage = () => {
   const [words, setWords] = useState([]);
   const [filteredWords, setFilteredWords] = useState([]);
   const [searchQuery, setSearchQuery] = useState(''); 
+  const [searchType, setSearchType] = useState('1'); // word=1, grammar=2, reading=3
   const [selectedBook, setSelectedBook] = useState(bookOptions[0].id); 
   const [isLoading, setIsLoading] = useState(false); 
   const [apiMessage, setApiMessage] = useState('');
@@ -83,13 +84,13 @@ const WordSearchPage = () => {
           return [];
         }
       } catch (error) {
-        console.error("JSON Parsing Error:", error); // 打印 JSON 解析错误
+        console.error("JSON Parsing Error:", error);
          setApiMessage('解析API响应失败: 非法的 JSON 格式');
         return [];
       }
   
     } catch (error) {
-      console.error("Fetch Error:", error); // 打印 fetch 请求错误
+      console.error("Fetch Error:", error);
       setApiMessage('网络请求失败: ' + error.message);
       return [];
     } finally {
@@ -98,15 +99,13 @@ const WordSearchPage = () => {
   };
   
 
-  // 获取词库数据
   const fetchWordList = async () => {
     const endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/get`;
     const words = await fetchWords(endpoint);
-    console.log("Fetched Word List:", words); // 打印获取的词库
-    setWords(words); // 更新词库数据
+    console.log("Fetched Word List:", words); 
+    setWords(words); 
   };
 
-  // 获取相似单词
   const fetchSimilarWords = async (query) => {
     var token = sessionStorage.getItem('token');
     if (!token) {
@@ -124,44 +123,51 @@ const WordSearchPage = () => {
     });
   
     const responseData = await response.json();
-    console.log("Fetched Response:", responseData);  // 打印实际返回的数据
+    console.log("Fetched Response:", responseData);  
   
-    // 检查返回的数据是否有 similar 字段
     if (responseData.results && responseData.results.length > 0) {
       setFilteredWords(responseData.results);
     } else {
-      setFilteredWords([]); // 如果没有数据，清空列表
+      setFilteredWords([]); 
     }
   };
   
 
   useEffect(() => {
     if (selectedBook) {
-      fetchWordList(); // 选择教材时，加载所有单词
+      fetchWordList(); 
     }
   }, [selectedBook]);
 
   useEffect(() => {
-    setFilteredWords(words); // 每当 words 更新时，更新 filteredWords
-    console.log("Filtered Words Updated:", words); // 打印更新后的filteredWords
+    setFilteredWords(words); 
+    console.log("Filtered Words Updated:", words); 
   }, [words]);
 
   useEffect(() => {
-    console.log("Filtered Words Updated:", filteredWords); // 打印 updated filteredWords
+    console.log("Filtered Words Updated:", filteredWords); 
   }, [filteredWords]);
   
 
-  // 处理搜索功能
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (!query.trim()) {
-      // 如果没有输入，显示所有单词
-      setFilteredWords(words); // 恢复到所有的单词列表
-      setApiMessage('');  // 清空消息
+      setFilteredWords(words); 
+      setApiMessage('');  
     } else {
-      fetchSimilarWords(query); // 有输入时，发起请求获取相似单词
+      fetchSimilarWords(query); 
     }
   };
+
+  const [searchCategory, setSearchCategory] = useState('1'); 
+  
+  const currentOptions = searchOptions[searchCategory - 1].options || [];
+
+  useEffect(() => {
+    if (currentOptions.length > 0) {
+      setSelectedBook(currentOptions[0].id);
+    }
+  }, [searchCategory]);
 
   return (
     <div className="word-search-page">
@@ -172,15 +178,30 @@ const WordSearchPage = () => {
 
       <main className="search-content">
         <section className="dictionary-section">
+          <label htmlFor="category">选择类别:</label>
+          <select
+            id="category"
+            value={searchCategory}
+            onChange={(e) => setSearchCategory(e.target.value)}
+          >
+            {searchOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </section>
+
+        <section className="dictionary-section">
           <label htmlFor="dictionary">选择词典:</label>
           <select
             id="dictionary"
             value={selectedBook}
             onChange={(e) => setSelectedBook(e.target.value)}
           >
-            {bookOptions.map((book) => (
-              <option key={book.id} value={book.id}>
-                {book.name}
+            {currentOptions.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.name}
               </option>
             ))}
           </select>

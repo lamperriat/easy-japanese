@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 export default function WordEditorPage() {
   const location = useLocation();
   const [wordData, setWordData] = useState(null);
+  const [readingData, setReadingData] = useState(null);
   const [bookId, setBookId] = useState(null);
   useEffect(() => {
     if (location.hash) {
@@ -20,6 +21,11 @@ export default function WordEditorPage() {
     if (location.state && location.state.word) {
       const word = location.state.word;
       setWordData(word);
+      setBookId(location.state.selectedBook);
+    }
+    if (location.state && location.state.reading) {
+      const reading = location.state.reading;
+      setReadingData(reading);
       setBookId(location.state.selectedBook);
     }
   })
@@ -42,7 +48,7 @@ export default function WordEditorPage() {
         </section>
         <section id='reading-form' className="word-form-section">
           <h3>添加/编辑阅读</h3>
-          <ReadingForm />
+          <ReadingForm initReadingData={readingData} initBookId={bookId} />
         </section>
       </main>
     </div>
