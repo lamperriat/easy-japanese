@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../services/api'; 
+import { useNavigate } from 'react-router-dom';
 import './WordSearchPage.css';
 const searchOptions = [
   {
@@ -35,6 +36,7 @@ const bookOptions = [
 ];
 
 const WordSearchPage = () => {
+  const navigate = useNavigate();
   const [words, setWords] = useState([]);
   const [filteredWords, setFilteredWords] = useState([]);
   const [searchQuery, setSearchQuery] = useState(''); 
@@ -42,6 +44,11 @@ const WordSearchPage = () => {
   const [isLoading, setIsLoading] = useState(false); 
   const [apiMessage, setApiMessage] = useState('');
 
+  const handleWordClick = (word) => {
+    navigate('/word-editor#word-form', {
+      state: { word: word, selectedBook: selectedBook }
+    });
+  };
 
   const fetchWords = async (endpoint, method = 'GET', body = null) => {
     setIsLoading(true);
@@ -196,7 +203,7 @@ const WordSearchPage = () => {
           <ul>
             {filteredWords.length > 0 ? (
               filteredWords.map((word, index) => (
-                <li key={index}>
+                <li key={index} onClick={() => handleWordClick(word)}>
                   <div>Kanji: {word.kanji || '无'}</div>
                   <div>Chinese: {word.chinese || '无'}</div>
                   <div>Hiragana: {word.hiragana || '无'}</div>

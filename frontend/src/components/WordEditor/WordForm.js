@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { API_BASE_URL } from '../../services/api';
 import Notification from '../Auth/Notification';
-export default function WordForm() {
+export default function WordForm({ initWordData, initBookId }) {
   const [formData, setFormData] = useState({
     id: 0,
     kanji: '',
@@ -21,6 +21,11 @@ export default function WordForm() {
       type: '',
       example: []
     });
+  }
+  const resetFormUser = () => {
+    resetForm();
+    setApiMessage('表单清空完成');
+    setEnableMsgButton(false);
   }
   const [selectedBook, setSelectedBook] = useState('1');
   const [apiMessage, setApiMessage] = useState('');
@@ -47,6 +52,25 @@ export default function WordForm() {
     { id: '6', name: '新标日高级下' },
     { id: '-1', name: 'user'}, 
   ];
+
+  useEffect(() => {
+    if (initBookId) {
+      setSelectedBook(initBookId);
+    }
+    if (initWordData) {
+      setFormData({
+        id: initWordData.id,
+        kanji: initWordData.kanji,
+        chinese: initWordData.chinese,
+        katakana: initWordData.katakana,
+        hiragana: initWordData.hiragana,
+        type: initWordData.type,
+        example: initWordData.example
+      });
+      setApiMessage('加载完成。清注意：此时您的提交会修改该词条，而非新增。');
+      setEnableMsgButton(false);
+    }
+  }, [initWordData, initBookId]);
   const handleSubmit = async (actionType) => {
     setIsLoading(true);
     setEnableMsgButton(false);
@@ -61,7 +85,7 @@ export default function WordForm() {
           endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/accurate-search`;
           method = 'POST';
         }
-      } else {
+      } else if (actionType === 'submit') {
         if (selectedBook === '-1') {
           endpoint = `${API_BASE_URL}/api/user/words`;
           method = 'POST';
@@ -76,6 +100,18 @@ export default function WordForm() {
           // 1: update
           endpoint += '/edit';
         }
+      } else if (actionType === 'delete') {
+        if (selectedBook === '-1') {
+          endpoint = `${API_BASE_URL}/api/user/words/delete`;
+          method = 'POST';
+        } else {
+          endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}/delete`;
+          method = 'POST';
+        }
+      } else {
+        setApiMessage('未知操作');
+        setIsLoading(false);
+        return;
       }
       var token = sessionStorage.getItem('token');
       if (!token) {
@@ -101,7 +137,7 @@ export default function WordForm() {
       });
 
       const result = await response.json();
-      if (response.ok && actionType === "submit") {
+      if (response.ok && actionType !== "check") {
         resetForm();
       }
       var searchMsg = '';
@@ -125,7 +161,8 @@ export default function WordForm() {
         }
         setApiMessage(searchMsg);
       } else {
-        setApiMessage(result.error || result.message || '操作成功');
+        console.log(result);
+        setApiMessage('操作成功');
       }
       
     } catch (error) {
@@ -281,6 +318,26 @@ export default function WordForm() {
             disabled={isLoading}
           >
             {isLoading ? '提交中...' : '提交词条'}
+          </button>
+        </div>
+
+        <div className="button-group">
+          <button 
+            type="button" 
+            onClick={resetFormUser}
+            disabled={isLoading}
+            style={{ backgroundColor: '#6c757d', color: 'white' }}
+          >
+            重置表单
+          </button>
+          
+          <button 
+            type="button" 
+            onClick={() => handleSubmit('delete')}
+            disabled={isLoading || formData.id === 0}
+            style={{ backgroundColor: '#dc3545', color: 'white' }}
+          >
+            删除词条
           </button>
         </div>
 
