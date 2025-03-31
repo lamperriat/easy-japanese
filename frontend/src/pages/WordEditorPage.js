@@ -9,6 +9,7 @@ export default function WordEditorPage() {
   const location = useLocation();
   const [wordData, setWordData] = useState(null);
   const [readingData, setReadingData] = useState(null);
+  const [grammarData, setGrammarData] = useState(null);
   const [bookId, setBookId] = useState(null);
   useEffect(() => {
     if (location.hash) {
@@ -28,6 +29,11 @@ export default function WordEditorPage() {
       setReadingData(reading);
       setBookId(location.state.selectedBook);
     }
+    if (location.state && location.state.grammar) {
+      const grammar = location.state.grammar;
+      setGrammarData(grammar);
+      setBookId(location.state.selectedBook);
+    }
   })
   return (
     <div className="word-editor-page">
@@ -44,7 +50,7 @@ export default function WordEditorPage() {
         </section>
         <section id='grammar-form' className="word-form-section">
           <h3>添加/编辑语法</h3>
-          <GrammarForm />
+          <GrammarForm initGrammarData={grammarData} initBookId={bookId} />
         </section>
         <section id='reading-form' className="word-form-section">
           <h3>添加/编辑阅读</h3>

@@ -26,8 +26,8 @@ export default function ReadingForm({ initReadingData, initBookId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState({ show: false, message: '', type: '' });
   const bookOptions = [
-    { id: '0', name: 'global' }, 
-    { id: '-1', name: 'user' },
+    { id: '1', name: '全局' }, 
+    { id: '-1', name: '个人' },
   ]
   useEffect(() => {
     if (initBookId) {
@@ -50,6 +50,7 @@ export default function ReadingForm({ initReadingData, initBookId }) {
       var method  = '';
       if (actionType === 'check') {
         setApiMessage('由于阅读材料只能全文检索，暂时不提供重复检查');
+        setIsLoading(false);
         return;
       } else if (actionType === 'submit') {
         if (selectedBook === '-1') {
@@ -108,7 +109,17 @@ export default function ReadingForm({ initReadingData, initBookId }) {
     return (
       <div className="word-editor">
         <form>
-        <div className="form-row">
+          <div className="form-row">
+          <div className="form-group">
+          <label>ID</label>
+          <input
+            value={formData.id}
+            readOnly
+            disabled
+            style={{ backgroundColor: '#f0f0f0' }}
+          />
+        </div>
+          <div className="form-group">
           <label htmlFor="book-select">选择数据库:</label>
           <select
             id="book-select"
@@ -121,14 +132,7 @@ export default function ReadingForm({ initReadingData, initBookId }) {
             ))}
           </select>
           </div>
-        <div className="form-group">
-          <label>ID</label>
-          <input
-            value={formData.id}
-            readOnly
-            disabled
-            style={{ backgroundColor: '#f0f0f0' }}
-          />
+
         </div>
         <div className="form-group">
           <label>标题</label>

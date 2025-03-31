@@ -11,29 +11,20 @@ const searchOptions = [
       { id: '4', name: '新标日中级下' },
       { id: '5', name: '新标日高级上' },
       { id: '6', name: '新标日高级下' },
-      { id: '-1', name: 'user'},
+      { id: '-1', name: '个人'},
     ]
   },
   {
     id: '2', name: '语法', options: [
-      { id: '1', name: 'user' }, 
-      { id: '-1', name: 'global' },
+      { id: '-1', name: '个人' }, 
+      { id: '1', name: '全局' },
   ] },
   {
     id: '3', name: '阅读', options: [
-      { id: '1', name: 'user' }, 
-      { id: '-1', name: 'global' },
+      { id: '-1', name: '个人' }, 
+      { id: '1', name: '全局' },
   ] },
 ]
-const bookOptions = [
-  { id: '1', name: '新标日初级上' },
-  { id: '2', name: '新标日初级下' },
-  { id: '3', name: '新标日中级上' },
-  { id: '4', name: '新标日中级下' },
-  { id: '5', name: '新标日高级上' },
-  { id: '6', name: '新标日高级下' },
-  { id: '-1', name: 'global'}
-];
 
 const WordSearchPage = () => {
   const navigate = useNavigate();
@@ -44,7 +35,7 @@ const WordSearchPage = () => {
   const [filteredGrammars, setFilteredGrammars] = useState([]);
   const [filteredReadings, setFilteredReadings] = useState([]);
   const [searchQuery, setSearchQuery] = useState(''); 
-  const [selectedBook, setSelectedBook] = useState(bookOptions[0].id); 
+  const [selectedBook, setSelectedBook] = useState(searchOptions[0].options[0].id); 
   const [isLoading, setIsLoading] = useState(false); 
   const [apiMessage, setApiMessage] = useState('');
   const [searchType, setSearchType] = useState('1'); 
@@ -131,14 +122,14 @@ const WordSearchPage = () => {
     setWords(words); 
   };
   const fetchGrammarList = async () => {
-    const endpoint = selectedBook === '1' ? 
+    const endpoint = selectedBook === '-1' ? 
       `${API_BASE_URL}/api/user/grammar/get` :
       `${API_BASE_URL}/api/grammar/get`;
     const grammars = await fetchRemote(endpoint);
     setGrammars(grammars);
   };
   const fetchReadingList = async () => {
-    const endpoint = selectedBook === '1' ?
+    const endpoint = selectedBook === '-1' ?
       `${API_BASE_URL}/api/user/reading-material/get` :
       `${API_BASE_URL}/api/reading-material/get`;
     const readings = await fetchRemote(endpoint);
@@ -157,13 +148,13 @@ const WordSearchPage = () => {
       endpoint = selectedBook !== "-1" ? `${API_BASE_URL}/api/words/book_${selectedBook}/fuzzy-search?query=${encodeURIComponent(query)}`
           : `${API_BASE_URL}/api/user/words/fuzzy-search?query=${encodeURIComponent(query)}`;
     } else if (searchType === '2') {
-      if (selectedBook === '1') {
+      if (selectedBook === '-1') {
         endpoint = `${API_BASE_URL}/api/user/grammar/search?query=${encodeURIComponent(query)}`;
       } else {
         endpoint = `${API_BASE_URL}/api/grammar/search?query=${encodeURIComponent(query)}`;
       }
     } else if (searchType === '3') {
-      if (selectedBook === '1') {
+      if (selectedBook === '-1') {
         endpoint = `${API_BASE_URL}/api/user/reading-material/search?query=${encodeURIComponent(query)}`;
       } else {
         endpoint = `${API_BASE_URL}/api/reading-material/search?query=${encodeURIComponent(query)}`;
@@ -252,10 +243,10 @@ const WordSearchPage = () => {
     filteredWords.length > 0 ? (
       filteredWords.map((word, index) => (
         <li key={index} onClick={() => handleWordClick(word)}>
-          <div>Kanji: {word.kanji || '无'}</div>
-          <div>Chinese: {word.chinese || '无'}</div>
-          <div>Hiragana: {word.hiragana || '无'}</div>
-          <div>Katakana: {word.katakana || '无'}</div>
+          <div>汉字: {word.kanji || '无'}</div>
+          <div>中文: {word.chinese || '无'}</div>
+          <div>平假名: {word.hiragana || '无'}</div>
+          <div>片假名: {word.katakana || '无'}</div>
         </li>
       ))
     ) : (

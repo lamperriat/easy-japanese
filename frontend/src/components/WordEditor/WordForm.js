@@ -50,7 +50,7 @@ export default function WordForm({ initWordData, initBookId }) {
     { id: '4', name: '新标日中级下' },
     { id: '5', name: '新标日高级上' },
     { id: '6', name: '新标日高级下' },
-    { id: '-1', name: 'user'}, 
+    { id: '-1', name: '个人'}, 
   ];
 
   useEffect(() => {
@@ -153,7 +153,7 @@ export default function WordForm({ initWordData, initBookId }) {
             }
             searchMsg += `; `;
           });
-          searchMsg += "\n加载到表单吗？";
+          searchMsg += "\n加载第一条到表单吗？";
           setEnableMsgButton(true);
           setSearchResult(result[0]);
         } else {
@@ -191,6 +191,7 @@ export default function WordForm({ initWordData, initBookId }) {
     <div className="word-editor">
       <form>
         <div className="form-row">
+          <div className="form-group">
           <label htmlFor="book-select">选择教材:</label>
           <select
             id="book-select"
@@ -202,6 +203,7 @@ export default function WordForm({ initWordData, initBookId }) {
               <option key={book.id} value={book.id}>{book.name}</option>
             ))}
           </select>
+        </div>
         </div>
         <div className='form-row'>
         <div className="form-group">
@@ -301,6 +303,23 @@ export default function WordForm({ initWordData, initBookId }) {
           >
             +
           </button>
+          <button
+          type="button"
+          onClick={() => {
+          if (formData.example.length > 0) {
+            const newExamples = [...formData.example];
+            newExamples.pop();
+            setFormData({
+            ...formData,
+            example: newExamples
+            });
+          }
+          }}
+          disabled={formData.example.length === 0}
+          style={{ marginLeft: '2px' }}
+        >
+          -
+        </button>
         </div>
 
         <div className="button-group">
