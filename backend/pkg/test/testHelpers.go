@@ -36,18 +36,18 @@ func GetTestReviewHandler() *reviewer.ReviewHandler {
 	return reviewer.NewReviewHandler(GetTestDB())
 }
 
-func NewRequest(t *testing.T, method, url string, body []byte, apikey string) *http.Request {
+func NewRequest(t *testing.T, method, url string, body []byte, token string) *http.Request {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	if err != nil {
 		t.Fatalf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-API-Key", apikey)
+	req.Header.Set("Authorization", token)
 	return req
 }
 
 // if expected is 0, then the status code will not be checked
-func CreateTest(router *gin.Engine, apikey string, accept interface{}, 
+func CreateTest(router *gin.Engine, token string, accept interface{}, 
 		apipath string, method string, expected int) func(*testing.T) {
 	return func(t *testing.T) {
 		body, err := json.Marshal(accept)
@@ -57,7 +57,7 @@ func CreateTest(router *gin.Engine, apikey string, accept interface{},
 		if method == "GET" {
 			body = nil
 		}
-		req := NewRequest(t, method, apipath, body, apikey)
+		req := NewRequest(t, method, apipath, body, token)
 		rr := httptest.NewRecorder()
 		router.ServeHTTP(rr, req)
 		println(rr.Body.String())

@@ -10,9 +10,9 @@ import (
 )
 
 // @Summary Add reading material
-// @Description 
+// @Description
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.ReadingMaterial
@@ -45,7 +45,7 @@ func (h* WordHandler) AddReadingMaterial(c *gin.Context) {
 // @Summary Edit reading material
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON"
@@ -87,7 +87,7 @@ func (h* WordHandler) EditReadingMaterial(c *gin.Context) {
 // @Summary Delete reading material
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON"
@@ -129,7 +129,7 @@ func (h* WordHandler) DeleteReadingMaterial(c *gin.Context) {
 // @Summary Browse all reading materials
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Param page query int false "Page number"
@@ -167,7 +167,7 @@ func (h* WordHandler) GetReadingMaterial(c *gin.Context) {
 // @Summary Fuzzy search in all reading materials
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Param page query int false "Page number"

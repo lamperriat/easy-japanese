@@ -15,6 +15,11 @@ type SuccessMsg struct {
 	Message string `json:"message"`
 }
 
+type TokenResponse struct {
+	Token string `json:"token"`
+	ExpiresIn int `json:"expires_in"`
+}
+
 type Metadata struct {
 	LatestID int `json:"latestID"`
 }

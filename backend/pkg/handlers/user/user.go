@@ -24,7 +24,7 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
 // @Summary Register user
 // @Description Both the username and the sha256 of the api key should be unique
 // @Tags userOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.SuccessMsg
@@ -79,7 +79,7 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 // @Summary Change the username
 // @Description The sha256 of the api key is used as the identifier. 
 // @Tags userOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.SuccessMsg
@@ -128,7 +128,7 @@ func (h* UserHandler) UpdateUserName(c *gin.Context) {
 // @Summary Remove user
 // @Description The sha256 of the api key is used as the identifier.
 // @Tags userOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Produce json
 // @Success 201 {object} models.SuccessMsg
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON"

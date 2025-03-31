@@ -4,6 +4,7 @@ import (
 	_ "backend/docs"
 	"backend/pkg/auth"
 	"backend/pkg/db"
+	"backend/pkg/handlers/authmid"
 	"backend/pkg/handlers/editor"
 	"backend/pkg/handlers/user"
 
@@ -36,16 +37,15 @@ func main() {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},
-		AllowHeaders:     []string{"Origin", "X-API-KEY", "Content-Type"},
+		AllowHeaders:     []string{"Origin", "X-API-KEY", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
 
-	// Random API
-	r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
-
+	// r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
+	r.POST("/api/auth/token", authmid.GetToken)
 	// User routes
-	userGroup := r.Group("/api/user", auth.APIKeyAuth())
+	userGroup := r.Group("/api/user", auth.JWTAuth())
 	{
 		userGroup.POST("/register", userHandler.RegisterUser)
 		userGroup.POST("/update", userHandler.UpdateUserName)
@@ -78,14 +78,14 @@ func main() {
 	}
 
 	// Answer routes
-	answerGroup := r.Group("/api/answer", auth.APIKeyAuth())
+	answerGroup := r.Group("/api/answer", auth.JWTAuth())
 	{
 		answerGroup.POST("/correct/:wordId", editor.UpdateWordWeightCorrect)
 		answerGroup.POST("/wrong/:wordId", editor.UpdateWordWeightIncorrect)
 	}
 
 	// Dictionary/Words routes
-	dictGroup := r.Group("/api/words/:dictName", auth.APIKeyAuth())
+	dictGroup := r.Group("/api/words/:dictName", auth.JWTAuth())
 	{
 		dictGroup.POST("/accurate-search", wordHandler.AccurateSearchWord)
 		dictGroup.GET("/fuzzy-search", wordHandler.FuzzySearchWord)
@@ -96,7 +96,7 @@ func main() {
 	}
 	
 	// Reading Material routes
-	readingGroup := r.Group("/api/reading-material", auth.APIKeyAuth())
+	readingGroup := r.Group("/api/reading-material", auth.JWTAuth())
 	{
 		readingGroup.POST("/add", wordHandler.AddReadingMaterial)
 		readingGroup.POST("/edit", wordHandler.EditReadingMaterial)
@@ -106,7 +106,7 @@ func main() {
 	}
 	
 	// Grammar routes
-	grammarGroup := r.Group("/api/grammar", auth.APIKeyAuth())
+	grammarGroup := r.Group("/api/grammar", auth.JWTAuth())
 	{
 		grammarGroup.POST("/add", wordHandler.AddGrammar)
 		grammarGroup.POST("/edit", wordHandler.EditGrammar)

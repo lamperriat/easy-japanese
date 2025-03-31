@@ -5,13 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type queryType int
-
-const (
-	correct queryType = iota
-	incorrect
-)
-
 // @deprecated
 func UpdateWordWeightCorrect(c *gin.Context) {
 	// if err := updateWordWeight(c, correct); err != nil {

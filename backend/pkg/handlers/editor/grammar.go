@@ -9,10 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
-// @Summary Add grammar 
-// @Description 
+// @Summary Add grammar
+// @Description
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.Grammar
@@ -44,7 +44,7 @@ func (h* WordHandler) AddGrammar(c *gin.Context) {
 // @Summary Edit grammar 
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.Grammar
@@ -104,7 +104,7 @@ func (h* WordHandler) EditGrammar(c *gin.Context) {
 // @Summary Delete grammar 
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg "Grammar deleted"
@@ -152,7 +152,7 @@ func (h *WordHandler) DeleteGrammar(c *gin.Context) {
 // @Summary Browse all grammars 
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Produce json
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"
@@ -189,7 +189,7 @@ func (h *WordHandler) GetGrammar(c *gin.Context) {
 // @Summary Search among all grammars 
 // @Description 
 // @Tags globalDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Produce json
 // @Param query query string true "Search query"
 // @Param page query int false "Page number"

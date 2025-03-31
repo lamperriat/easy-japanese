@@ -13,7 +13,7 @@ import (
 // @Summary Add a grammar to user's dictionary
 // @Description
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 201 {object} models.SuccessMsg
@@ -61,7 +61,7 @@ func (h* WordHandler) AddGrammarUser(c *gin.Context) {
 // @Summary Edit a grammar in user's dictionary
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg
@@ -129,7 +129,7 @@ func (h* WordHandler) EditGrammarUser(c *gin.Context) {
 // @Summary Delete a grammar from user's dictionary
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.SuccessMsg
@@ -187,7 +187,7 @@ func (h* WordHandler) DeleteGrammarUser(c *gin.Context) {
 // @Summary Browse all grammars in user's dictionary
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Produce json
 // @Param page query int false "Page number"
 // @Param RPP query int false "Results per page"
@@ -236,7 +236,7 @@ func (h* WordHandler) GetGrammarUser(c *gin.Context) {
 // @Summary Search among all grammars in user's dictionary
 // @Description 
 // @Tags userDictOp
-// @Security APIKeyAuth
+// @Security JWTAuth
 // @Produce json
 // @Param query query string true "Search query"
 // @Param page query int false "Page number"
