@@ -34,7 +34,7 @@ export default function WordEditorPage() {
       setGrammarData(grammar);
       setBookId(location.state.selectedBook);
     }
-  })
+  }, [location]);
   return (
     <div className="word-editor-page">
       <header className="main-header">
