@@ -57,7 +57,7 @@ func calcWeight(familiarity int, lastSeenTillNow int) int {
 
 // @Summary User correctly answer the word
 // @Description 
-// @Tags globalDictOp
+// @Tags reviewer 
 // @Security JWTAuth
 // @Accept json
 // @Produce json
@@ -73,7 +73,7 @@ func (h* ReviewHandler) CorrectWord(c *gin.Context) {
 
 // @Summary User incorrectly answer the word
 // @Description 
-// @Tags globalDictOp
+// @Tags reviewer
 // @Security JWTAuth
 // @Accept json
 // @Produce json
@@ -89,7 +89,7 @@ func (h* ReviewHandler) IncorrectWord(c *gin.Context) {
 
 // @Summary User correctly answer the grammar
 // @Description 
-// @Tags globalDictOp
+// @Tags reviewer
 // @Security JWTAuth
 // @Accept json
 // @Produce json
@@ -105,7 +105,7 @@ func (h* ReviewHandler) CorrectGrammar(c *gin.Context) {
 
 // @Summary User incorrectly answer the grammar
 // @Description 
-// @Tags globalDictOp
+// @Tags reviewer
 // @Security JWTAuth
 // @Accept json
 // @Produce json
@@ -178,37 +178,112 @@ func updateLearnable[T models.Learnable](db *gorm.DB, c *gin.Context, updateFunc
 
 const time_threshold = 90
 
-func getReviewWordsSeq(db *gorm.DB, review_cnt int64, userID uint, batch_size int) ([]models.UserWord, error) {
+func getReviewLearnableSeq[T models.Learnable](db *gorm.DB, review_cnt int64, userID uint, batch_size int) ([]T, error) {
 	recent_threshold := review_cnt - time_threshold
-	var userWords []models.UserWord
+	var learnables []T
+	// try to preload examples
+	preload := true
 	err := db.Preload("Examples").
 		Where("user_id = ? AND last_seen <= ? AND Familiarity > 0", userID, recent_threshold).
-		Find(&userWords).Error
+		Find(&learnables).Error
 	if err != nil {
-		return nil, err
-	}
-	if len(userWords) < batch_size {
-		err := db.Preload("Examples").
-			Where("user_id = ? AND Familiarity > 0", userID).
-			Find(&userWords).Error
+		// if fail, try to find without preloading
+		preload = false
+		err = db.Where("user_id = ? AND Familiarity > 0", userID).
+			Find(&learnables).Error
 		if err != nil {
 			return nil, err
 		}
-		if len(userWords) == 0 {
-			return []models.UserWord{}, nil
+	}
+	if len(learnables) < batch_size {
+		if preload {
+			err := db.Preload("Examples").
+				Where("user_id = ? AND Familiarity > 0", userID).
+				Find(&learnables).Error
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			err := db.Where("user_id = ? AND Familiarity > 0", userID).
+				Find(&learnables).Error
+			if err != nil {
+				return nil, err
+			}
+		}
+		if len(learnables) == 0 {
+			return []T{}, nil
 		}
 	}
-	if len(userWords) <= batch_size {
-		return userWords, nil
+	if len(learnables) <= batch_size {
+		return learnables, nil
 	}
-	// sort with calcWeight(familiarity, lastSeenTillNow)
-	sort.Slice(userWords, func(i, j int) bool {
+	sort.Slice(learnables, func(i, j int) bool {
 		// descending order
-		return calcWeight(userWords[i].Familiarity, int(review_cnt - userWords[i].LastSeen)) > calcWeight(userWords[j].Familiarity, int(review_cnt - userWords[i].LastSeen))
+		return calcWeight(learnables[i].GetFamiliarity(), int(review_cnt - learnables[i].GetLastSeen())) > calcWeight(learnables[j].GetFamiliarity(), int(review_cnt - learnables[j].GetLastSeen()))
 	})
 
-	return userWords[:batch_size], nil
+	return learnables[:batch_size], nil
 }
+
+func getReviewLearnableRand[T models.Learnable](db *gorm.DB, review_cnt int64, userID uint, batch_size int) ([]T, error) {
+	recent_threshold := review_cnt - time_threshold
+	var learnables []T
+	preload := true
+	err := db.Preload("Examples").
+		Where("user_id = ? AND last_seen <= ? AND Familiarity > 0", userID, recent_threshold).
+		Find(&learnables).Error
+	if err != nil {
+		preload = false
+		err = db.Where("user_id = ? AND Familiarity > 0", userID).
+			Find(&learnables).Error
+		if err != nil {
+			return nil, err
+		}
+	}
+	if len(learnables) < batch_size {
+		if preload {
+			err := db.Preload("Examples").
+				Where("user_id = ? AND Familiarity > 0", userID).
+				Find(&learnables).Error
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			err := db.Where("user_id = ? AND Familiarity > 0", userID).
+				Find(&learnables).Error
+			if err != nil {
+				return nil, err
+			}
+		}
+		if len(learnables) == 0 {
+			return []T{}, nil
+		}
+	}
+	if len(learnables) <= batch_size {
+		return learnables, nil
+	}
+	weights := make([]int, len(learnables))
+	total_weight := 0
+	for i := 0; i < len(learnables); i++ {
+		weight := calcWeight(learnables[i].GetFamiliarity(), int(review_cnt - learnables[i].GetLastSeen()))
+		weights[i] = weight
+		total_weight += weight
+	}
+	// build the segment tree
+	st := &segmentTree{}
+	st.build(weights)
+	choices := make([]T, batch_size)
+	for i := 0; i < batch_size; i++ {
+		weight := rand.Intn(total_weight) + 1
+		index := st.search(weight)
+		choices[i] = learnables[index]
+		st.setZero(index)
+		total_weight -= weights[index]
+		weights[index] = 0
+	}
+	return choices, nil
+}
+
 
 // fast log2 by shifting
 // log2(1) = 0
@@ -285,60 +360,10 @@ func (st *segmentTree) setZero(index int) {
 }
 
 
-// we will use a segment tree based approach to do weighted random sampling.
-func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size int) ([]models.UserWord, error) {
-	recent_threshold := review_cnt - time_threshold
-
-	var userWords []models.UserWord
-	// fmt.Printf("filtering: user_id = %d, last_seen <= %d\n", userID, recent_threshold)
-	err := db.Preload("Examples").
-		Where("user_id = ? AND last_seen <= ? AND Familiarity > 0", userID, recent_threshold).
-		Find(&userWords).Error
-	if err != nil {
-		return nil, err
-	}
-	// println(len(userWords))
-	if len(userWords) < batch_size {
-		// fmt.Printf("filtering: user_id = %d, Familiarity > 0\n", userID)
-		err := db.Preload("Examples").
-			Where("user_id = ? AND Familiarity > 0", userID).
-			Find(&userWords).Error
-		if err != nil {
-			return nil, err
-		}
-		if len(userWords) == 0 {
-			return []models.UserWord{}, nil
-		}
-	}
-	if len(userWords) <= batch_size {
-		return userWords, nil
-	}
-	weights := make([]int, len(userWords))
-	total_weight := 0
-	for i := 0; i < len(userWords); i++ {
-		weight := calcWeight(userWords[i].Familiarity, int(review_cnt - userWords[i].LastSeen))
-		weights[i] = weight
-		total_weight += weight
-		// fmt.Printf("%d: %d, ", userWords[i].ID, weight)
-	}
-	// build the segment tree
-	st := &segmentTree{}
-	st.build(weights)
-	choices := make([]models.UserWord, batch_size)
-	for i := 0; i < batch_size; i++ {
-		weight := rand.Intn(total_weight) + 1
-		index := st.search(weight)
-		choices[i] = userWords[index]
-		st.setZero(index)
-		total_weight -= weights[index]
-		weights[index] = 0
-	}
-	return choices, nil
-}
 
 // @Summary Get batched words for review 
 // @Description 
-// @Tags globalDictOp
+// @Tags reviewer
 // @Security JWTAuth
 // @Accept json
 // @Produce json
@@ -348,7 +373,7 @@ func getReviewWordsRand(db *gorm.DB, review_cnt int64, userID uint, batch_size i
 // @Failure 404 {object} models.ErrorMsg "User word not found"
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /api/user/review/get [get]
+// @Router /api/user/review/get/word [get]
 func (h *ReviewHandler) GetWords(c *gin.Context) {
     providedKey := c.GetHeader("X-API-Key")
     keyhash := auth.Sha256hex(providedKey)
@@ -373,11 +398,11 @@ func (h *ReviewHandler) GetWords(c *gin.Context) {
 	if err != nil {
 		seq = false
 	}
-	var userWords []models.UserWord
+	var userWords []*models.UserWord
 	if seq {
-		userWords, err = getReviewWordsSeq(h.db, user.ReviewCount, user.ID, batch_size)
+		userWords, err = getReviewLearnableSeq[*models.UserWord](h.db, user.ReviewCount, user.ID, batch_size)
 	} else {
-		userWords, err = getReviewWordsRand(h.db, user.ReviewCount, user.ID, batch_size)
+		userWords, err = getReviewLearnableRand[*models.UserWord](h.db, user.ReviewCount, user.ID, batch_size)
 	}
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -396,6 +421,70 @@ func (h *ReviewHandler) GetWords(c *gin.Context) {
 
 	c.JSON(200, userWords)
 }
+
+// @Summary Get batched words for review 
+// @Description 
+// @Tags reviewer
+// @Security JWTAuth
+// @Accept json
+// @Produce json
+// @Param batch query int false "Batch size (default 20)"
+// @Param seq query bool false "Use sequential sampling (default false)"
+// @Success 200 {object} []models.UserGrammar "Success"
+// @Failure 404 {object} models.ErrorMsg "User grammar not found"
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/user/review/get/grammar [get]
+func (h *ReviewHandler) GetGrammar(c *gin.Context) {
+	// yes the function is almost exactly the same as GetWords
+	// we do not do a further abstraction, sticking to the principle of
+	// "low in coupling, high in cohesion"
+    providedKey := c.GetHeader("X-API-Key")
+    keyhash := auth.Sha256hex(providedKey)
+    var user models.User
+    if err := h.db.Where("keyhash = ?", keyhash).
+        First(&user).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            c.JSON(404, models.ErrorMsg{Error: "User not found"})
+        } else {
+            c.JSON(500, models.ErrorMsg{Error: "Database error"})
+        } 
+        return
+    }
+
+	batch_size_str := c.Query("batch")
+	batch_size, err := strconv.Atoi(batch_size_str)
+	if err != nil || batch_size < 1 {
+		batch_size = 20
+	}
+	seq_str := c.Query("seq")
+	seq, err := strconv.ParseBool(seq_str)
+	if err != nil {
+		seq = false
+	}
+	var userGrammars []*models.UserGrammar
+	if seq {
+		userGrammars, err = getReviewLearnableSeq[*models.UserGrammar](h.db, user.ReviewCount, user.ID, batch_size)
+	} else {
+		userGrammars, err = getReviewLearnableRand[*models.UserGrammar](h.db, user.ReviewCount, user.ID, batch_size)
+	}
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, models.ErrorMsg{Error: "User word not found"})
+		} else {
+			c.JSON(500, models.ErrorMsg{Error: "Database error"})
+		}
+		return
+	}
+	if len(userGrammars) == 0 {
+		c.JSON(200, []models.UserGrammar{})
+		return
+	}
+	// We do NOT need to care about updating the LastSeen of words here.
+	// When user answers, `updateWord` will do the job
+
+	c.JSON(200, userGrammars)
+}	
 
 // since our segment tree is not exposed, we have to write unit test in the same package
 func TestSegTree() {

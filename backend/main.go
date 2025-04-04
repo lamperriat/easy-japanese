@@ -6,6 +6,7 @@ import (
 	"backend/pkg/db"
 	"backend/pkg/handlers/authmid"
 	"backend/pkg/handlers/editor"
+	"backend/pkg/handlers/reviewer"
 	"backend/pkg/handlers/user"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -34,6 +35,7 @@ func main() {
 	}
 	wordHandler := editor.NewWordHandler(db)
 	userHandler := user.NewUserHandler(db)
+	reviewHandler := reviewer.NewReviewHandler(db)
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},
@@ -75,6 +77,21 @@ func main() {
 			wordsGroup.POST("/delete", wordHandler.DeleteWordUser)
 			wordsGroup.GET("/get", wordHandler.GetWordsUser)
 		}
+		reviewGroup := userGroup.Group("/review")
+		{
+			reviewWordGroup := reviewGroup.Group("/word")
+			{
+				reviewWordGroup.POST("/correct", reviewHandler.CorrectWord)
+				reviewWordGroup.POST("/incorrect", reviewHandler.IncorrectWord)
+				reviewWordGroup.GET("/get", reviewHandler.GetWords)
+			}
+			reviewGrammarGroup := reviewGroup.Group("/grammar")
+			{
+				reviewGrammarGroup.POST("/correct", reviewHandler.CorrectGrammar)
+				reviewGrammarGroup.POST("/incorrect", reviewHandler.IncorrectGrammar)
+				reviewGrammarGroup.GET("/get", reviewHandler.GetGrammar)
+			}
+		}
 	}
 
 	// Answer routes
@@ -114,6 +131,7 @@ func main() {
 		grammarGroup.GET("/get", wordHandler.GetGrammar)
 		grammarGroup.GET("/search", wordHandler.FuzzySearchGrammar)
 	}
+
 	
 	r.Run(":8080")
 }
