@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../services/api';
+import Notification from '../components/Auth/Notification';
 import './ReviewSessionPage.css';
 
 const ReviewSessionPage = () => {
@@ -14,31 +15,56 @@ const ReviewSessionPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayMode, setDisplayMode] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchReviewItems = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(
-          `${API_BASE_URL}/api/user/review/get/${reviewType}?batch=${batchSize}`
-        );
-        if (!response.ok) {
-          throw new Error('Failed to fetch review items');
-        }
-        const data = await response.json();
-        setItems(data);
-        
-        // Set initial display mode for words
-        if (reviewType === 'word' && data.length > 0) {
-          setRandomDisplayMode();
-        }
-        
+      setIsLoading(true);
+      var token = sessionStorage.getItem('token');
+      if (!token) {
+        setNotification({
+          show: true,
+          message: '请先登录',
+          type: 'error'
+        });
+        setTimeout(() => {
+          setNotification({ show: false, message: '', type: '' });
+        }, 3000);
         setIsLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setIsLoading(false);
+        return;
       }
+      const response = await fetch(
+        `${API_BASE_URL}/api/user/review/${reviewType}/get?batch=${batchSize}`, 
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          }
+        }
+      );
+      if (response.status === 401) {
+        setNotification({
+          show: true,
+          message: '登录已过期，请重新登录',
+          type: 'error'
+        });
+        setTimeout(() => {
+          setNotification({ show: false, message: '', type: '' });
+        }, 3000);
+        setIsLoading(false);
+        return;
+      }
+      const data = await response.json();
+      setItems(data);
+      
+      // Set initial display mode for words
+      if (reviewType === 'word' && data.length > 0) {
+      setRandomDisplayMode();
+      }
+      
+      setIsLoading(false);
     };
 
     fetchReviewItems();
@@ -48,10 +74,16 @@ const ReviewSessionPage = () => {
     const random = Math.random();
     if (random < 0.3) {
       setDisplayMode('chinese');
-    } else if (random < 0.6) {
-      setDisplayMode('kanji');
     } else {
-      setDisplayMode('kana');
+      if (items[currentIndex].kanji) {
+        if (random < 0.65) {
+          setDisplayMode('kanji');
+        } else {
+          setDisplayMode('kana');
+        }
+      } else {
+        setDisplayMode('kana');
+      }
     }
   };
 
@@ -144,6 +176,12 @@ const ReviewSessionPage = () => {
       <div className="no-items">
         <p>No items to review.</p>
         <button onClick={() => navigate('/review')}>Back to Review Settings</button>
+        {notification.show && (
+          <Notification 
+          message={notification.message} 
+          type={notification.type} 
+          />
+        )}
       </div>
     );
   }
@@ -174,6 +212,12 @@ const ReviewSessionPage = () => {
           Next
         </button>
       </div>
+      {notification.show && (
+        <Notification 
+        message={notification.message} 
+        type={notification.type} 
+        />
+      )}
     </div>
   );
 };

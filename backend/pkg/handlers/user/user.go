@@ -1,7 +1,6 @@
 package user
 
 import (
-	"backend/pkg/auth"
 	"backend/pkg/models"
 	"errors"
 	"fmt"
@@ -33,8 +32,8 @@ func NewUserHandler(db *gorm.DB) *UserHandler {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/register [post]
 func (h *UserHandler) RegisterUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+	keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
@@ -89,8 +88,8 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/update [post]
 func (h* UserHandler) UpdateUserName(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
@@ -136,8 +135,8 @@ func (h* UserHandler) UpdateUserName(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/delete [get]
 func (h* UserHandler) DeleteUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 
 	err := h.db.Transaction(func(tx *gorm.DB) error {
 		var user models.User

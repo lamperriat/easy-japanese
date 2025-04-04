@@ -1098,7 +1098,52 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/user/review/get": {
+        "/api/user/review/grammar/correct": {
+            "post": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reviewer"
+                ],
+                "summary": "User correctly answer the grammar",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User grammar not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/review/grammar/get": {
             "get": {
                 "security": [
                     {
@@ -1112,7 +1157,159 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "globalDictOp"
+                    "reviewer"
+                ],
+                "summary": "Get batched words for review",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Batch size (default 20)",
+                        "name": "batch",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Use sequential sampling (default false)",
+                        "name": "seq",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UserGrammar"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User grammar not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/review/grammar/incorrect": {
+            "post": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reviewer"
+                ],
+                "summary": "User incorrectly answer the grammar",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User grammar not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/review/word/correct": {
+            "post": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reviewer"
+                ],
+                "summary": "User correctly answer the word",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.SuccessMsg"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User word not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Database error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/review/word/get": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reviewer"
                 ],
                 "summary": "Get batched words for review",
                 "parameters": [
@@ -1160,141 +1357,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/user/review/grammar/correct": {
-            "post": {
-                "security": [
-                    {
-                        "JWTAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "globalDictOp"
-                ],
-                "summary": "User correctly answer the grammar",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessMsg"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid JSON format",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    },
-                    "404": {
-                        "description": "User grammar not found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    },
-                    "500": {
-                        "description": "Database error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/user/review/grammar/incorrect": {
-            "post": {
-                "security": [
-                    {
-                        "JWTAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "globalDictOp"
-                ],
-                "summary": "User incorrectly answer the grammar",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessMsg"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid JSON format",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    },
-                    "404": {
-                        "description": "User grammar not found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    },
-                    "500": {
-                        "description": "Database error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/user/review/word/correct": {
-            "post": {
-                "security": [
-                    {
-                        "JWTAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "globalDictOp"
-                ],
-                "summary": "User correctly answer the word",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "$ref": "#/definitions/models.SuccessMsg"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid JSON format",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    },
-                    "404": {
-                        "description": "User word not found",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    },
-                    "500": {
-                        "description": "Database error",
-                        "schema": {
-                            "$ref": "#/definitions/models.ErrorMsg"
-                        }
-                    }
-                }
-            }
-        },
         "/api/user/review/word/incorrect": {
             "post": {
                 "security": [
@@ -1309,7 +1371,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "globalDictOp"
+                    "reviewer"
                 ],
                 "summary": "User incorrectly answer the word",
                 "responses": {

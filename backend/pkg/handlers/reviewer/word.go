@@ -3,7 +3,6 @@ package reviewer
 // We do not do a further abstraction because we want
 // different weight algorithm for word and grammar
 import (
-	"backend/pkg/auth"
 	"backend/pkg/models"
 	"errors"
 	"fmt"
@@ -121,8 +120,8 @@ func (h* ReviewHandler) IncorrectGrammar(c *gin.Context) {
 
 // abstraction
 func updateLearnable[T models.Learnable](db *gorm.DB, c *gin.Context, updateFunc func(int) int, model T) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -373,10 +372,10 @@ func (st *segmentTree) setZero(index int) {
 // @Failure 404 {object} models.ErrorMsg "User word not found"
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /api/user/review/get/word [get]
+// @Router /api/user/review/word/get [get]
 func (h *ReviewHandler) GetWords(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -434,13 +433,13 @@ func (h *ReviewHandler) GetWords(c *gin.Context) {
 // @Failure 404 {object} models.ErrorMsg "User grammar not found"
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON format"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /api/user/review/get/grammar [get]
+// @Router /api/user/review/grammar/get [get]
 func (h *ReviewHandler) GetGrammar(c *gin.Context) {
 	// yes the function is almost exactly the same as GetWords
 	// we do not do a further abstraction, sticking to the principle of
 	// "low in coupling, high in cohesion"
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {

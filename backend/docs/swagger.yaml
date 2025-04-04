@@ -894,7 +894,130 @@ paths:
       summary: Register user
       tags:
       - userOp
-  /api/user/review/get:
+  /api/user/review/grammar/correct:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - JWTAuth: []
+      summary: User correctly answer the grammar
+      tags:
+      - reviewer
+  /api/user/review/grammar/get:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Batch size (default 20)
+        in: query
+        name: batch
+        type: integer
+      - description: Use sequential sampling (default false)
+        in: query
+        name: seq
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            items:
+              $ref: '#/definitions/models.UserGrammar'
+            type: array
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - JWTAuth: []
+      summary: Get batched words for review
+      tags:
+      - reviewer
+  /api/user/review/grammar/incorrect:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - JWTAuth: []
+      summary: User incorrectly answer the grammar
+      tags:
+      - reviewer
+  /api/user/review/word/correct:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User word not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - JWTAuth: []
+      summary: User correctly answer the word
+      tags:
+      - reviewer
+  /api/user/review/word/get:
     get:
       consumes:
       - application/json
@@ -932,91 +1055,7 @@ paths:
       - JWTAuth: []
       summary: Get batched words for review
       tags:
-      - globalDictOp
-  /api/user/review/grammar/correct:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/models.SuccessMsg'
-        "400":
-          description: Invalid JSON format
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "404":
-          description: User grammar not found
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "500":
-          description: Database error
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-      security:
-      - JWTAuth: []
-      summary: User correctly answer the grammar
-      tags:
-      - globalDictOp
-  /api/user/review/grammar/incorrect:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/models.SuccessMsg'
-        "400":
-          description: Invalid JSON format
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "404":
-          description: User grammar not found
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "500":
-          description: Database error
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-      security:
-      - JWTAuth: []
-      summary: User incorrectly answer the grammar
-      tags:
-      - globalDictOp
-  /api/user/review/word/correct:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: '#/definitions/models.SuccessMsg'
-        "400":
-          description: Invalid JSON format
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "404":
-          description: User word not found
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-        "500":
-          description: Database error
-          schema:
-            $ref: '#/definitions/models.ErrorMsg'
-      security:
-      - JWTAuth: []
-      summary: User correctly answer the word
-      tags:
-      - globalDictOp
+      - reviewer
   /api/user/review/word/incorrect:
     post:
       consumes:
@@ -1044,7 +1083,7 @@ paths:
       - JWTAuth: []
       summary: User incorrectly answer the word
       tags:
-      - globalDictOp
+      - reviewer
   /api/user/update:
     post:
       consumes:

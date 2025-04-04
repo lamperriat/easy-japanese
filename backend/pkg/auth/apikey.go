@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"strings"
@@ -14,7 +13,7 @@ func APIKeyValidate(apiKey string) bool {
 		return false
 	}
 	validKeys := strings.Split(os.Getenv("API_KEYS"), ",")
-	fmt.Printf("Valid API Keys: %v\n", validKeys)
+	// fmt.Printf("Valid API Keys: %v\n", validKeys)
 	for _, key := range validKeys {
 		if key == apiKey {
 			return true
