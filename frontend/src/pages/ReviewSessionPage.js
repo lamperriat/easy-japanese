@@ -12,11 +12,12 @@ const ReviewSessionPage = () => {
   const batchSize = queryParams.get('batch');
 
   const [items, setItems] = useState([]);
+  const [correctness, setCorrectness] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayMode, setDisplayMode] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [notification, setNotification] = useState({ show: false, message: '', type: '' });
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
   const [showFullInfo, setShowFullInfo] = useState(false);
   const [answered, setAnswered] = useState(false);
@@ -60,20 +61,7 @@ const ReviewSessionPage = () => {
       }
       const data = await response.json();
       setItems(data);
-      
-      // Set initial display mode for words
-      if (reviewType === 'word' && data.length > 0) {
-        try {
-          setRandomDisplayMode();
-        } catch (error) {
-          console.log(items);
-          console.log(currentIndex);
-          console.error('Error setting display mode:', error);
-          setDisplayMode('chinese'); // Fallback to a default mode
-        }
-        
-      }
-      
+      setCorrectness(new Array(data.length).fill(false));
       setIsLoading(false);
     };
 
@@ -87,6 +75,7 @@ const ReviewSessionPage = () => {
   }
 
   const setRandomDisplayMode = () => {
+    if (currentIndex < 0 || currentIndex >= items.length) return;
     const random = Math.random();
     if (random < 0.3) {
       setDisplayMode('chinese');
@@ -103,6 +92,12 @@ const ReviewSessionPage = () => {
     }
   };
 
+  useEffect(() => {
+    if (items.length > 0 && reviewType === 'word' && currentIndex < items.length) {
+      setRandomDisplayMode();
+    }
+  }, [items, reviewType]);
+
   const handlePrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
@@ -115,6 +110,16 @@ const ReviewSessionPage = () => {
 
   const handleAnswer = (isCorrect) => {
     setShowFullInfo(true);
+    setCorrectness((prev) => {
+      const newCorrectness = [...prev];
+      newCorrectness[currentIndex] = isCorrect;
+      return newCorrectness;
+    });
+    setItems((prev) => {
+      const newItems = [...prev];
+      newItems[currentIndex].userAnswer = userAnswer;
+      return newItems;
+    });
     setAnswered(true);
     // Here you would typically send the result to your API
     // For now, we'll just move to the next item
@@ -130,6 +135,12 @@ const ReviewSessionPage = () => {
       clear();
     } else {
       // TODO: Handle end of review session
+      navigate('/summary', {
+        state: {
+          reviewedWords: items,
+          correctness: correctness,
+        }
+      });
     }
   };
 
@@ -139,25 +150,25 @@ const ReviewSessionPage = () => {
       return (
         <div className="word-full-info">
           <div className="info-row">
-            <span className="label">Chinese:</span>
+            <span className="label">中文:</span>
             <span className="value">{word.chinese}</span>
           </div>
           {word.kanji && (
             <div className="info-row">
-              <span className="label">Kanji:</span>
+              <span className="label">汉字:</span>
               <span className="value">{word.kanji}</span>
             </div>
           )}
           <div className="info-row">
-            <span className="label">Hiragana:</span>
+            <span className="label">平假名:</span>
             <span className="value">{word.hiragana}</span>
           </div>
           <div className="info-row">
-            <span className="label">Katakana:</span>
+            <span className="label">片假名:</span>
             <span className="value">{word.katakana}</span>
           </div>
           <div className="info-row">
-            <span className="label">Type:</span>
+            <span className="label">词性:</span>
             <span className="value">{word.type}</span>
           </div>
           <div className="info-row">
@@ -166,7 +177,7 @@ const ReviewSessionPage = () => {
           </div>
           {word.example && word.example.length > 0 && (
             <div className="examples">
-              <h3>Examples:</h3>
+              <h3>例句:</h3>
               {word.example.map((ex, idx) => (
                 <div key={idx} className="example">
                   <div className="japanese">{ex.example}</div>
@@ -183,26 +194,26 @@ const ReviewSessionPage = () => {
         return (
           <div className="word-display">
             <div className="main-display">{word.chinese}</div>
-            <div className="hint">Chinese meaning</div>
+            <div className="hint">对应的汉字/假名是？</div>
           </div>
         );
       case 'kanji':
         return word.kanji ? (
           <div className="word-display">
             <div className="main-display">{word.kanji}</div>
-            <div className="hint">Kanji</div>
+            <div className="hint">对应的中文/假名是？</div>
           </div>
         ) : (
           <div className="word-display">
             <div className="main-display">{word.hiragana || word.katakana}</div>
-            <div className="hint">Kana</div>
+            <div className="hint">对应的中文/汉字是？</div>
           </div>
         );
       case 'kana':
         return (
           <div className="word-display">
             <div className="main-display">{word.hiragana || word.katakana}</div>
-            <div className="hint">Kana</div>
+            <div className="hint">对应的中文/汉字是？</div>
           </div>
         );
       default:
@@ -232,9 +243,9 @@ const ReviewSessionPage = () => {
     return <div className="loading">Loading...</div>;
   }
 
-  if (error) {
-    return <div className="error">Error: {error}</div>;
-  }
+  // if (error) {
+  //   return <div className="error">Error: {error}</div>;
+  // }
 
   if (items.length === 0) {
     return (
@@ -276,7 +287,7 @@ const ReviewSessionPage = () => {
                 setShowFullInfo(true);
               }
             }}
-            placeholder={"Type your answer here (optional)\nPress Enter to display the answer"}
+            placeholder={"写下你的回答(非必须)\n按下Enter显示正确答案"}
             rows="2"
           />
         </div>
