@@ -1,7 +1,6 @@
 package editor
 
 import (
-	"backend/pkg/auth"
 	"backend/pkg/models"
 	"errors"
 	"strconv"
@@ -22,8 +21,8 @@ import (
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/grammar/add [post]
 func (h* WordHandler) AddGrammarUser(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -70,8 +69,8 @@ func (h* WordHandler) AddGrammarUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/grammar/edit [post]
 func (h* WordHandler) EditGrammarUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := h.db.Where("keyhash =?", keyhash).
 		First(&user).Error; err != nil {
@@ -138,8 +137,8 @@ func (h* WordHandler) EditGrammarUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/grammar/delete [post]
 func (h* WordHandler) DeleteGrammarUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := h.db.Where("keyhash =?", keyhash).
 		First(&user).Error; err != nil {
@@ -195,8 +194,8 @@ func (h* WordHandler) DeleteGrammarUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/grammar/get [get]
 func (h* WordHandler) GetGrammarUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := h.db.Where("keyhash =?", keyhash).
 		First(&user).Error; err != nil {
@@ -245,8 +244,8 @@ func (h* WordHandler) GetGrammarUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/grammar/search [get]
 func (h* WordHandler) SearchGrammarUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := h.db.Where("keyhash =?", keyhash).
 		First(&user).Error; err != nil {

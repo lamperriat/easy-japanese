@@ -21,10 +21,15 @@
   
   /* 词典选择部分 */
   .dictionary-section {
-    margin-bottom: 20px;
+    width: 250px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   
   .dictionary-section label {
+    width: 150px;
     font-size: 1.1rem;
     font-weight: bold;
     margin-right: 10px;

@@ -13,6 +13,8 @@ export default function Navigation() {
     try {
       var token = sessionStorage.getItem('token');
       if (!token) {
+        console.log('Token not found, requesting new token...');
+        console.log('API Key:', apikey);
         const response = await fetch(`${API_BASE_URL}/api/auth/token`, {
           method: 'POST',
           headers: {
@@ -51,11 +53,22 @@ export default function Navigation() {
         localStorage.setItem('username', username);
         setShowAuthPopup(false);
       } else if (response.status === 409) {
-        setNotification({ 
-          show: true, 
-          message: '该API已经注册', 
-          type: 'success' 
-        });
+        const errorData = await response.json();
+        if (errorData.error === 'user already exists') {
+          setNotification({ 
+            show: true, 
+            message: '该API已经注册', 
+            type: 'success' 
+          });
+        } else {
+          setNotification({ 
+            show: true, 
+            message: `提交失败: ${errorData.error || '未知错误'}`, 
+            type: 'error' 
+          });
+        }
+
+        console.log('Error:', errorData.error);
       } else {
         const errorData = await response.json();
         setNotification({ 
@@ -88,6 +101,7 @@ export default function Navigation() {
         <ul>
           <li><Link to="/word-editor"> 修改词库</Link></li>
           <li><Link to="/word-search"> 词库搜索</Link></li>
+          <li><Link to="/review">复习</Link></li>
           <li><Link to="/"> 返回主页</Link></li>
           <li className="right-item">
             <button 

@@ -1,7 +1,6 @@
 package editor
 
 import (
-	"backend/pkg/auth"
 	"backend/pkg/models"
 	"errors"
 	"strconv"
@@ -22,8 +21,8 @@ import (
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/reading-material/add [post]
 func (h* WordHandler) AddReadingMaterialUser(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -67,8 +66,8 @@ func (h* WordHandler) AddReadingMaterialUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/reading-material/edit [post]
 func (h* WordHandler) EditReadingMaterialUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := h.db.Where("keyhash = ?", keyhash).
 		First(&user).Error; err != nil {
@@ -120,8 +119,8 @@ func (h* WordHandler) EditReadingMaterialUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/reading-material/delete [post]
 func (h* WordHandler) DeleteReadingMaterialUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := h.db.Where("keyhash = ?", keyhash).
 		First(&user).Error; err != nil {
@@ -173,8 +172,8 @@ func (h* WordHandler) DeleteReadingMaterialUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/reading-material/get [get]
 func (h* WordHandler) GetReadingMaterialUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := h.db.Where("keyhash = ?", keyhash).
 		First(&user).Error; err != nil {
@@ -225,8 +224,8 @@ func (h* WordHandler) GetReadingMaterialUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/reading-material/search [get]
 func (h* WordHandler) FuzzySearchReadingMaterialUser(c *gin.Context) {
-	providedKey := c.GetHeader("X-API-Key")
-	keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
 	var user models.User
 	if err := h.db.Where("keyhash = ?", keyhash).
 		First(&user).Error; err != nil {

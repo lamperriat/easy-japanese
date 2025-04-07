@@ -1,7 +1,6 @@
 package editor
 
 import (
-	"backend/pkg/auth"
 	"backend/pkg/models"
 	"errors"
 	"fmt"
@@ -24,8 +23,8 @@ import (
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/words/accurate-search [post]
 func (h* WordHandler) AccurateSearchWordUser(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -88,8 +87,8 @@ func (h* WordHandler) AccurateSearchWordUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/words/fuzzy-search [get]
 func (h* WordHandler) FuzzySearchWordUser(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -156,8 +155,8 @@ func (h* WordHandler) FuzzySearchWordUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/words/add [post]
 func (h* WordHandler) AddWordUser(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -227,8 +226,8 @@ func (h* WordHandler) AddWordUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/words/edit [post]
 func (h* WordHandler) EditWordUser(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -307,8 +306,8 @@ func (h* WordHandler) EditWordUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/words/delete [post]
 func (h *WordHandler) DeleteWordUser(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {
@@ -366,8 +365,8 @@ func (h *WordHandler) DeleteWordUser(c *gin.Context) {
 // @Failure 500 {object} models.ErrorMsg "Database error"
 // @Router /api/user/words/get [get]
 func (h *WordHandler) GetWordsUser(c *gin.Context) {
-    providedKey := c.GetHeader("X-API-Key")
-    keyhash := auth.Sha256hex(providedKey)
+    keyhash_,  _ := c.Get("keyhash")
+    keyhash, _ := keyhash_.(string)
     var user models.User
     if err := h.db.Where("keyhash = ?", keyhash).
         First(&user).Error; err != nil {

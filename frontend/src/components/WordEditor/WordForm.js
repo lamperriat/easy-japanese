@@ -93,7 +93,7 @@ export default function WordForm({ initWordData, initBookId }) {
           endpoint = `${API_BASE_URL}/api/words/book_${selectedBook}`;
           method = 'POST';
         }
-        if (formData.id == 0) {
+        if (formData.id === 0) {
           // 0: add new
           endpoint += '/add';
         } else {
