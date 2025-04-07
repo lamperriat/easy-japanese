@@ -121,9 +121,10 @@ const ReviewSessionPage = () => {
       return newItems;
     });
     setAnswered(true);
-    // Here you would typically send the result to your API
-    // For now, we'll just move to the next item
-    // handleNext();
+    // for grammars, we directly go next
+    if (reviewType === 'grammar') {
+      handleNext();
+    }
   };
 
   const handleNext = () => {
@@ -139,6 +140,7 @@ const ReviewSessionPage = () => {
         state: {
           reviewedWords: items,
           correctness: correctness,
+          reviewType: reviewType,
         }
       });
     }
@@ -227,7 +229,7 @@ const ReviewSessionPage = () => {
       <div className="grammar-display">
         <div className="description">{grammar.description}</div>
         <div className="examples">
-          <h3>Examples:</h3>
+          <h3>例句:</h3>
           {grammar.example.map((ex, idx) => (
             <div key={idx} className="example">
               <div className="japanese">{ex.example}</div>
@@ -265,7 +267,7 @@ const ReviewSessionPage = () => {
     <div className="review-session">
       <div className="header">
         <button className="exit-btn" onClick={() => navigate('/review')}>
-          Exit Review
+          退出复习 
         </button>
         <div className="progress">
           {currentIndex + 1} / {items.length}
@@ -282,12 +284,13 @@ const ReviewSessionPage = () => {
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (reviewType === 'word' && e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault(); 
                 setShowFullInfo(true);
               }
             }}
-            placeholder={"写下你的回答(非必须)\n按下Enter显示正确答案"}
+            placeholder={reviewType == 'word' ? "写下你的回答(非必须)\n按下Enter显示正确答案" :
+              "将你的联想记录在这(不会保存至后台)"}
             rows="2"
           />
         </div>
@@ -295,21 +298,21 @@ const ReviewSessionPage = () => {
 
       <div className="navigation">
         <button className="nav-btn prev" onClick={handlePrevious} disabled={currentIndex === 0}>
-          Previous
+          上一个
         </button>
         
         {!answered ? (
           <div className="answer-buttons">
             <button className="answer-btn incorrect" onClick={() => handleAnswer(false)}>
-              Incorrect
+              我答错了
             </button>
             <button className="answer-btn correct" onClick={() => handleAnswer(true)}>
-              Correct
+              我答对了
             </button>
           </div>
         ) : (
           <button className="nav-btn next" onClick={handleNext}>
-            {currentIndex < items.length - 1 ? 'Next' : 'Finish'}
+            {currentIndex < items.length - 1 ? '下一个' : '完成'}
           </button>
         )}
       </div>

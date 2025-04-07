@@ -11,7 +11,9 @@ const SummaryPage = () => {
 
   // Assume these are passed via state from the previous page
   const reviewedWords = location.state?.reviewedWords || [];
+  console.log('Reviewed Words:', reviewedWords);
   const correctness = location.state?.correctness || [];
+  const reviewType = location.state?.reviewType || 'word';
   
   // Calculate accuracy
   const correctCount = correctness.filter(Boolean).length;
@@ -46,7 +48,12 @@ const SummaryPage = () => {
   const handleBackToReview = () => {
     navigate('/review');
   };
-
+  const strClamp = (str, maxLength) => {
+    if (str.length > maxLength) {
+      return str.slice(0, maxLength) + '...';
+    }
+    return str;
+  }
   return (
     <div className="summary-page">
       <h1>复习总结</h1>
@@ -61,7 +68,7 @@ const SummaryPage = () => {
           <div className="progress-text">{Math.round(progress)}%</div>
         </div>
         <p className="accuracy-message">
-          在{reviewedWords.length}个单词中你答对了{correctCount}个!
+          在{reviewedWords.length}个{reviewType == 'word' ? '单词' : '语法'}中你答对了{correctCount}个!
         </p>
       </div>
       
@@ -72,12 +79,13 @@ const SummaryPage = () => {
             className={`word-card ${correctness[index] ? 'correct' : 'incorrect'}`}
             onClick={() => handleWordClick(index)}
           >
-            {word.kanji || word.hiragana || word.katakana}
+            {reviewType === 'word' ? word.kanji || word.hiragana || word.katakana
+            : strClamp(word.description, 8)}
           </div>
         ))}
       </div>
       
-      {selectedWord && (
+      {reviewType === 'word' ? (selectedWord && (
         <div className="word-details">
           <h3>单词详情</h3>
           <div className="details-table">
@@ -126,7 +134,36 @@ const SummaryPage = () => {
             关闭
           </button>
         </div>
-      )}
+      )) : (selectedWord && (
+        <div className="word-details">
+          <h3>语法详情</h3>
+          <div className="details-table">
+            <div className="detail-row">
+              <span className="detail-label">描述:</span>
+              <span className="detail-value" style={{ whiteSpace: 'pre-wrap', textAlign: 'left' }}>
+                {selectedWord.description.replace(/\\n/g, '\n')}
+              </span>
+            </div>
+            {selectedWord.example && selectedWord.example.length > 0 && (
+              <div className="examples-section">
+                <h4>例句:</h4>
+                {selectedWord.example.map((ex, idx) => (
+                  <div key={idx} className="example">
+                    <div className="japanese">{ex.example}</div>
+                    <div className="translation">{ex.chinese}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <button 
+            className="close-details"
+            onClick={() => setSelectedWord(null)}
+          >
+            关闭
+          </button>
+        </div>
+      ))}
       
       <button className="back-button" onClick={handleBackToReview}>
         返回复习页面
