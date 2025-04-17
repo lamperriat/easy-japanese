@@ -27,6 +27,8 @@ const searchOptions = [
 ]
 
 const WordSearchPage = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const navigate = useNavigate();
   const [words, setWords] = useState([]);
   const [grammars, setGrammars] = useState([]);
@@ -39,7 +41,7 @@ const WordSearchPage = () => {
   const [isLoading, setIsLoading] = useState(false); 
   const [apiMessage, setApiMessage] = useState('');
   const [searchType, setSearchType] = useState('1'); 
-
+  const resultPerPage = 30;
   const handleWordClick = (word) => {
     navigate('/word-editor#word-form', {
       state: { word: word, selectedBook: selectedBook }
@@ -89,6 +91,9 @@ const WordSearchPage = () => {
       }
       try {
         const parsed = JSON.parse(responseText);
+        if (parsed.count) {
+          setTotalCount(parsed.count);
+        }
         const result = Array.isArray(parsed) ? parsed : parsed.results; 
         console.log("Parsed API Response:", result); 
         
@@ -116,22 +121,22 @@ const WordSearchPage = () => {
 
   const fetchWordList = async () => {
     const endpoint = selectedBook === '-1' ?
-      `${API_BASE_URL}/api/user/words/get` :
-      `${API_BASE_URL}/api/words/book_${selectedBook}/get`;
+      `${API_BASE_URL}/api/user/words/get?page=${currentPage}`:
+      `${API_BASE_URL}/api/words/book_${selectedBook}/get?page=${currentPage}`;
     const words = await fetchRemote(endpoint);
     setWords(words); 
   };
   const fetchGrammarList = async () => {
     const endpoint = selectedBook === '-1' ? 
-      `${API_BASE_URL}/api/user/grammar/get` :
-      `${API_BASE_URL}/api/grammar/get`;
+      `${API_BASE_URL}/api/user/grammar/get?page=${currentPage}` :
+      `${API_BASE_URL}/api/grammar/get?page=${currentPage}`;
     const grammars = await fetchRemote(endpoint);
     setGrammars(grammars);
   };
   const fetchReadingList = async () => {
     const endpoint = selectedBook === '-1' ?
-      `${API_BASE_URL}/api/user/reading-material/get` :
-      `${API_BASE_URL}/api/reading-material/get`;
+      `${API_BASE_URL}/api/user/reading-material/get?page=${currentPage}` :
+      `${API_BASE_URL}/api/reading-material/get?page=${currentPage}`;
     const readings = await fetchRemote(endpoint);
     setReadings(readings);
   };
@@ -145,19 +150,19 @@ const WordSearchPage = () => {
     }
     var endpoint = '';
     if (searchType === '1') {
-      endpoint = selectedBook !== "-1" ? `${API_BASE_URL}/api/words/book_${selectedBook}/fuzzy-search?query=${encodeURIComponent(query)}`
-          : `${API_BASE_URL}/api/user/words/fuzzy-search?query=${encodeURIComponent(query)}`;
+      endpoint = selectedBook !== "-1" ? `${API_BASE_URL}/api/words/book_${selectedBook}/fuzzy-search?query=${encodeURIComponent(query)}&page=${currentPage}`
+          : `${API_BASE_URL}/api/user/words/fuzzy-search?query=${encodeURIComponent(query)}&page=${currentPage}`;
     } else if (searchType === '2') {
       if (selectedBook === '-1') {
-        endpoint = `${API_BASE_URL}/api/user/grammar/search?query=${encodeURIComponent(query)}`;
+        endpoint = `${API_BASE_URL}/api/user/grammar/search?query=${encodeURIComponent(query)}&page=${currentPage}`;
       } else {
-        endpoint = `${API_BASE_URL}/api/grammar/search?query=${encodeURIComponent(query)}`;
+        endpoint = `${API_BASE_URL}/api/grammar/search?query=${encodeURIComponent(query)}&page=${currentPage}`;
       }
     } else if (searchType === '3') {
       if (selectedBook === '-1') {
-        endpoint = `${API_BASE_URL}/api/user/reading-material/search?query=${encodeURIComponent(query)}`;
+        endpoint = `${API_BASE_URL}/api/user/reading-material/search?query=${encodeURIComponent(query)}&page=${currentPage}`;
       } else {
-        endpoint = `${API_BASE_URL}/api/reading-material/search?query=${encodeURIComponent(query)}`;
+        endpoint = `${API_BASE_URL}/api/reading-material/search?query=${encodeURIComponent(query)}&page=${currentPage}`;
       }
     } else {
       return [];
@@ -202,7 +207,7 @@ const WordSearchPage = () => {
     } else if (searchType === '3') {
       fetchReadingList(); 
     }
-  }, [searchType, selectedBook]);
+  }, [searchType, selectedBook, currentPage]);
 
   useEffect(() => {
     setFilteredWords(words); 
@@ -325,12 +330,32 @@ const WordSearchPage = () => {
 
         <section className="word-list-section">
           <h3>结果列表</h3>
-          <ul>
+          <div className="results-count">
+            共计{totalCount}条结果
+          </div>
+          <div className="word-grid">
             {searchType === '1' && wordResult}
             {searchType === '2' && grammarResult}
             {searchType === '3' && readingResult}
-          </ul>
+          </div>
         </section>
+        {totalCount > resultPerPage && (
+          <div className='pagination'>
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            >
+              上一页
+            </button>
+            <span>第 {currentPage} 页</span>
+            <button
+              disabled={currentPage * resultPerPage >= totalCount}
+              onClick={() => setCurrentPage(Math.min(Math.ceil(totalCount / resultPerPage), currentPage + 1))}
+            >
+              下一页
+            </button>
+          </div>
+        )}
       </main>
     </div>
   );

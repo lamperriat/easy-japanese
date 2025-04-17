@@ -19,6 +19,19 @@
     margin-bottom: 20px;
   }
   
+  .search-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .search-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
   /* 词典选择部分 */
   .dictionary-section {
     width: 250px;
@@ -65,34 +78,90 @@
   
   /* 单词列表 */
   .word-list-section {
-    background-color: white;
+    background-color: rgba(240, 240, 240, 0.7);
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    display: inline-block;
-    text-align: left;
   }
   
-  .word-list-section h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
   }
   
-  .word-list-section ul {
+  .results-count {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .word-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+  }
+  
+  .word-grid li {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     list-style: none;
-    padding: 0;
   }
   
-  .word-list-section li {
+  .word-grid li:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background: #e9ecef;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    transition: background 0.3s ease;
+  }
+  .loading {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #007bff;
+    padding: 20px;
   }
   
-  .word-list-section li:hover {
-    background: #ced4da;
+  .error-message {
+    text-align: center;
+    color: #dc3545;
+    padding: 10px;
+    background: #f8d7da;
+    border-radius: 5px;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    gap: 5px;
+  }
+  .pagination button {
+    padding: 8px 12px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .pagination button:hover:not(:disabled) {
+    background-color: #e9ecef;
+  }
+  
+  .pagination button:disabled {
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  .pagination button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
   }
   
   /* 返回主页 */
