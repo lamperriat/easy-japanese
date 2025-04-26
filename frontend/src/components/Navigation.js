@@ -102,6 +102,7 @@ export default function Navigation() {
           <li><Link to="/word-editor"> 修改词库</Link></li>
           <li><Link to="/word-search"> 词库搜索</Link></li>
           <li><Link to="/review">复习</Link></li>
+          <li><Link to="/video-player">播放视频</Link></li>
           <li><Link to="/"> 返回主页</Link></li>
           <li><Link to="/About">关于</Link> </li>
           <li className="right-item">
