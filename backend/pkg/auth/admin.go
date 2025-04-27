@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -31,6 +32,8 @@ func InitAdminAccount(db *gorm.DB) error {
 	if len(password) < 12 {
 		return fmt.Errorf("password must be at least 12 characters long")
 	}
+
+	log.Printf("Default admin username: %s\n", username)
     
     hashedPassword, err := SafeHash(password)
     if err != nil {
@@ -48,4 +51,28 @@ func InitAdminAccount(db *gorm.DB) error {
     
     log.Println("Admin account created successfully")
     return nil
+}
+
+func AdminAuth(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		username := c.GetHeader("Admin-Name")
+		password := c.GetHeader("Admin-Password")
+		if username == "" || password == "" {
+			c.JSON(401, models.ErrorMsg{Error: "Admin-Name and Admin-Password headers are required"})
+			c.Abort()
+			return
+		}
+		var admin models.AdminAccount
+		if err := db.Where("username = ?", username).First(&admin).Error; err != nil {
+			c.JSON(401, models.ErrorMsg{Error: "Invalid admin credentials"})
+			c.Abort()
+			return
+		}
+		if !SafeCompare(password, admin.PasswordHash) {
+			c.JSON(401, models.ErrorMsg{Error: "Invalid admin credentials"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }
