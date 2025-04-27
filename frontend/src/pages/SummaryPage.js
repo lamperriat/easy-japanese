@@ -68,7 +68,7 @@ const SummaryPage = () => {
           <div className="progress-text">{Math.round(progress)}%</div>
         </div>
         <p className="accuracy-message">
-          在{reviewedWords.length}个{reviewType == 'word' ? '单词' : '语法'}中你答对了{correctCount}个!
+          在{reviewedWords.length}个{reviewType === 'word' ? '单词' : '语法'}中你答对了{correctCount}个!
         </p>
       </div>
       

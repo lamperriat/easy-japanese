@@ -6,6 +6,8 @@ import Navigation from './components/Navigation.js';
 import ReviewPage from './pages/ReviewPage.js';
 import ReviewSessionPage from './pages/ReviewSessionPage.js';
 import SummaryPage from './pages/SummaryPage.js';
+import AboutUs from './pages/AboutUs.js';
+import VideoPlayer from './pages/VideoPlayer.js';
 import './App.css';
 export default function App() {
   return (
@@ -18,6 +20,8 @@ export default function App() {
         <Route path="/review" element={<ReviewPage />} />
         <Route path="/review/session" element={<ReviewSessionPage />} />
         <Route path="/summary" element={<SummaryPage />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/video-player" element={<VideoPlayer />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
     </Router>
