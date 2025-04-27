@@ -28,6 +28,8 @@ func InitDB() (*gorm.DB, error) {
 		&models.UserGrammar{},
 		&models.UserGrammarExample{},
 		&models.UserReadingMaterial{}, 
+		&models.AdminAccount{},
+		&models.ApiKey{},
 	)
 	realDB = db
     return db, err
