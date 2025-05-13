@@ -33,6 +33,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	err = auth.InitAdminAccount(db)
+	if err != nil {
+		panic(err)
+	}
 	wordHandler := editor.NewWordHandler(db)
 	userHandler := user.NewUserHandler(db)
 	reviewHandler := reviewer.NewReviewHandler(db)

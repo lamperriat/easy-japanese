@@ -59,6 +59,8 @@ func InitDBTest() (*gorm.DB, error) {
 		&models.UserGrammar{},
 		&models.UserGrammarExample{}, 
 		&models.UserReadingMaterial{}, 
+		&models.AdminAccount{},
+		&models.ApiKey{},
 	)
 	testDB = db
 	return db, err
