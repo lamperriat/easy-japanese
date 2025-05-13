@@ -50,6 +50,13 @@ func main() {
 
 	// r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
 	r.POST("/api/auth/token", authmid.GetToken)
+	adminGroup := r.Group("/api/admin", auth.AdminAuth(db))
+	{
+		adminGroup.POST("/account/create", auth.CreateAdminAccount(db))
+		adminGroup.POST("/apikey/create", auth.GenerateApiKey(db))
+		adminGroup.POST("/apikey/delete", auth.DeleteApiKey(db))
+	}
+
 	// User routes
 	userGroup := r.Group("/api/user", auth.JWTAuth())
 	{

@@ -100,7 +100,7 @@ type AdminAccountJSON struct {
 // @Success 200 {object} models.SuccessMsg
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /admin-api/account/create [post]
+// @Router /api/admin/account/create [post]
 func CreateAdminAccount(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var adminAccount AdminAccountJSON
@@ -128,7 +128,7 @@ type ApiKeyJSON struct {
 // @Success 200 {object} ApiKeyJSON
 // @Failure 400 {object} models.ErrorMsg "Invalid JSON"
 // @Failure 500 {object} models.ErrorMsg "Database error"
-// @Router /admin-api/apikey/create [GET]
+// @Router /api/admin/apikey/create [GET]
 func GenerateApiKey(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		newKey, err := SafeRandom(256)
@@ -149,5 +149,37 @@ func GenerateApiKey(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 		c.JSON(200, ApiKeyJSON{Key: newKey})
+	}
+}
+
+// @Summary Delete an existing apikey
+// @Description 
+// @Tags admin
+// @Security AdminAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.SuccessMsg
+// @Failure 400 {object} models.ErrorMsg "Invalid JSON"
+// @Failure 500 {object} models.ErrorMsg "Database error"
+// @Router /api/admin/apikey/delete [POST]
+func DeleteApiKey(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var apiKey ApiKeyJSON
+		if err := c.ShouldBindJSON(&apiKey); err != nil {
+			c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
+			return
+		}
+		keyHash, err := SafeHash(apiKey.Key)
+		if err != nil {
+			c.JSON(500, models.ErrorMsg{Error: err.Error()})
+			return
+		}
+
+		if err := db.Where("key_hash = ?", keyHash).Delete(&models.ApiKey{}).Error; err != nil {
+			c.JSON(500, models.ErrorMsg{Error: err.Error()})
+			return
+		}
+
+		c.JSON(200, models.SuccessMsg{Message: "API key deleted successfully"})
 	}
 }
