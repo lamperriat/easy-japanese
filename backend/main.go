@@ -53,7 +53,7 @@ func main() {
 	adminGroup := r.Group("/api/admin", auth.AdminAuth(db))
 	{
 		adminGroup.POST("/account/create", auth.CreateAdminAccount(db))
-		adminGroup.POST("/apikey/create", auth.GenerateApiKey(db))
+		adminGroup.GET("/apikey/create", auth.GenerateApiKey(db))
 		adminGroup.POST("/apikey/delete", auth.DeleteApiKey(db))
 	}
 

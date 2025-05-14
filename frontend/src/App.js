@@ -8,6 +8,7 @@ import ReviewSessionPage from './pages/ReviewSessionPage.js';
 import SummaryPage from './pages/SummaryPage.js';
 import AboutUs from './pages/AboutUs.js';
 import VideoPlayer from './pages/VideoPlayer.js';
+import AdminPage from './pages/AdminPage.js';
 import './App.css';
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
         <Route path="/summary" element={<SummaryPage />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/video-player" element={<VideoPlayer />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
     </Router>
