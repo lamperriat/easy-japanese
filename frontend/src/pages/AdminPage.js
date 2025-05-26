@@ -4,6 +4,27 @@ import "./AdminPage.css";
 import React, { useState } from 'react';
 import axios from 'axios';
 
+// const Color = {
+//   RED: 'red',
+//   GREEN: 'green', 
+//   BLUE: 'blue',
+//   // Prevent modifications
+//   [Symbol.for('isEnum')]: true
+// };
+
+// // Freeze to prevent modifications
+// Object.freeze(Color);
+
+const QueryTypes = {
+  APIKEY_ADD: 'apikeyAdd',
+  APIKEY_DEL: 'apikeyDel',
+  ACCOUNT_ADD: 'accountAdd',
+  INVALID: 'invalid',
+  [Symbol.for('isEnum')]: true
+}
+
+Object.freeze(QueryTypes);
+
 const AdminPage = () => {
   const [credentials, setCredentials] = useState({
     username: '',
@@ -13,6 +34,7 @@ const AdminPage = () => {
   const [apiResponse, setApiResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState('');
+  const [queryType, setQueryType] = useState(QueryTypes.INVALID); // apikey or account
   const [newAccount, setNewAccount] = useState({
     username: '',
     password: ''
@@ -48,6 +70,7 @@ const AdminPage = () => {
           'Admin-Password': credentials.password
         }
       });
+      setQueryType(QueryTypes.APIKEY_ADD);
       setApiResponse(response.data);
     } catch (error) {
       setApiResponse(error.response?.data || { error: 'An error occurred' });
@@ -74,6 +97,7 @@ const AdminPage = () => {
           }
         }
       );
+      setQueryType(QueryTypes.APIKEY_DEL);
       setApiResponse(response.data);
       setApiKeyInput('');
     } catch (error) {
@@ -101,6 +125,7 @@ const AdminPage = () => {
           }
         }
       );
+      setQueryType(QueryTypes.ACCOUNT_ADD);
       setApiResponse(response.data);
       setNewAccount({ username: '', password: '' });
     } catch (error) {
@@ -174,6 +199,12 @@ const AdminPage = () => {
               {loading ? 'Generating...' : 'Create New API Key'}
             </button>
           </div>
+          {apiResponse && queryType === QueryTypes.APIKEY_ADD &&  (
+            <div className={`api-response ${apiResponse.error ? 'error' : 'success'}`}>
+              <h3 className="response-title">New API KEY:</h3>
+              <pre className="response-content">{apiResponse.key + "\nPlease copy and save it properly. You will not have access to it after refreshing the page." || apiResponse.error}</pre>
+            </div>
+          )}
 
           <div className="action-card">
             <h3 className="action-title">Delete API Key</h3>
@@ -194,6 +225,12 @@ const AdminPage = () => {
             </button>
           </div>
         </div>
+        {apiResponse && queryType === QueryTypes.APIKEY_DEL &&  (
+            <div className={`api-response ${apiResponse.error ? 'error' : 'success'}`}>
+              <h3 className="response-title">Result:</h3>
+              <pre className="response-content">{apiResponse.message || apiResponse.error}</pre>
+            </div>
+          )}
 
         <div className="section-divider"></div>
 
@@ -231,14 +268,15 @@ const AdminPage = () => {
               {loading ? 'Creating...' : 'Create Account'}
             </button>
           </div>
+          {apiResponse && queryType === QueryTypes.ACCOUNT_ADD &&  (
+            <div className={`api-response ${apiResponse.error ? 'error' : 'success'}`}>
+              <h3 className="response-title">Result:</h3>
+              <pre className="response-content">{apiResponse.message || apiResponse.error}</pre>
+            </div>
+          )}
         </div>
 
-        {apiResponse && (
-          <div className={`api-response ${apiResponse.error ? 'error' : 'success'}`}>
-            <h3 className="response-title">Response:</h3>
-            <pre className="response-content">{JSON.stringify(apiResponse, null, 2)}</pre>
-          </div>
-        )}
+
       </div>
     </div>
   );

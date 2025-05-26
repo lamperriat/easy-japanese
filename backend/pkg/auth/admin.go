@@ -12,7 +12,7 @@ import (
 
 func registerAdmin(db *gorm.DB, username, password string) error {
     if username == "" || password == "" {
-        return fmt.Errorf("ADMIN_USERNAME and ADMIN_PASSWORD environment variables must be set")
+        return fmt.Errorf("EASYJP_ADMIN_USERNAME and EASYJP_ADMIN_PASSWORD environment variables must be set")
     }
 
 	if len(password) < 12 {

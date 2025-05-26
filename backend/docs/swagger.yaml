@@ -1,4 +1,9 @@
 definitions:
+  auth.ApiKeyJSON:
+    properties:
+      key:
+        type: string
+    type: object
   models.ErrorMsg:
     properties:
       error:
@@ -220,6 +225,77 @@ info:
   title: Easy Japanese API
   version: "0.1"
 paths:
+  /api/admin/account/create:
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - AdminAuth: []
+      summary: Create admin account
+      tags:
+      - admin
+  /api/admin/apikey/create:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.ApiKeyJSON'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - AdminAuth: []
+      summary: Create new apikey
+      tags:
+      - admin
+  /api/admin/apikey/delete:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.SuccessMsg'
+        "400":
+          description: Invalid JSON
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Database error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - AdminAuth: []
+      summary: Delete an existing apikey
+      tags:
+      - admin
   /api/auth/token:
     post:
       consumes:
