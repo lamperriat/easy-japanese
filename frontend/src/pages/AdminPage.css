@@ -1,0 +1,196 @@
+/* Base styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+  
+  /* Container styles */
+  .admin-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Card styles */
+  .login-card, .dashboard-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin: 20px auto;
+  }
+  
+  /* Header styles */
+  .login-title {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+  }
+  
+  .dashboard-title {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  .user-info {
+    color: #7f8c8d;
+    margin: 5px 0 0 0;
+    font-size: 14px;
+  }
+  
+  .username {
+    font-weight: 600;
+    color: #3498db;
+  }
+  
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  /* Form styles */
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-label {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-weight: 500;
+  }
+  
+  .form-input {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: #3498db;
+  }
+  
+  /* Button styles */
+  .login-button, .logout-button, .action-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .login-button {
+    background-color: #3498db;
+    color: white;
+    margin-top: 10px;
+  }
+  
+  .login-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .logout-button {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .logout-button:hover {
+    background-color: #c0392b;
+  }
+  
+  .action-button {
+    background-color: #3498db;
+    color: white;
+    margin-top: 15px;
+  }
+  
+  .action-button:hover:not(:disabled) {
+    background-color: #2980b9;
+  }
+  
+  .action-button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+  }
+  
+  /* Section styles */
+  .section-divider {
+    height: 1px;
+    background-color: #ecf0f1;
+    margin: 25px 0;
+  }
+  
+  .section-title {
+    color: #2c3e50;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  /* Action card styles */
+  .action-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .action-title {
+    color: #2c3e50;
+    margin: 0 0 5px 0;
+    font-size: 16px;
+  }
+  
+  .action-description {
+    color: #7f8c8d;
+    font-size: 13px;
+    margin: 0 0 15px 0;
+  }
+  
+  /* Response styles */
+  .api-response {
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 30px;
+    font-size: 14px;
+  }
+  
+  .api-response.success {
+    background-color: #e8f8f5;
+    border-left: 4px solid #2ecc71;
+  }
+  
+  .api-response.error {
+    background-color: #fdedee;
+    border-left: 4px solid #e74c3c;
+  }
+  
+  .response-title {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+  }
+  
+  .response-content {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1.5;
+  }

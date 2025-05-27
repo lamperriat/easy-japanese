@@ -33,19 +33,30 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	err = auth.InitAdminAccount(db)
+	if err != nil {
+		panic(err)
+	}
 	wordHandler := editor.NewWordHandler(db)
 	userHandler := user.NewUserHandler(db)
 	reviewHandler := reviewer.NewReviewHandler(db)
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},
-		AllowHeaders:     []string{"Origin", "X-API-KEY", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "X-API-KEY", "Content-Type", "Authorization", "Admin-Name", "Admin-Password"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
 
 	// r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
 	r.POST("/api/auth/token", authmid.GetToken)
+	adminGroup := r.Group("/api/admin", auth.AdminAuth(db))
+	{
+		adminGroup.POST("/account/create", auth.CreateAdminAccount(db))
+		adminGroup.GET("/apikey/create", auth.GenerateApiKey(db))
+		adminGroup.POST("/apikey/delete", auth.DeleteApiKey(db))
+	}
+
 	// User routes
 	userGroup := r.Group("/api/user", auth.JWTAuth())
 	{
