@@ -4,17 +4,6 @@ import "./AdminPage.css";
 import React, { useState } from 'react';
 import axios from 'axios';
 
-// const Color = {
-//   RED: 'red',
-//   GREEN: 'green', 
-//   BLUE: 'blue',
-//   // Prevent modifications
-//   [Symbol.for('isEnum')]: true
-// };
-
-// // Freeze to prevent modifications
-// Object.freeze(Color);
-
 const QueryTypes = {
   APIKEY_ADD: 'apikeyAdd',
   APIKEY_DEL: 'apikeyDel',
