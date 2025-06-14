@@ -8,6 +8,7 @@ import (
 	"backend/pkg/handlers/editor"
 	"backend/pkg/handlers/reviewer"
 	"backend/pkg/handlers/user"
+	"backend/pkg/proxy"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -49,7 +50,8 @@ func main() {
 	}))
 
 	// r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
-	r.POST("/api/auth/token", authmid.GetToken)
+	r.POST("/api/auth/token", authmid.GetToken(db))
+	r.POST("/api/proxy", auth.JWTAuth(), proxy.CORSProxy())
 	adminGroup := r.Group("/api/admin", auth.AdminAuth(db))
 	{
 		adminGroup.POST("/account/create", auth.CreateAdminAccount(db))

@@ -183,3 +183,18 @@ func DeleteApiKey(db *gorm.DB) gin.HandlerFunc {
 		c.JSON(200, models.SuccessMsg{Message: "API key deleted successfully"})
 	}
 }
+
+func ValidateApiKey(db *gorm.DB, apiKey string) (bool, error) {
+	if apiKey == "" {
+		return false, nil
+	}
+	var count int64
+	keyHash, err := SafeHash(apiKey)
+	if err != nil {
+		return false, fmt.Errorf("failed to hash API key: %w", err)
+	}
+	if err := db.Model(&models.ApiKey{}).Where("key_hash = ?", keyHash).Count(&count).Error; err != nil {
+		return false, fmt.Errorf("failed to validate API key: %w", err)
+	}
+	return count > 0, nil
+}

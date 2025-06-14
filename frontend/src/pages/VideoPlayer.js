@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './VideoPlayer.css';
 import subParse from '../components/SubParser/SubParser';
-
+import { API_BASE_URL } from '../services/api';
+import Notification from '../components/Auth/Notification';
+import DictSearch from '../components/Dict/DictSearch';
+import HoverPreview from '../components/HoverPreview';
 
 const VideoMode = {
   WATCH: 'watch',
@@ -25,10 +28,41 @@ const VideoPlayer = () => {
   const [subtitleFileName, setSubtitleFileName] = useState('');
   const [curSubtitleLineIndex, setCurSubtitleLineIndex] = useState(0);
   const [assLines, setAssLines] = useState([]);
+  const [notification, setNotification] = useState({ show: false, message: '', type: '' });
 
   // settings
   const [subtitleTimeOffset, setSubtitleTimeOffset] = useState(0);
-  const [dictUrl, setDictUrl] = useState('https://www.youdao.com/result?word={}&lang=ja');
+  const [dictUrl, setDictUrl] = useState('https://dict.youdao.com/result?word={}&lang=ja');
+
+
+  async function GetHTMLStringProxy(word) {
+    var token = sessionStorage.getItem('token');
+    if (!token) {
+      setNotification({
+        show: true,
+        message: '请先登录',
+        type: 'error'
+      });
+      setTimeout(() => {
+        setNotification({ show: false, message: '', type: '' });
+      }, 3000);
+      return;
+    }
+    try {
+      return await DictSearch(word, token);
+    } catch (error) {
+      console.error("Error fetching HTML:", error);
+      setNotification({
+        show: true,
+        message: '网络请求失败',
+        type: 'error'
+      });
+      setTimeout(() => {
+        setNotification({ show: false, message: '', type: '' });
+      }, 3000);
+      return '';
+    }
+  }
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -462,7 +496,7 @@ const VideoPlayer = () => {
               type="text"
               value={dictUrl}
               onChange={(e) => setDictUrl(e.target.value)}
-              placeholder="https://www.youdao.com/result?word={}&lang=ja"
+              placeholder="https://dict.youdao.com/result?word={}&lang=ja"
             ></input>
             (用于查询，使用{"{}"}作为单词的占位符。请注意：不同词典的HTML结构不同，不一定有效，最好通过插件形式实现其他词典的查询)
 
@@ -470,15 +504,29 @@ const VideoPlayer = () => {
           </li>
 
         </ul>
-        {/* <button onClick={() => {
-          fetchDOM(dictUrl.replace('{}',　'私'))
-            .then(data => {
-              console.log(data);
-          }) 
+        <button onClick={() => {
+          GetHTMLStringProxy(dictUrl.replace('{}', encodeURIComponent('私'))).then(html => {
+            console.log(dictUrl.replace('{}', encodeURIComponent('私')));
+          })
         }}>
           test
-        </button> */}
+        </button>
       </div>
+      {notification.show && (
+          <Notification 
+            message={notification.message} 
+            type={notification.type} 
+          />
+      )}
+      {/* test */}
+      {/* <HoverPreview
+        text="私"
+        fGetContent={GetHTMLStringProxy}
+      ></HoverPreview>
+      <HoverPreview
+        text="は"
+        fGetContent={GetHTMLStringProxy}
+      ></HoverPreview> */}
     </div>
   );
 };

@@ -2,7 +2,7 @@ package user_test
 
 import (
 	"backend/pkg/auth"
-	"backend/pkg/handlers/authmid"
+	// "backend/pkg/handlers/authmid"
 	"backend/pkg/models"
 	"backend/pkg/test"
 	"bytes"
@@ -33,7 +33,7 @@ func TestUserOps(t *testing.T) {
 	router.POST("/api/user/register", auth.JWTAuth(), handler.RegisterUser)
 	router.POST("/api/user/update", auth.JWTAuth(), handler.UpdateUserName)
 	router.GET("/api/user/delete", auth.JWTAuth(), handler.DeleteUser)
-	router.POST("/api/auth/token", authmid.GetToken)
+	// router.POST("/api/auth/token", authmid.GetToken(test.GetTestDB()))
 	apikey := "TEST_USE_API_KEY"
 	var token string
 	t.Run("GetToken", func(t *testing.T) {

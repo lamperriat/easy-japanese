@@ -9,6 +9,7 @@ import (
 )
 
 func APIKeyValidate(apiKey string) bool {
+	println("APIKeyValidate: This function is deprecated, use ValidateApiKey instead")
 	if apiKey == "" {
 		return false
 	}

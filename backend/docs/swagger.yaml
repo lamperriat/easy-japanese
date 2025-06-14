@@ -217,6 +217,11 @@ definitions:
       example:
         type: string
     type: object
+  proxy.ProxyRsp:
+    properties:
+      text:
+        type: string
+    type: object
 info:
   contact: {}
   license:
@@ -462,6 +467,34 @@ paths:
       summary: Search among all grammars
       tags:
       - globalDictOp
+  /api/proxy:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Clean response from the proxied server
+          schema:
+            $ref: '#/definitions/proxy.ProxyRsp'
+        "400":
+          description: Invalid JSON format
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "404":
+          description: User grammar not found
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+        "500":
+          description: Other error
+          schema:
+            $ref: '#/definitions/models.ErrorMsg'
+      security:
+      - JWTAuth: []
+      summary: Proxy to bypass CORS issues
+      tags:
+      - proxy
   /api/random:
     get:
       description: Test use

@@ -399,6 +399,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/proxy": {
+            "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "proxy"
+                ],
+                "summary": "Proxy to bypass CORS issues",
+                "responses": {
+                    "200": {
+                        "description": "Clean response from the proxied server",
+                        "schema": {
+                            "$ref": "#/definitions/proxy.ProxyRsp"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid JSON format",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "404": {
+                        "description": "User grammar not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    },
+                    "500": {
+                        "description": "Other error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorMsg"
+                        }
+                    }
+                }
+            }
+        },
         "/api/random": {
             "get": {
                 "description": "Test use",
@@ -2530,6 +2575,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "example": {
+                    "type": "string"
+                }
+            }
+        },
+        "proxy.ProxyRsp": {
+            "type": "object",
+            "properties": {
+                "text": {
                     "type": "string"
                 }
             }
