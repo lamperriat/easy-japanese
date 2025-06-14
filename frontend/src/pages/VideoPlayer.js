@@ -1,6 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './VideoPlayer.css';
 
+const VideoMode = {
+  WATCH: 'watch',
+  STUDY: 'study',
+  INVALID: 'invalid',
+  [Symbol.for('isEnum')]: true
+}
+
 const VideoPlayer = () => {
   const [videoUrl, setVideoUrl] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
@@ -11,6 +18,7 @@ const VideoPlayer = () => {
   const [fullscreen, setFullscreen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
+  const [videoMode, setVideoMode] = useState(VideoMode.WATCH);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -234,7 +242,30 @@ const VideoPlayer = () => {
         <h1>视频播放器</h1>
         <h2>Video Player</h2>
       </header>
-
+      {/* Add mode selector */}
+      <div className="mode-selector">
+        <button 
+          className={`mode-button ${videoMode === VideoMode.WATCH ? 'active' : ''}`}
+          onClick={() => setVideoMode(VideoMode.WATCH)}
+        >
+          观看模式
+        </button>
+        <button 
+          className={`mode-button ${videoMode === VideoMode.STUDY ? 'active' : ''}`}
+          onClick={() => setVideoMode(VideoMode.STUDY)}
+        >
+          学习模式
+        </button>
+        <div className="mode-help">
+        <span className="help-icon material-icons">help_outline</span>
+        <div className="tooltip">
+          <div className="tooltip-content">
+            <strong>观看模式:</strong> 大屏幕观看<br/>
+            <strong>学习模式:</strong> 播放器缩小，实时AI讲解语法<br/>
+          </div>
+        </div>
+      </div>
+      </div>
 
       <div className="video-input-container">
 
@@ -264,7 +295,7 @@ const VideoPlayer = () => {
       </div>
 
       <div 
-        className={`video-player-container ${!showControls ? 'hide-controls' : ''}`}
+        className={`video-player-container ${videoMode} ${!showControls ? 'hide-controls' : ''}`}
         ref={playerRef}
         onMouseMove={handlePlayerMouseMove}
         onMouseLeave={handlePlayerMouseLeave}
@@ -336,7 +367,7 @@ const VideoPlayer = () => {
         {!videoUrl && (
           <div className="video-placeholder">
             <span className="material-icons">movie</span>
-            <p>请输入视频URL并点击加载</p>
+            <p>请选择本地文件播放</p>
           </div>
         )}
       </div>

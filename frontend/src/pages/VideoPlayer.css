@@ -161,6 +161,37 @@
   font-size: 14px;
 }
 
+.mode-selector {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.mode-button {
+  padding: 10px 20px;
+  border: 2px solid #4a90e2;
+  background-color: transparent;
+  color: #4a90e2;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.mode-button:hover {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.mode-button.active {
+  background-color: #4a90e2;
+  color: white;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
+
 .video-player-container {
   position: relative;
   width: 100%;
@@ -170,6 +201,35 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   aspect-ratio: 16 / 9;
   margin-bottom: 30px;
+}
+
+.video-player-container.watch {
+  width: 100%;
+  margin: 0 auto 30px auto;
+}
+
+.video-player-container.study {
+  width: 60%;
+  margin: 0 0 30px 0;
+}
+
+/* tablet */
+@media (max-width: 1024px) {
+  .video-player-container.study {
+    width: 70%; 
+  }
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .video-player-container.study {
+    width: 85%; 
+  }
+  
+  .mode-button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
 }
 
 .video-player-container video {
@@ -327,4 +387,73 @@
   .volume-container {
     width: 100px;
   }
+}
+
+/* Help icon container */
+.mode-help {
+  position: relative;
+  margin-left: 5px;
+}
+
+.help-icon {
+  font-size: 20px;
+  color: #6c757d;
+  cursor: help;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help-icon:hover {
+  color: #4a90e2;
+  background-color: rgba(74, 144, 226, 0.1);
+  transform: scale(1.1);
+}
+
+/* Tooltip styling */
+.tooltip {
+  width: 250px;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.mode-help:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+.tooltip-content {
+  background-color: #2c3e50;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  max-width: 300px;
+  white-space: normal; /* Allow text wrapping for longer content */
+}
+
+/* Tooltip arrow */
+.tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #2c3e50;
 }
