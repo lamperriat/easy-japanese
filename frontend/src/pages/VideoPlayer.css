@@ -367,6 +367,40 @@
   color: #333;
 }
 
+.advance-settings {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.advance-settings button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.advance-settings input {
+  width: 30%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.advance-settings ul {
+  padding-left: 20px;
+}
+
+.advance-settings li {
+  margin-bottom: 10px;
+}
+
 .video-info ul {
   padding-left: 20px;
 }

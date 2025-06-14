@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './VideoPlayer.css';
 import subParse from '../components/SubParser/SubParser';
 
+
 const VideoMode = {
   WATCH: 'watch',
   STUDY: 'study',
@@ -22,7 +23,12 @@ const VideoPlayer = () => {
   const [videoMode, setVideoMode] = useState(VideoMode.WATCH);
   const [subtitleUrl, setSubtitleUrl] = useState('');
   const [subtitleFileName, setSubtitleFileName] = useState('');
+  const [curSubtitleLineIndex, setCurSubtitleLineIndex] = useState(0);
   const [assLines, setAssLines] = useState([]);
+
+  // settings
+  const [subtitleTimeOffset, setSubtitleTimeOffset] = useState(0);
+  const [dictUrl, setDictUrl] = useState('https://www.youdao.com/result?word={}&lang=ja');
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -97,6 +103,11 @@ const VideoPlayer = () => {
 
   const handleTimeUpdate = () => {
     setCurrentTime(videoRef.current.currentTime);
+    while (assLines[curSubtitleLineIndex] && 
+           assLines[curSubtitleLineIndex].end < videoRef.current.currentTime + subtitleTimeOffset) {
+      // Update current subtitle line index
+      setCurSubtitleLineIndex(curSubtitleLineIndex + 1);
+    }
   };
 
   const handleDurationChange = () => {
@@ -420,6 +431,8 @@ const VideoPlayer = () => {
         )}
       </div>
 
+
+
       <div className="video-info">
         <h3>使用说明:</h3>
         <ul>
@@ -427,6 +440,44 @@ const VideoPlayer = () => {
           <li>按空格暂停/继续</li>
           <li>用左右箭头键快进/快退(5s)</li>
         </ul>
+      </div>
+
+      <div className="advance-settings">
+        <h3>高级设置:</h3>
+        <ul>
+          <li>字幕时间轴基准: 
+            <input
+              type="number"
+              style={{ width: '60px' }}
+              value={0}
+              onChange={(e) => {
+                setSubtitleTimeOffset(parseFloat(e.target.value));
+              }}
+            ></input>
+
+            (用于对齐视频与字幕，单位：秒)
+          </li>
+          <li>词典URL:
+            <input
+              type="text"
+              value={dictUrl}
+              onChange={(e) => setDictUrl(e.target.value)}
+              placeholder="https://www.youdao.com/result?word={}&lang=ja"
+            ></input>
+            (用于查询，使用{"{}"}作为单词的占位符。请注意：不同词典的HTML结构不同，不一定有效，最好通过插件形式实现其他词典的查询)
+
+
+          </li>
+
+        </ul>
+        {/* <button onClick={() => {
+          fetchDOM(dictUrl.replace('{}',　'私'))
+            .then(data => {
+              console.log(data);
+          }) 
+        }}>
+          test
+        </button> */}
       </div>
     </div>
   );
