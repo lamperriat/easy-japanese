@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './VideoPlayer.css';
+import subParse from '../components/SubParser/SubParser';
 
 const VideoMode = {
   WATCH: 'watch',
@@ -19,6 +20,9 @@ const VideoPlayer = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [videoMode, setVideoMode] = useState(VideoMode.WATCH);
+  const [subtitleUrl, setSubtitleUrl] = useState('');
+  const [subtitleFileName, setSubtitleFileName] = useState('');
+  const [assLines, setAssLines] = useState([]);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -47,6 +51,31 @@ const VideoPlayer = () => {
       }, 500);
     }
   };
+
+  const handleSubtitleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // const isValidSubtitle = fileName.endsWith('.ass') || fileName.endsWith('.srt');
+      const isValidSubtitle = file.name.endsWith('.ass') || file.name.endsWith('.ASS');
+      if (!isValidSubtitle) {
+        setErrorMessage('请选择有效的字幕文件 (暂时只支持.ass 未来将支持.srt)');
+        setTimeout(() => setErrorMessage(''), 3000);
+        return;
+      }
+      setSubtitleFileName(file.name);
+      // Process valid subtitle file
+      const url = URL.createObjectURL(file);
+      setSubtitleUrl(url);
+    
+      subParse(url, ".ass").then(parsed => {
+        setErrorMessage(`已选择字幕文件: ${file.name}`);
+        setTimeout(() => setErrorMessage(''), 3000);
+        setAssLines(parsed);
+      })
+
+    }
+  }
+
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const hideControlsTimeout = useRef(null);
@@ -134,6 +163,7 @@ const VideoPlayer = () => {
       case 'ArrowLeft':
         // Go back 5 seconds
         videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 5);
+        // console.log('Current time after rewind:', videoRef.current.currentTime);
         setCurrentTime(videoRef.current.currentTime);
         
         // Show visual feedback
@@ -158,8 +188,13 @@ const VideoPlayer = () => {
   }, [videoUrl, duration, togglePlay]);
 
   const formatTime = (timeInSeconds) => {
+    const hours = Math.floor(timeInSeconds / 3600);
+    timeInSeconds %= 3600;
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = Math.floor(timeInSeconds % 60);
+    if (hours > 0) {
+      return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
@@ -270,7 +305,7 @@ const VideoPlayer = () => {
       <div className="video-input-container">
 
         <div className="file-input-section">
-          <p>选择本地文件：</p>
+          <p>选择本地视频文件：</p>
           <div className="custom-file-input">
             <input 
               type="file" 
@@ -286,12 +321,25 @@ const VideoPlayer = () => {
             </label>
           </div>
         </div>
-        
-        {errorMessage && (
-          <div className={`message ${errorMessage.includes('已选择') ? 'success-message' : 'error-message'}`}>
-            {errorMessage}
+
+        <div className="file-input-section">
+          <p>选择本地字幕文件：</p>
+          <div className="custom-file-input">
+            <input
+              type="file"
+              id="subtitle-file"
+              accept="*"
+              onChange={handleSubtitleFileSelect}
+              className="file-input"
+            />
+            <label htmlFor="subtitle-file"
+              className={`file-input-label ${assLines.length > 0 ? 'has-file' : ''}`}>
+              <span className="material-icons">upload_file</span>
+              {assLines.length > 0 ? subtitleFileName : "选择字幕文件"}
+            </label>
           </div>
-        )}
+        </div>
+
       </div>
 
       <div 
