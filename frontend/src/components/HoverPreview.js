@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from "react";
-
+import "./HoverPreview.css";
 const HoverPreview = (
   {text, fGetContent} 
 ) => {

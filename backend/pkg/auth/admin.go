@@ -136,11 +136,7 @@ func GenerateApiKey(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(500, models.ErrorMsg{Error: err.Error()})
 			return
 		}
-		keyHash, err := SafeHash(newKey)
-		if err != nil {
-			c.JSON(500, models.ErrorMsg{Error: err.Error()})
-			return
-		}
+		keyHash := Sha256hex(newKey)
 		apiKey := models.ApiKey{
 			KeyHash: keyHash, 
 		}
@@ -169,11 +165,7 @@ func DeleteApiKey(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(400, models.ErrorMsg{Error: "Invalid JSON"})
 			return
 		}
-		keyHash, err := SafeHash(apiKey.Key)
-		if err != nil {
-			c.JSON(500, models.ErrorMsg{Error: err.Error()})
-			return
-		}
+		keyHash := Sha256hex(apiKey.Key)
 
 		if err := db.Where("key_hash = ?", keyHash).Delete(&models.ApiKey{}).Error; err != nil {
 			c.JSON(500, models.ErrorMsg{Error: err.Error()})
@@ -189,12 +181,11 @@ func ValidateApiKey(db *gorm.DB, apiKey string) (bool, error) {
 		return false, nil
 	}
 	var count int64
-	keyHash, err := SafeHash(apiKey)
-	if err != nil {
-		return false, fmt.Errorf("failed to hash API key: %w", err)
-	}
+	keyHash := Sha256hex(apiKey)
+
 	if err := db.Model(&models.ApiKey{}).Where("key_hash = ?", keyHash).Count(&count).Error; err != nil {
 		return false, fmt.Errorf("failed to validate API key: %w", err)
 	}
+	println(count)
 	return count > 0, nil
 }

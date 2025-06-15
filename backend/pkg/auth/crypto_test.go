@@ -1,8 +1,9 @@
 package auth_test
 
 import (
-	"testing"
 	"backend/pkg/auth"
+	"testing"
+
 )
 
 func TestSha256hex(t *testing.T) {
@@ -12,4 +13,9 @@ func TestSha256hex(t *testing.T) {
 	if got != wanted {
 		t.Errorf("Sha256hex(%q) = %q; want %q", s, got, wanted)
 	}
+}
+
+func TestSafeHash(t *testing.T) {
+	s := "TEST_USE_API_KEY"
+	println(auth.SafeHash(s))
 }

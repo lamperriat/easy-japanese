@@ -26,7 +26,7 @@ func APIKeyValidate(apiKey string) bool {
 
 func APIKeyAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		providedKey := c.GetHeader("X-API-Key")
+		providedKey := c.GetHeader("X-API-KEY")
 		if providedKey == "" {
 			c.AbortWithStatusJSON(401, gin.H{"error": "API Key Required"})
 			return
@@ -46,7 +46,7 @@ func JWTAuth() gin.HandlerFunc {
 		token := c.GetHeader("Authorization")
 		claims, err := ParseJwt(token)
 		if err != nil {
-			logger.Errorf("JWTAuth: Error parsing token: %v", false, err)
+			logger.Errorf("JWTAuth: Error parsing token: %v", err)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token parse error"})
 			return
 		}

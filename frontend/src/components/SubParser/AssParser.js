@@ -85,9 +85,9 @@ export default async function assParse(fileUrl) {
         const parts = line.split(',');
         const start_str = parts[1].trim();
         const end_str = parts[2].trim();
-        const text = parts[parts.length - 1].trim();
+        const text = parts.slice(9).join(',').trim(); // Join the rest as text
         // text may have content `{some useless stuff...}`, clear it
-        const cleanedText = text.replace(/\{.*?\}/g, '').trim();
+        const cleanedText = text.replace(/{([^{}]*|{[^{}]*})*}/g, '').trim();
         if (cleanedText === '') {
           return; // skip empty text
         }

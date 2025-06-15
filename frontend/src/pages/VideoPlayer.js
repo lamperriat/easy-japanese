@@ -25,10 +25,15 @@ const VideoPlayer = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [videoMode, setVideoMode] = useState(VideoMode.WATCH);
   const [subtitleUrl, setSubtitleUrl] = useState('');
+  const rSubtitleLn = useRef(0);
   const [subtitleFileName, setSubtitleFileName] = useState('');
   const [curSubtitleLineIndex, setCurSubtitleLineIndex] = useState(0);
   const [assLines, setAssLines] = useState([]);
   const [notification, setNotification] = useState({ show: false, message: '', type: '' });
+
+  const [prevJPLine, setPrevJPLine] = useState('');
+  const [curJPLine, setCurJPLine] = useState('');
+  const [nextJPLine, setNextJPLine] = useState('');
 
   // settings
   const [subtitleTimeOffset, setSubtitleTimeOffset] = useState(0);
@@ -60,6 +65,7 @@ const VideoPlayer = () => {
       if (response.ok && data && data.tokens) {
         return data.tokens;
       }
+      console.log(data.error || 'Unknown error');
       return [];
     } catch (error) {
       console.error("Error fetching tokenized string:", error);
@@ -92,16 +98,7 @@ const VideoPlayer = () => {
     try {
       return await DictSearch(word, token);
     } catch (error) {
-      console.error("Error fetching HTML:", error);
-      setNotification({
-        show: true,
-        message: '网络请求失败',
-        type: 'error'
-      });
-      setTimeout(() => {
-        setNotification({ show: false, message: '', type: '' });
-      }, 3000);
-      return '';
+      return '无法找到内容，可能是网络原因，或查找的不是常规单词';
     }
   }
 
@@ -175,15 +172,53 @@ const VideoPlayer = () => {
     
     setIsPlaying(!isPlaying);
   }, [isPlaying]);
-
+  useEffect(() => {
+    if (curSubtitleLineIndex > 0) {
+      renderJPSubtitles(curSubtitleLineIndex - 1, setPrevJPLine);
+    }
+    renderJPSubtitles(curSubtitleLineIndex, setCurJPLine);
+    if (curSubtitleLineIndex < assLines.length - 1) {
+      renderJPSubtitles(curSubtitleLineIndex + 1, setNextJPLine);
+    }
+    console.log(assLines);
+    cache.current = {};
+  }, [assLines]);
   const handleTimeUpdate = () => {
     setCurrentTime(videoRef.current.currentTime);
-    while (assLines[curSubtitleLineIndex] && 
-           assLines[curSubtitleLineIndex].end < videoRef.current.currentTime + subtitleTimeOffset) {
+    let idx = rSubtitleLn.current;
+    // console.log("Current time:", videoRef.current.currentTime);
+    // console.log(`idx: ${idx} subtitle end time:`, assLines[idx]);
+    while ( (idx < assLines.length - 1) && assLines[idx] && 
+           (assLines[idx].end < +videoRef.current.currentTime + subtitleTimeOffset)) {
       // Update current subtitle line index
-      setCurSubtitleLineIndex(curSubtitleLineIndex + 1);
+      // console.log(
+      //   `Updating subtitle line index: 
+      //   ${curSubtitleLineIndex} -> ${curSubtitleLineIndex + 1}, 
+      //   current time: ${videoRef.current.currentTime}, 
+      //   offset: ${subtitleTimeOffset}`
+      // )
+      idx++;
     }
+    if (idx > rSubtitleLn.current) {
+      rSubtitleLn.current = idx;
+      if (idx > 0) {
+        renderJPSubtitles(idx - 1, setPrevJPLine);
+      }
+      renderJPSubtitles(idx, setCurJPLine);
+      if (idx < assLines.length - 1) {
+        renderJPSubtitles(idx + 1, setNextJPLine);
+      }
+    }
+    setCurSubtitleLineIndex(idx);
+
   };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      handleTimeUpdate();
+    }, 100);
+    return () => clearInterval(intervalId);
+  }, [assLines])
 
   const handleDurationChange = () => {
     setDuration(videoRef.current.duration);
@@ -357,6 +392,69 @@ const VideoPlayer = () => {
     };
   }, [duration, videoUrl, handleKeyDown]); 
   // window.addEventListener('keydown', handleKeyDown);
+
+  // cached:
+  const cache = useRef({});
+  function renderJPSubtitles(idx, setter) {
+    if (idx < 0 || idx >= assLines.length) return null;
+    if (cache.current[idx]) {
+      const cached = cache.current[idx];
+      if (cached.setters.has(setter)) {
+        return;
+      }
+      setter(cached.content);
+      cached.setters.add(setter);
+      return;
+    } 
+    cache.current[idx] = {
+      content: null,
+      setters: new Set([setter])
+    };
+    const cacheEntry = cache.current[idx];
+    const line = assLines[idx];
+    GetTokenizedString(line.jp_text).then(
+      tokens => {
+        let content;
+        if (!tokens || tokens.length === 0) {
+          console.log("Get tokens failed.")
+          content = (<span>{line.jp_text || "null"}</span>);
+        } else {
+          console.log("Get tokens success:", tokens);
+          content = (
+            tokens.map((token, i) => (
+              <HoverPreview
+                key={`jp-token-${i}`}
+                text={token}
+                fGetContent={GetHTMLStringProxy}
+              />
+            ))
+          )
+        }
+        cacheEntry.content = content;
+        setter(content);
+
+      }
+    );
+  }
+  
+  function renderCNSubtitles(idx) {
+    if (idx < 0 || idx >= assLines.length) return null;
+    const line = assLines[idx];
+    return (
+      <span>{ line.cn_text }</span>
+    )
+  }
+
+  // useEffect(() => {
+  //   if (curSubtitleLineIndex > 0) {
+  //     renderJPSubtitles(curSubtitleLineIndex - 1, setPrevJPLine);
+  //   }
+  //   renderJPSubtitles(curSubtitleLineIndex, setCurJPLine);
+  //   if (curSubtitleLineIndex < assLines.length - 1) {
+  //     renderJPSubtitles(curSubtitleLineIndex + 1, setNextJPLine);
+  //   }
+  // }, [curSubtitleLineIndex, assLines]);
+
   return (
     <div className="video-player-page">
       <header className="video-header">
@@ -427,7 +525,7 @@ const VideoPlayer = () => {
         </div>
 
       </div>
-
+      <div className='study-layout'>
       <div 
         className={`video-player-container ${videoMode} ${!showControls ? 'hide-controls' : ''}`}
         ref={playerRef}
@@ -439,7 +537,6 @@ const VideoPlayer = () => {
         <video
           ref={videoRef}
           src={videoUrl}
-          onTimeUpdate={handleTimeUpdate}
           onDurationChange={handleDurationChange}
           onEnded={handleVideoEnd}
           onClick={togglePlay}
@@ -505,6 +602,47 @@ const VideoPlayer = () => {
           </div>
         )}
       </div>
+      {videoMode === VideoMode.STUDY && (
+        <div className='subtitle-display'>
+          <div className='subtitle-block'>
+            <div className='japanese-block'>
+              {curSubtitleLineIndex > 0 && (
+                <div className='subtitle prev'>
+                  {prevJPLine}
+                </div>
+              )}
+              <div className='subtitle current'>
+                {curJPLine}
+              </div>
+              {curSubtitleLineIndex < assLines.length - 1 && (
+                <div className='subtitle next'>
+                  {nextJPLine}
+                </div>
+              )}
+            </div>
+
+
+          </div>
+          <div className='subtitle-block'>
+            <div className='chinese-block'>
+              {curSubtitleLineIndex > 0 && (
+                <div className='subtitle prev'>
+                  {renderCNSubtitles(curSubtitleLineIndex - 1)}
+                </div>
+              )}
+              <div className='subtitle current'>
+                {renderCNSubtitles(curSubtitleLineIndex)}
+              </div>
+              {curSubtitleLineIndex < assLines.length - 1 && (
+                <div className='subtitle next'>
+                  {renderCNSubtitles(curSubtitleLineIndex + 1)}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        )}
+        </div>
 
 
 
@@ -530,12 +668,13 @@ const VideoPlayer = () => {
               }}
             ></input>
 
-            (用于对齐视频与字幕，单位：秒)
+            (用于对齐视频与字幕，可以输入负值和小数，单位：秒)
           </li>
           <li>词典URL:
             <input
               type="text"
               value={dictUrl}
+              disabled={true}
               onChange={(e) => setDictUrl(e.target.value)}
               placeholder="https://dict.youdao.com/result?word={}&lang=ja"
             ></input>

@@ -1,0 +1,12 @@
+.hover-trigger {
+  background-color: transparent;
+  border-radius: 3px;
+  padding: 2px;
+  font-size: 18px;
+  transition: background-color 0.5s ease;
+}
+
+.hover-trigger:hover {
+  background-color: rgba(0,0,0,0.1);
+  transition: background-color 0.5s ease;
+}

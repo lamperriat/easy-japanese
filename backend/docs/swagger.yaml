@@ -309,7 +309,7 @@ paths:
       parameters:
       - description: API Key
         in: header
-        name: X-API-Key
+        name: X-API-KEY
         required: true
         type: string
       produces:

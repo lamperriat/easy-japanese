@@ -151,7 +151,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "API Key",
-                        "name": "X-API-Key",
+                        "name": "X-API-KEY",
                         "in": "header",
                         "required": true
                     }

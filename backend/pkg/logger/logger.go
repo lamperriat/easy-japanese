@@ -67,16 +67,20 @@ func Warningf(message string, args ...interface{}) {
 	fmt.Printf("[WARNING] %s: %s\n", time.Now().Format(time.DateTime), formatted)
 }
 
-// Error level log
-func Errorf(message string, trace bool, args ...interface{}) {
+func Errorf(message string, args ...interface{}) {
 	if logLevel > ERROR {
 		return
 	}
 	formatted := fmt.Sprintf(message, args...)
-	if !trace {
-		fmt.Printf("[ERROR] %s: %s\n", time.Now().Format(time.DateTime), formatted)
+	fmt.Printf("[ERROR] %s: %s\n", time.Now().Format(time.DateTime), formatted)
+}
+
+// Error level log with trace
+func Errort_f(message string, args ...interface{}) {
+	if logLevel > ERROR {
 		return
 	}
+	formatted := fmt.Sprintf(message, args...)
 	pc, file, line, ok := runtime.Caller(1)
 	if !ok {
 		fmt.Printf("[ERROR] %s: %s\n", time.Now().Format(time.DateTime), formatted)

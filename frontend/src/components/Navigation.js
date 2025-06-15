@@ -12,12 +12,12 @@ export default function Navigation() {
   const handleAuthSubmit = async (username, apikey) => {
     try {
       let token;
-      {
-        const response = await fetch(`${API_BASE_URL}/api/auth/token`, {
+
+      let response = await fetch(`${API_BASE_URL}/api/auth/token`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-API-Key': apikey
+            'X-API-KEY': apikey
           },
           body: JSON.stringify({ username: username })
         });
@@ -28,12 +28,13 @@ export default function Navigation() {
             message: `提交失败: ${errorData.error || '未知错误'}`,
             type: 'error'
           });
+          return;
         }
         const data = await response.json();
         token = data.token;
         sessionStorage.setItem('token', token);
-      }
-      const response = await fetch(`${API_BASE_URL}/api/user/register`, {
+
+      response = await fetch(`${API_BASE_URL}/api/user/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

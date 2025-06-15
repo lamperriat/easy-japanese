@@ -38,7 +38,7 @@ func TestUserOps(t *testing.T) {
 	var token string
 	t.Run("GetToken", func(t *testing.T) {
 		req, err := http.NewRequest("POST", "/api/auth/token", nil)
-		req.Header.Set("X-API-Key", apikey)
+		req.Header.Set("X-API-KEY", apikey)
 		if err != nil {
 			t.Fatalf("Failed to create request: %v", err)
 		}
@@ -156,7 +156,7 @@ func TestUserOps(t *testing.T) {
 	// 		t.Fatalf("Failed to create request: %v", err)
 	// 	}
 	// 	req.Header.Set("Content-Type", "application/json")
-	// 	req.Header.Set("X-API-Key", new_apikey)
+	// 	req.Header.Set("X-API-KEY", new_apikey)
 
 	// 	rr := httptest.NewRecorder()
 	// 	router.ServeHTTP(rr, req)
