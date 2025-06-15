@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"backend/pkg/logger"
 	"net/http"
 	"os"
 	"strings"
@@ -45,6 +46,7 @@ func JWTAuth() gin.HandlerFunc {
 		token := c.GetHeader("Authorization")
 		claims, err := ParseJwt(token)
 		if err != nil {
+			logger.Errorf("JWTAuth: Error parsing token: %v", false, err)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token parse error"})
 			return
 		}

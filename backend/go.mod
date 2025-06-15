@@ -25,6 +25,9 @@ require (
 	github.com/go-playground/validator/v10 v10.25.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
+	github.com/ikawaha/kagome-dict v1.1.6 // indirect
+	github.com/ikawaha/kagome-dict/ipa v1.2.5 // indirect
+	github.com/ikawaha/kagome/v2 v2.10.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect

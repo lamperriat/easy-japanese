@@ -11,10 +11,8 @@ export default function Navigation() {
 
   const handleAuthSubmit = async (username, apikey) => {
     try {
-      var token = sessionStorage.getItem('token');
-      if (!token) {
-        console.log('Token not found, requesting new token...');
-        console.log('API Key:', apikey);
+      let token;
+      {
         const response = await fetch(`${API_BASE_URL}/api/auth/token`, {
           method: 'POST',
           headers: {

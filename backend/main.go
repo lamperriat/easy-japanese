@@ -7,9 +7,12 @@ import (
 	"backend/pkg/handlers/authmid"
 	"backend/pkg/handlers/editor"
 	"backend/pkg/handlers/reviewer"
+	"backend/pkg/handlers/subtitles"
 	"backend/pkg/handlers/user"
 	"backend/pkg/proxy"
 
+	"github.com/ikawaha/kagome-dict/ipa"
+	"github.com/ikawaha/kagome/v2/tokenizer"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -41,6 +44,10 @@ func main() {
 	wordHandler := editor.NewWordHandler(db)
 	userHandler := user.NewUserHandler(db)
 	reviewHandler := reviewer.NewReviewHandler(db)
+	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
+	if err != nil {
+		panic(err)
+	}
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},
@@ -52,6 +59,7 @@ func main() {
 	// r.GET("/api/random", auth.APIKeyAuth(), editor.GetRandomNumber)
 	r.POST("/api/auth/token", authmid.GetToken(db))
 	r.POST("/api/proxy", auth.JWTAuth(), proxy.CORSProxy())
+	r.POST("/api/subtitles/tokenize", auth.JWTAuth(), subtitles.TokenizeSentence(t))
 	adminGroup := r.Group("/api/admin", auth.AdminAuth(db))
 	{
 		adminGroup.POST("/account/create", auth.CreateAdminAccount(db))

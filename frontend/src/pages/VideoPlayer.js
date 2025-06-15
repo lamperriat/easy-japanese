@@ -34,6 +34,47 @@ const VideoPlayer = () => {
   const [subtitleTimeOffset, setSubtitleTimeOffset] = useState(0);
   const [dictUrl, setDictUrl] = useState('https://dict.youdao.com/result?word={}&lang=ja');
 
+  async function GetTokenizedString(sentence) {
+    var token = sessionStorage.getItem('token');
+    if (!token) {
+      setNotification({
+        show: true,
+        message: '请先登录',
+        type: 'error'
+      });
+      setTimeout(() => {
+        setNotification({ show: false, message: '', type: '' });
+      }, 3000);
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/subtitles/tokenize`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: JSON.stringify({ text: sentence })
+      });
+      const data = await response.json();
+      if (response.ok && data && data.tokens) {
+        return data.tokens;
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching tokenized string:", error);
+      setNotification({
+        show: true,
+        message: '网络请求失败',
+        type: 'error'
+      });
+      setTimeout(() => {
+        setNotification({ show: false, message: '', type: '' });
+      }, 3000);
+      return '';
+    }
+    
+  }
 
   async function GetHTMLStringProxy(word) {
     var token = sessionStorage.getItem('token');
@@ -505,9 +546,9 @@ const VideoPlayer = () => {
 
         </ul>
         <button onClick={() => {
-          GetHTMLStringProxy(dictUrl.replace('{}', encodeURIComponent('私'))).then(html => {
-            console.log(dictUrl.replace('{}', encodeURIComponent('私')));
-          })
+          GetTokenizedString("私は学生です").then(
+            tokens => console.log(tokens)
+          )
         }}>
           test
         </button>
